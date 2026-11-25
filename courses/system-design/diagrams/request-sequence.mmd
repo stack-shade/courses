@@ -1,0 +1,14 @@
+sequenceDiagram
+  participant U as User
+  participant C as Client
+  participant E as Edge
+  participant A as API
+  participant D as Database
+  U->>C: Action
+  C->>E: HTTPS request
+  E->>A: Forward cache miss
+  A->>D: Query / transaction
+  D-->>A: Result
+  A-->>E: Response
+  E-->>C: HTTP response
+  C-->>U: Render result

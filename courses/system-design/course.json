@@ -1,0 +1,30 @@
+{
+  "slug": "system-design",
+  "title": "System Design: Beginner to Advanced",
+  "description": "A practical path from system-design fundamentals and capacity estimation to distributed systems, reliability and complete architecture design.",
+  "level": "Beginner to Advanced",
+  "status": "in-progress",
+  "category": "Software Engineering",
+  "prerequisites": [
+    "Basic programming",
+    "HTTP and database familiarity are helpful but not required"
+  ],
+  "topics": [
+    "requirements",
+    "capacity-estimation",
+    "networking",
+    "apis",
+    "databases",
+    "caching",
+    "messaging",
+    "distributed-systems",
+    "reliability",
+    "architecture"
+  ],
+  "youtube": {
+    "channel": "https://www.youtube.com/@StackShade",
+    "playlist": null,
+    "videos": []
+  },
+  "entrypoint": "README.md"
+}

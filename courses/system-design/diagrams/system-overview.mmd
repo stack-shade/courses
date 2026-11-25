@@ -1,0 +1,14 @@
+flowchart TB
+  User[User] --> Client[Web / mobile client]
+  Client --> Edge[DNS / CDN / edge protection]
+  Edge --> LB[Load balancer / reverse proxy]
+  LB --> App[Application instances]
+  App --> DB[(Primary database)]
+  App --> Cache[(Cache)]
+  App --> Queue[Queue / event stream]
+  Queue --> Worker[Background workers]
+  Worker --> DB
+  Worker --> Search[(Search / analytics)]
+  Obs[Logs / metrics / traces] -. observe .-> Edge
+  Obs -. observe .-> App
+  Obs -. observe .-> DB

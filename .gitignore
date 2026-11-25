@@ -1,0 +1,26 @@
+# Dependencies and build caches
+node_modules/
+.pnpm-store/
+.next/
+out/
+dist/
+coverage/
+.turbo/
+.cache/
+
+# Generated presentation exports and local media captures
+courses/*/downloads/*.pptx
+courses/*/downloads/*.pdf
+courses/*/downloads/*.zip
+*.webm
+*.mp4
+*.mov
+
+# Local environment and editor files
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

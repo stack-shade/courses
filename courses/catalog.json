@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "channel": {
+    "name": "StackShade",
+    "youtube": "https://www.youtube.com/@StackShade"
+  },
+  "courses": [
+    {
+      "slug": "system-design",
+      "title": "System Design: Beginner to Advanced",
+      "description": "A practical path from system-design fundamentals and capacity estimation to distributed systems, reliability and complete architecture design.",
+      "level": "Beginner to Advanced",
+      "status": "in-progress",
+      "category": "Software Engineering",
+      "path": "courses/system-design/README.md",
+      "topics": [
+        "architecture",
+        "scalability",
+        "databases",
+        "distributed-systems",
+        "reliability"
+      ]
+    }
+  ]
+}
