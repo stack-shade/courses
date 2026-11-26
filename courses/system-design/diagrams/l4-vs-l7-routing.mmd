@@ -1,0 +1,9 @@
+flowchart TB
+  U([Client Request]) -->|TCP 443 + Encrypted HTTP| LB{Load Balancer Mode}
+  LB -->|L4 Transport Mode| L4[Inspects IP + Port only]
+  L4 -->|Forwards TCP packets / NAT| B1[Backend Pool A]
+  L4 -->|Low CPU, TLS pass-through| B2[Backend Pool B]
+  LB -->|L7 Application Mode| L7[Terminates TLS & Parses HTTP]
+  L7 -->|Path /api/v1/orders| O[Order Service]
+  L7 -->|Header X-Canary: true| CAN[Canary Service]
+  L7 -->|Static /assets/*| CDN{{Edge / Static Cache}}

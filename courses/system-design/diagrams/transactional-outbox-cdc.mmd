@@ -1,0 +1,8 @@
+flowchart LR
+  API[Order Service] -->|Single ACID BEGIN..COMMIT| DB[(Primary DB)]
+  DB -->|Row insert| T1[(orders table)]
+  DB -->|Row insert| T2[(outbox_events table)]
+  DB ==>|WAL stream| CDC[CDC Relay / Debezium]
+  CDC -.->|Publish at-least-once| Q[/Event Stream: orders.v1/]
+  Q -.->|Offset commit + dedupe| W[Notification / Billing Worker]
+  W --> WDB[(Worker Idempotency Store)]

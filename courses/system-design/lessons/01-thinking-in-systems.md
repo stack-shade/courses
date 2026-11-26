@@ -1,6 +1,34 @@
+---
+id: "01"
+module: "00"
+title: "Thinking in Systems"
+level: "Beginner"
+status: "draft"
+durationMinutes: 15
+prerequisites: []
+objectives:
+  - "Explain what system design covers and what it does not"
+  - "Decompose a product into users, interfaces, services, data stores and external dependencies"
+  - "Distinguish a requirement from a proposed implementation"
+  - "Explain at least one trade-off in a design"
+slides: "../slides/01-course-kickoff.md"
+downloadHtml: "../downloads/01-course-kickoff.html"
+diagrams:
+  - "../diagrams/system-overview.mmd"
+animations:
+  - "anim-request-layers"
+youtube:
+  videoId: null
+  publishedAt: null
+  chapters: []
+  transcriptUrl: null
+---
+
 # 01 · Thinking in Systems
 
 **Level:** Beginner · **Status:** First draft · **Prerequisites:** Basic programming and web-app familiarity
+
+> **Slides & Visuals:** [Course Kickoff Deck](../slides/01-course-kickoff.md) · Diagram: [system-overview.mmd](../diagrams/system-overview.mmd) · Interactive visual: `anim-request-layers` ([catalog](../animations-and-visuals.md)) · Downloads: [downloads guide](../downloads/README.md)
 
 ## Learning objectives
 

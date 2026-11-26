@@ -1,0 +1,16 @@
+sequenceDiagram
+  participant C1 as ([Client 1..100])
+  participant API as [API + Singleflight]
+  participant R as {{Redis Cache}}
+  participant DB as [(Primary DB)]
+
+  Note over R: Hot key "product:42" expires at t=0
+  C1->>API: 100 concurrent GET /products/42
+  API->>R: GET product:42
+  R-->>API: 100 cache misses
+  Note over API: Singleflight groups 100 misses by key "product:42"
+  API->>DB: 1 leader SELECT * FROM products WHERE id=42
+  Note over API: 99 follower callers await the in-flight Future
+  DB-->>API: Row returned (18 ms)
+  API->>R: SET product:42 (TTL = 300s + jitter)
+  API-->>C1: Broadcast same response to all 100 callers

@@ -1,0 +1,18 @@
+sequenceDiagram
+  participant T1 as Tx1 (Doctor A)
+  participant T2 as Tx2 (Doctor B)
+  participant DB as [(Primary DB · Snapshot Isolation)]
+
+  Note over DB: Shift requires >= 1 doctor on call (A=on, B=on)
+  T1->>DB: BEGIN REPEATABLE READ (Snapshot t=10)
+  T2->>DB: BEGIN REPEATABLE READ (Snapshot t=10)
+  T1->>DB: SELECT count(*) WHERE on_call = true
+  DB-->>T1: Returns 2 (sees A and B)
+  T2->>DB: SELECT count(*) WHERE on_call = true
+  DB-->>T2: Returns 2 (sees A and B)
+  T1->>DB: UPDATE doctors SET on_call = false WHERE id = 'A'
+  T2->>DB: UPDATE doctors SET on_call = false WHERE id = 'B'
+  T1->>DB: COMMIT
+  DB-->>T1: OK (t=11, disjoint row)
+  T2->>DB: COMMIT
+  DB-->>T2: OK (t=12, disjoint row -> Write Skew: 0 doctors on call!)

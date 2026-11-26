@@ -1,0 +1,8 @@
+flowchart LR
+  U([DAU & Actions/User]) -->|Multiply| D[Daily Requests]
+  D -->|Divide by 86,400 s| AVG[Average QPS]
+  AVG -->|Multiply by Peak Factor| PEAK[Peak QPS]
+  PEAK -->|Little's Law L = λW| APP[App Concurrency & Pods]
+  PEAK -->|Hit Ratio & Payload| CACHE{{Cache Memory & Network}}
+  PEAK -->|Write QPS × Retention| DB[(Storage & Disk IOPS)]
+  PEAK -->|Response Bytes/s| NET[Egress Bandwidth Gbps]

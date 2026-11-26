@@ -1,0 +1,11 @@
+flowchart LR
+  K([Client Write / Read Key]) -->|Hash key mod 2^32| R[Consistent Hash Ring]
+  R -->|Walk clockwise to next vnode| V1[VNode A1: 0x1A00]
+  R -->|Walk clockwise to next vnode| V2[VNode B1: 0x5C00]
+  R -->|Walk clockwise to next vnode| V3[VNode A2: 0x9E00]
+  R -->|Walk clockwise to next vnode| V4[VNode C1: 0xD200]
+  V1 --> N1[(Physical Shard A)]
+  V3 --> N1
+  V2 --> N2[(Physical Shard B)]
+  V4 --> N3[(Physical Shard C)]
+  M[Ring Membership / Gossip] -.->|Only 1/N keys move on add/remove| R

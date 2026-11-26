@@ -1,0 +1,1490 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>35 · System Security, Identity &amp; Abuse Prevention · StackShade Slides</title>
+  <style>
+    :root {
+      --bg:#ffffff;--surface:#f8fafc;--ink:#0f172a;--ink-muted:#475569;--border:#e2e8f0;
+      --accent:#4f46e5;--accent-ink:#ffffff;--status-ok:#15803d;--status-warn:#b45309;--status-err:#b91c1c;
+      --font-sans:"Inter",system-ui,-apple-system,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+      --radius:6px;--ease-out:cubic-bezier(0.2,0.8,0.2,1);
+    }
+    [data-theme="dark"] {
+      --bg:#0f141d;--surface:#161c28;--ink:#f1f5f9;--ink-muted:#94a3b8;--border:#252f42;
+      --accent:#a3e635;--accent-ink:#0f141d;--status-ok:#4ade80;--status-warn:#fbbf24;--status-err:#f87171;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-sans);height:100vh;overflow:hidden;display:flex;flex-direction:column}
+    .ss-stage{flex:1;display:flex;align-items:center;justify-content:center;padding:24px 28px 68px;overflow:auto}
+    .ss-slide{display:none;width:100%;max-width:1080px;min-height:min(620px,78vh);padding:40px 48px;border:1px solid var(--border);border-radius:10px;background:var(--bg);flex-direction:column;justify-content:center;animation:ssIn 180ms var(--ease-out)}
+    .ss-slide.active{display:flex}
+    @keyframes ssIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+    .ss-slide h1{font-size:clamp(26px,3.2vw,40px);line-height:1.15;margin:0 0 12px;color:var(--accent)}
+    .ss-slide h2{font-size:clamp(18px,2.1vw,26px);line-height:1.25;margin:0 0 14px;color:var(--ink)}
+    .ss-slide h3{font-size:18px;margin:10px 0 8px;color:var(--ink-muted)}
+    .ss-slide p,.ss-slide li{font-size:clamp(15px,1.45vw,20px);line-height:1.5;margin:6px 0}
+    .ss-slide ul,.ss-slide ol{margin:8px 0 12px 24px;padding:0}
+    .ss-slide code{font-family:var(--font-mono);font-size:0.88em;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1px 5px}
+    .ss-slide pre{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;overflow:auto;font-size:14px}
+    .ss-slide pre code{border:none;padding:0;background:none}
+    .ss-slide table{width:100%;border-collapse:collapse;margin:10px 0;font-size:15px}
+    .ss-slide th,.ss-slide td{border:1px solid var(--border);padding:8px 10px;text-align:left}
+    .ss-slide th{background:var(--surface)}
+    .ss-slide blockquote{border-left:3px solid var(--accent);margin:10px 0;padding:6px 14px;color:var(--ink-muted);background:var(--surface)}
+    .ss-slide a{color:var(--accent)}
+    .ss-step{opacity:0;transform:translateY(6px);transition:opacity 160ms var(--ease-out),transform 160ms var(--ease-out);pointer-events:none}
+    .ss-step.revealed{opacity:1;transform:none;pointer-events:auto}
+    .ss-mermaid-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin:10px 0;overflow:auto;text-align:center}
+    pre.mermaid{margin:0;border:none;background:transparent;font-family:var(--font-mono);font-size:13px;text-align:left}
+    .ss-hud{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 12px;font-size:12px;z-index:40}
+    .ss-hud button,.ss-hud a{border:1px solid var(--border);background:var(--bg);color:var(--ink);border-radius:999px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none}
+    .ss-hud button:hover{border-color:var(--accent)}
+    .ss-progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);transition:width 180ms var(--ease-out);z-index:50}
+    .ss-drawer{position:fixed;right:16px;bottom:64px;width:min(380px,90vw);max-height:42vh;overflow:auto;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:13px;z-index:45}
+    .ss-grid{position:fixed;inset:0;background:var(--bg);z-index:60;overflow:auto;padding:28px;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+    .ss-grid[hidden],.ss-drawer[hidden]{display:none}
+    .ss-thumb{border:1px solid var(--border);border-radius:8px;padding:14px;background:var(--surface);cursor:pointer;text-align:left}
+    .ss-thumb.cur{border-color:var(--accent);border-width:2px}
+    .ss-cam{position:fixed;right:24px;bottom:72px;width:168px;height:168px;border-radius:50%;overflow:hidden;border:3px solid var(--accent);background:#000;z-index:55;cursor:grab;display:none}
+    .ss-cam video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+    @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}}
+    @media print{.ss-hud,.ss-progress,.ss-drawer,.ss-cam{display:none!important}.ss-slide{display:flex!important;page-break-after:always;min-height:92vh;border:none}.ss-step{opacity:1!important;transform:none!important}}
+  </style>
+</head>
+<body>
+  <div class="ss-progress" id="progress"></div>
+  <main class="ss-stage" id="stage" aria-live="polite">
+    <section class="ss-slide active">
+<h1>System Security &amp; Abuse Prevention</h1>
+<h2>OAuth 2.1 + PKCE, JWTs vs. opaque tokens, ReBAC, mTLS &amp; rate limiting</h2>
+<p>StackShade · System Design · Module 07</p>
+    </section>
+    <section class="ss-slide">
+<h1>1. Three Real-World Launch Bugs</h1>
+<p>An API validates every JWT signature cleanly—yet fails a security audit:</p>
+<ol><li class="ss-step">Changing <code>/v1/invoices/9041</code> -&gt; <code>9042</code> leaks <strong>another tenant's PDF (<code>BOLA</code>)</strong></li><li class="ss-step">Revoking a fired user's session still leaves their <code>60 min</code> JWT active</li><li class="ss-step">A bot exploits a <strong>Fixed Window</strong> limiter (<code>:59</code> + <code>:01</code>) to send <strong><code>2×</code> burst in <code>2 s</code></strong></li></ol>
+    </section>
+    <section class="ss-slide">
+<h1>2. OAuth 2.1 + PKCE (<code>S256</code>) Across Trust Boundaries</h1>
+<div><div class="ss-mermaid-box"><pre class="mermaid">sequenceDiagram
+  participant UA as Browser (Untrusted)
+  participant App as Client / BFF
+  participant AS as Auth Server (IdP)
+  participant API as Resource API
+
+  App-&gt;&gt;App: Generate code_verifier + S256 code_challenge
+  UA-&gt;&gt;AS: GET /authorize (code_challenge, S256, state)
+  AS--&gt;&gt;UA: 302 Callback (one-time code, state)
+  App-&gt;&gt;AS: POST /token (code, code_verifier)
+  AS--&gt;&gt;App: Access JWT (5 min) + Rotating Refresh Token
+  App-&gt;&gt;API: GET /v1/orders (Bearer token)</pre></div></div>
+    </section>
+    <section class="ss-slide">
+<h1>3. Hardening JWTs &amp; Token Revocation</h1>
+<p>Verifying the signature alone is <strong>not enough</strong>:</p>
+<ul><li class="ss-step">Enforce <code>alg</code> allowlist (<code>EdDSA</code> / <code>RS256</code> only — block <code>alg: none</code>!)</li><li class="ss-step">Verify <code>iss</code>, <code>aud</code> (stops cross-service token replay), <code>exp</code>, <code>nbf</code>, <code>scope</code></li><li class="ss-step"><strong>Immediate Revocation:</strong> Use <code>5 min</code> JWT + rotating refresh tokens (reuse revokes family), OR <strong>opaque tokens</strong> backed by regional Redis introspection</li></ul>
+    </section>
+    <section class="ss-slide">
+<h1>4. Authorization Models &amp; BOLA Defense</h1>
+<table><thead><tr><th>Model</th><th>Best For</th><th>Fails When</th></tr></thead><tbody><tr><td><strong>RBAC</strong></td><td>Coarse org roles (<code>admin</code>, <code>viewer</code>)</td><td>Per-folder/document sharing (<code>role explosion</code>)</td></tr><tr><td><strong>ABAC</strong></td><td>Policy rules (<code>dept == doc.dept</code>)</td><td>Hard to answer <em>&quot;who can view doc X?&quot;</em></td></tr><tr><td><strong>ReBAC (Zanzibar)</strong></td><td>Nested groups &amp; per-resource ACLs</td><td>Simple single-role apps (overkill)</td></tr></tbody></table>
+<p><strong>Mandatory BOLA rule:</strong> Always enforce <code>WHERE id = $1 AND org_id = $token_org_id</code>!</p>
+    </section>
+    <section class="ss-slide">
+<h1>5. Zero-Trust mTLS &amp; KMS Envelope Encryption</h1>
+<ul><li><strong>East-West mTLS (SPIFFE / Envoy):</strong> Every microservice authenticates via short-lived <code>X.509</code> workload certs (<code>VPC IP != trust</code>)</li><li class="ss-step"><strong>KMS Envelope Encryption:</strong> App gets <code>(plaintext_DEK, KMS_encrypted_DEK)</code> once per object/batch</li><li class="ss-step">Encrypts bulk bytes locally (<code>AES-256-GCM</code>); wipes <code>plaintext_DEK</code> from RAM</li></ul>
+    </section>
+    <section class="ss-slide">
+<h1>6. Rate Limiting Algorithms Compared</h1>
+<ul><li><strong>Fixed Window:</strong> <code>O(1)</code> RAM, <strong>but</strong> allows <code>2×</code> boundary burst (<code>00:59 + 01:01</code>)</li><li class="ss-step"><strong>Sliding Window Log (<code>ZSET</code>):</strong> Exact, <strong>but</strong> <code>O(limit)</code> RAM (<code>4 GB</code> at <code>1M</code> users × <code>100</code> reqs!)</li><li class="ss-step"><strong>Sliding Window Counter:</strong> <code>O(1)</code> (<code>~80 B</code>/user), blends adjacent windows (<code>&lt; 0.5%</code> error)</li><li class="ss-step"><strong>Token Bucket (Redis Lua):</strong> <code>O(1)</code> (<code>~80 B</code>/user), allows bounded burst + smooth sustained cap</li></ul>
+    </section>
+    <section class="ss-slide">
+<h1>7. Interactive Sim: Rate Limiter Burst Tester</h1>
+<div data-stackshade-anim="sim-rate-limiter-algorithms"></div>
+<p>Fire a double-burst across the <code>:00</code> minute boundary to contrast <strong>Fixed Window (<code>2×</code> spike leak)</strong>, <strong>Leaky Bucket</strong>, <strong>Token Bucket</strong>, and <strong>Sliding Window Counter</strong>.</p>
+    </section>
+    <section class="ss-slide">
+<h1>8. Worked Memory Math (<code>1M</code> Active API Keys)</h1>
+<p>Target: <code>100 req/min</code>, <code>burst = 25</code> across <code>1,000,000</code> active clients:</p>
+<ul><li class="ss-step"><strong>Token Bucket / Sliding Counter:</strong> <code>~80 B</code>/user × <code>1M</code> = <strong><code>~80 MB</code> RAM</strong></li><li class="ss-step"><strong>Sliding Window Log (<code>ZSET</code>):</strong> <code>100</code> timestamps × <code>40 B</code> × <code>1M</code> = <strong><code>4.0 GB</code> RAM</strong> (<code>50×</code> more!)</li><li class="ss-step"><strong>JWT Verification (<code>20k req/s</code>):</strong> <code>~0.08 ms</code> CPU = <code>1.6</code> cores fleet-wide</li></ul>
+    </section>
+    <section class="ss-slide">
+<h1>9. Failure Posture &amp; Scaling (<code>10×</code> / <code>100×</code>)</h1>
+<ul><li><strong>Fail-Open vs. Fail-Closed:</strong> Fail-open on Redis crash with <strong>in-memory per-pod fallback cap</strong> for checkout/login; fail-closed on expensive abuse targets</li><li><strong>10× (<code>200k req/s</code>):</strong> Shard Redis by <code>tenant_id</code> or batch-sync local Envoy counters every <code>100 ms</code></li><li><strong>100× (<code>2M req/s</code>):</strong> Push WAF/DDoS/IP throttling to <strong>Anycast Edge PoPs</strong></li></ul>
+    </section>
+    <section class="ss-slide">
+<h1>10. Lab &amp; Retrieval Check</h1>
+<p><strong>Hands-on:</strong> <a href="../labs/13-threat-model-oauth.md" target="_blank" rel="noopener">Lab 13 · Threat Modeling &amp; OAuth 2.1 + PKCE Audit</a></p>
+<ol><li class="ss-step">What attack does PKCE (<code>S256</code>) prevent on OAuth redirect callbacks?</li><li class="ss-step">Which JWT claims prevent a valid token for Service A from working on Service B?</li><li class="ss-step">Why must Redis Token Bucket updates run inside an atomic Lua script?</li></ol>
+    </section>
+  </main>
+  <aside class="ss-drawer" id="notes" hidden></aside>
+  <section class="ss-grid" id="grid" hidden></section>
+  <div class="ss-cam" id="camBox" title="Drag to reposition"><video id="camVid" autoplay playsinline muted></video></div>
+  <nav class="ss-hud" aria-label="Slide controls">
+    <button id="prevBtn" title="Previous (←)">←</button>
+    <span id="counter">1 / 1</span>
+    <button id="nextBtn" title="Next (→ / Space)">→</button>
+    <button id="gridBtn" title="Overview Grid (G)">Grid</button>
+    <button id="notesBtn" title="Speaker Notes (N)">Notes</button>
+    <button id="themeBtn" title="Toggle Theme (T)">Theme</button>
+    <button id="camBtn" title="Toggle Local Webcam Bubble (C)">Camera: Off</button>
+    <button id="fsBtn" title="Fullscreen (F)">Fullscreen</button>
+    <a href="../lessons/35-security-identity.md">Lesson</a>
+    <a href="index.html">All Decks</a>
+  </nav>
+  <script>
+(function (global) {
+  'use strict';
+
+  var WIDGETS = {};
+
+  function el(tag, attrs, children) {
+    var node = document.createElement(tag);
+    if (attrs) {
+      Object.keys(attrs).forEach(function (k) {
+        if (k === 'class') node.className = attrs[k];
+        else if (k === 'text') node.textContent = attrs[k];
+        else if (k === 'html') node.innerHTML = attrs[k];
+        else if (k.indexOf('on') === 0) node.addEventListener(k.slice(2).toLowerCase(), attrs[k]);
+        else node.setAttribute(k, attrs[k]);
+      });
+    }
+    if (children) {
+      (Array.isArray(children) ? children : [children]).forEach(function (c) {
+        if (c == null) return;
+        node.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+      });
+    }
+    return node;
+  }
+
+  function svgEl(tag, attrs, children) {
+    var node = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    if (attrs) {
+      Object.keys(attrs).forEach(function (k) {
+        if (k === 'text') node.textContent = attrs[k];
+        else node.setAttribute(k, attrs[k]);
+      });
+    }
+    if (children) {
+      (Array.isArray(children) ? children : [children]).forEach(function (c) {
+        if (c) node.appendChild(c);
+      });
+    }
+    return node;
+  }
+
+  function injectBaseStyles() {
+    if (document.getElementById('ss-widget-styles')) return;
+    var css = [
+      '.ss-w{border:1px solid var(--border,#e2e8f0);border-radius:8px;background:var(--surface,#f8fafc);color:var(--ink,#0f172a);padding:14px 16px;font-family:var(--font-sans,system-ui,sans-serif);font-size:14px;line-height:1.45;margin:12px 0;}',
+      '.ss-w-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;border-bottom:1px solid var(--border,#e2e8f0);padding-bottom:8px;}',
+      '.ss-w-title{font-weight:700;font-size:14px;margin:0;color:var(--ink,#0f172a);}',
+      '.ss-w-tag{font-size:11px;font-family:var(--font-mono,monospace);color:var(--ink-muted,#475569);border:1px solid var(--border,#e2e8f0);border-radius:4px;padding:2px 6px;}',
+      '.ss-w-ctrl{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px;}',
+      '.ss-w-btn{border:1px solid var(--border,#e2e8f0);background:var(--bg,#fff);color:var(--ink,#0f172a);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer;}',
+      '.ss-w-btn[data-active="true"],.ss-w-btn.primary{background:var(--accent,#4f46e5);color:var(--accent-ink,#fff);border-color:var(--accent,#4f46e5);}',
+      '.ss-w-slider{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-muted,#475569);}',
+      '.ss-w-slider input{accent-color:var(--accent,#4f46e5);cursor:pointer;}',
+      '.ss-w-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:10px;}',
+      '.ss-w-stat{background:var(--bg,#fff);border:1px solid var(--border,#e2e8f0);border-radius:6px;padding:8px 10px;}',
+      '.ss-w-stat-k{font-size:11px;color:var(--ink-muted,#475569);display:block;}',
+      '.ss-w-stat-v{font-size:15px;font-weight:700;font-family:var(--font-mono,monospace);}',
+      '.ss-w-note{font-size:12px;color:var(--ink-muted,#475569);margin-top:8px;}',
+      '.ss-w-svg{width:100%;height:auto;display:block;background:var(--bg,#fff);border:1px solid var(--border,#e2e8f0);border-radius:6px;}'
+    ].join('\n');
+    document.head.appendChild(el('style', { id: 'ss-widget-styles', text: css }));
+  }
+
+  function makeShell(root, title, tag) {
+    root.innerHTML = '';
+    var wrap = el('div', { class: 'ss-w' });
+    wrap.appendChild(el('div', { class: 'ss-w-head' }, [
+      el('div', { class: 'ss-w-title', text: title }),
+      el('span', { class: 'ss-w-tag', text: tag })
+    ]));
+    root.appendChild(wrap);
+    return wrap;
+  }
+
+  function fmtNum(n) {
+    if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+    if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+    if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+    return String(Math.round(n * 10) / 10);
+  }
+
+  // 1. anim-request-layers
+  WIDGETS['anim-request-layers'] = function (root) {
+    var shell = makeShell(root, '5-Layer Request Path Tracer', 'L01 · Interactive');
+    var mode = 'sync-read';
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var svg = svgEl('svg', { viewBox: '0 0 640 160', class: 'ss-w-svg' });
+    var note = el('div', { class: 'ss-w-note' });
+    var modes = [
+      ['sync-read', 'Sync Read (Cache Hit)'],
+      ['sync-write', 'Sync Write (Durable DB)'],
+      ['async-queue', 'Async Queue + Worker']
+    ];
+    function render() {
+      ctrl.innerHTML = '';
+      modes.forEach(function (m) {
+        ctrl.appendChild(el('button', {
+          class: 'ss-w-btn', 'data-active': String(mode === m[0]), text: m[1],
+          onClick: function () { mode = m[0]; render(); }
+        }));
+      });
+      svg.innerHTML = '';
+      var nodes = [
+        { id: 'u', x: 20, y: 55, w: 84, label: 'Client', active: true },
+        { id: 'i', x: 135, y: 55, w: 96, label: 'API Edge', active: true },
+        { id: 'a', x: 262, y: 55, w: 100, label: 'Compute', active: true },
+        { id: 'c', x: 396, y: 18, w: 100, label: 'Cache', active: mode === 'sync-read' },
+        { id: 'd', x: 396, y: 98, w: 100, label: 'Database', active: mode !== 'sync-read' },
+        { id: 'q', x: 526, y: 55, w: 94, label: 'Queue+Worker', active: mode === 'async-queue' }
+      ];
+      function line(x1, y1, x2, y2, active, dash) {
+        svg.appendChild(svgEl('line', {
+          x1: x1, y1: y1, x2: x2, y2: y2,
+          stroke: active ? 'var(--accent,#4f46e5)' : 'var(--border,#cbd5e1)',
+          'stroke-width': active ? '3' : '1.5',
+          'stroke-dasharray': dash ? '5 4' : 'none'
+        }));
+      }
+      line(104, 75, 135, 75, true, false);
+      line(231, 75, 262, 75, true, false);
+      line(362, 75, 396, 38, mode === 'sync-read', false);
+      line(362, 75, 396, 118, mode === 'sync-write', false);
+      line(362, 75, 526, 75, mode === 'async-queue', true);
+      line(573, 95, 496, 118, mode === 'async-queue', true);
+
+      nodes.forEach(function (n) {
+        svg.appendChild(svgEl('rect', {
+          x: n.x, y: n.y, width: n.w, height: 40, rx: 6,
+          fill: n.active ? 'var(--accent,#4f46e5)' : 'var(--surface,#f8fafc)',
+          stroke: n.active ? 'var(--accent,#4f46e5)' : 'var(--border,#cbd5e1)'
+        }));
+        svg.appendChild(svgEl('text', {
+          x: n.x + n.w / 2, y: n.y + 24, 'text-anchor': 'middle',
+          fill: n.active ? 'var(--accent-ink,#fff)' : 'var(--ink-muted,#475569)',
+          'font-size': '12', 'font-weight': '600', text: n.label
+        }));
+      });
+      note.textContent = mode === 'sync-read'
+        ? 'Cache hit returns directly from memory (~1–5ms) without touching durable disk storage.'
+        : mode === 'sync-write'
+          ? 'Synchronous write waits for durable database commit before replying to client.'
+          : 'API enqueues event and returns 202 Accepted fast; background worker persists to DB asynchronously.';
+    }
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(note); render();
+  };
+
+  // 2. anim-tail-latency
+  WIDGETS['anim-tail-latency'] = function (root) {
+    var shell = makeShell(root, 'Average vs Tail Latency (p95 / p99)', 'L02 · Distribution');
+    var skew = 4;
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+    var svg = svgEl('svg', { viewBox: '0 0 600 120', class: 'ss-w-svg' });
+    var inp = el('input', { type: 'range', min: '0', max: '15', value: String(skew) });
+    var valLbl = el('span', { text: skew + '%' });
+    inp.addEventListener('input', function () { skew = Number(inp.value); valLbl.textContent = skew + '%'; render(); });
+    ctrl.appendChild(el('label', { class: 'ss-w-slider' }, ['Slow Requests (%):', inp, valLbl]));
+
+    function render() {
+      var samples = [];
+      for (var i = 0; i < 100; i++) {
+        samples.push(i >= 100 - skew ? 800 + (i - (100 - skew)) * 60 : 25 + (i % 25));
+      }
+      samples.sort(function (a, b) { return a - b; });
+      var mean = samples.reduce(function (a, b) { return a + b; }, 0) / 100;
+      var p50 = samples[49], p95 = samples[94], p99 = samples[98];
+      stats.innerHTML = '';
+      [['Mean (Average)', Math.round(mean) + ' ms'], ['p50 (Median)', p50 + ' ms'], ['p95', p95 + ' ms'], ['p99 (Tail)', p99 + ' ms']].forEach(function (s) {
+        stats.appendChild(el('div', { class: 'ss-w-stat' }, [
+          el('span', { class: 'ss-w-stat-k', text: s[0] }),
+          el('span', { class: 'ss-w-stat-v', text: s[1] })
+        ]));
+      });
+      svg.innerHTML = '';
+      for (var j = 0; j < 50; j++) {
+        var v = samples[j * 2];
+        var h = Math.min(100, Math.max(4, v / 14));
+        svg.appendChild(svgEl('rect', {
+          x: 10 + j * 11.6, y: 110 - h, width: 9, height: h, rx: 2,
+          fill: v > 200 ? 'var(--status-err,#b91c1c)' : 'var(--accent,#4f46e5)'
+        }));
+      }
+    }
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats);
+    shell.appendChild(el('div', { class: 'ss-w-note', text: 'Even when 95% of requests finish in ~35ms, just 4–5% slow calls push p99 above 1,000ms while average looks deceptively low.' }));
+    render();
+  };
+
+  // 3. sim-capacity-calculator
+  WIDGETS['sim-capacity-calculator'] = function (root) {
+    var shell = makeShell(root, 'Back-of-the-Envelope Capacity Estimator', 'L03 · Calculator');
+    var st = { dauM: 5, reqPerDay: 20, peak: 5, kb: 4, years: 3 };
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+
+    function addSlider(label, key, min, max, step) {
+      var lbl = el('span', { text: String(st[key]) });
+      var inp = el('input', { type: 'range', min: min, max: max, step: step, value: String(st[key]) });
+      inp.addEventListener('input', function () { st[key] = Number(inp.value); lbl.textContent = String(st[key]); render(); });
+      ctrl.appendChild(el('label', { class: 'ss-w-slider' }, [label + ':', inp, lbl]));
+    }
+    addSlider('DAU (M)', 'dauM', 1, 50, 1);
+    addSlider('Req/User/Day', 'reqPerDay', 5, 100, 5);
+    addSlider('Peak ×', 'peak', 2, 20, 1);
+    addSlider('Payload (KB)', 'kb', 1, 100, 1);
+    addSlider('Retention (yr)', 'years', 1, 10, 1);
+
+    function render() {
+      var dailyReq = st.dauM * 1e6 * st.reqPerDay;
+      var avgQps = dailyReq / 86400;
+      var peakQps = avgQps * st.peak;
+      var mbps = (peakQps * st.kb * 8) / 1000;
+      var storageTB = (dailyReq * st.kb * 1000 * 365 * st.years) / 1e12;
+      stats.innerHTML = '';
+      [
+        ['Daily Requests', fmtNum(dailyReq)],
+        ['Average QPS', fmtNum(avgQps) + ' /s'],
+        ['Peak QPS (' + st.peak + '×)', fmtNum(peakQps) + ' /s'],
+        ['Peak Egress', mbps.toFixed(1) + ' Mbps'],
+        ['Raw Storage (' + st.years + 'y)', storageTB.toFixed(1) + ' TB']
+      ].forEach(function (s) {
+        stats.appendChild(el('div', { class: 'ss-w-stat' }, [
+          el('span', { class: 'ss-w-stat-k', text: s[0] }),
+          el('span', { class: 'ss-w-stat-v', text: s[1] })
+        ]));
+      });
+    }
+    shell.appendChild(ctrl); shell.appendChild(stats);
+    shell.appendChild(el('div', { class: 'ss-w-note', text: 'Uses 86,400 sec/day and decimal TB (10^12 B). Multiply raw storage by 3×–5× for replication, indexes, and backups.' }));
+    render();
+  };
+
+  // 4. sim-tail-amplification
+  WIDGETS['sim-tail-amplification'] = function (root) {
+    var shell = makeShell(root, 'Fan-Out Tail Latency Amplification', 'L04 · Probability');
+    var fanout = 10, pSlow = 1;
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+    var svg = svgEl('svg', { viewBox: '0 0 600 72', class: 'ss-w-svg' });
+
+    var iN = el('input', { type: 'range', min: '1', max: '50', value: String(fanout) });
+    var lN = el('span', { text: String(fanout) });
+    iN.addEventListener('input', function () { fanout = Number(iN.value); lN.textContent = String(fanout); render(); });
+    ctrl.appendChild(el('label', { class: 'ss-w-slider' }, ['Downstream Calls (N):', iN, lN]));
+
+    var iP = el('input', { type: 'range', min: '1', max: '5', value: String(pSlow) });
+    var lP = el('span', { text: pSlow + '%' });
+    iP.addEventListener('input', function () { pSlow = Number(iP.value); lP.textContent = pSlow + '%'; render(); });
+    ctrl.appendChild(el('label', { class: 'ss-w-slider' }, ['Per-Call Slow %:', iP, lP]));
+
+    function render() {
+      var slowProb = (1 - Math.pow(1 - pSlow / 100, fanout)) * 100;
+      stats.innerHTML = '';
+      [
+        ['Parallel Sub-Calls', String(fanout)],
+        ['Single Call Slow %', pSlow + '%'],
+        ['End-User Request Hits Tail', slowProb.toFixed(1) + '%']
+      ].forEach(function (s) {
+        stats.appendChild(el('div', { class: 'ss-w-stat' }, [
+          el('span', { class: 'ss-w-stat-k', text: s[0] }),
+          el('span', { class: 'ss-w-stat-v', text: s[1] })
+        ]));
+      });
+      svg.innerHTML = '';
+      svg.appendChild(svgEl('rect', { x: 20, y: 22, width: 560, height: 24, rx: 4, fill: 'var(--surface,#f1f5f9)', stroke: 'var(--border,#cbd5e1)' }));
+      svg.appendChild(svgEl('rect', { x: 20, y: 22, width: Math.max(4, 5.6 * slowProb), height: 24, rx: 4, fill: slowProb > 20 ? 'var(--status-err,#b91c1c)' : 'var(--accent,#4f46e5)' }));
+      svg.appendChild(svgEl('text', { x: 300, y: 39, 'text-anchor': 'middle', fill: 'var(--ink,#0f172a)', 'font-size': '12', 'font-weight': '700', text: '1 - (1 - ' + (pSlow / 100) + ')^' + fanout + ' = ' + slowProb.toFixed(1) + '% slow requests' }));
+    }
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
+  };
+
+  // 5. anim-dns-resolution
+  WIDGETS['anim-dns-resolution'] = function (root) {
+    var shell = makeShell(root, 'Recursive DNS Lookup Stepper', 'L05 · Networking');
+    var step = 0, cached = false;
+    var steps = [
+      'Browser checks local OS/browser cache → Miss',
+      'Stub sends query to Recursive Resolver (ISP / 1.1.1.1)',
+      'Recursive Resolver asks Root (.) → Referral to .com TLD',
+      'Recursive Resolver asks .com TLD → Referral to Authoritative NS',
+      'Authoritative NS returns A/AAAA IP (with TTL) → Browser connects!'
+    ];
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var svg = svgEl('svg', { viewBox: '0 0 640 120', class: 'ss-w-svg' });
+    var note = el('div', { class: 'ss-w-note' });
+
+    function render() {
+      ctrl.innerHTML = '';
+      ctrl.appendChild(el('button', { class: 'ss-w-btn primary', text: 'Next Hop (' + (step + 1) + '/' + (cached ? 2 : 5) + ')', onClick: function () { step = (step + 1) % (cached ? 2 : 5); render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(cached), text: cached ? 'Cache Mode: HIT' : 'Cache Mode: MISS', onClick: function () { cached = !cached; step = 0; render(); } }));
+
+      var hops = ['Browser', 'Resolver', 'Root (.)', '.com TLD', 'Auth NS'];
+      svg.innerHTML = '';
+      hops.forEach(function (h, i) {
+        var active = cached ? (i <= 1 && i <= step) : (i <= step);
+        var current = i === step;
+        var x = 16 + i * 124;
+        if (i > 0) {
+          svg.appendChild(svgEl('line', { x1: x - 20, y1: 60, x2: x, y2: 60, stroke: active ? 'var(--accent,#4f46e5)' : 'var(--border,#cbd5e1)', 'stroke-width': active ? '3' : '1.5' }));
+        }
+        svg.appendChild(svgEl('rect', {
+          x: x, y: 36, width: 104, height: 48, rx: 6,
+          fill: current ? 'var(--accent,#4f46e5)' : (active ? 'var(--surface,#e0e7ff)' : 'var(--bg,#fff)'),
+          stroke: active ? 'var(--accent,#4f46e5)' : 'var(--border,#cbd5e1)', 'stroke-width': current ? '2.5' : '1.5'
+        }));
+        svg.appendChild(svgEl('text', {
+          x: x + 52, y: 65, 'text-anchor': 'middle', 'font-size': '12', 'font-weight': '600',
+          fill: current ? 'var(--accent-ink,#fff)' : 'var(--ink,#0f172a)', text: h
+        }));
+      });
+      note.textContent = cached && step === 1 ? 'Resolver cache HIT! Returns IP immediately without contacting Root/TLD.' : steps[step];
+    }
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(note); render();
+  };
+
+  // 6. anim-http-multiplexing
+  WIDGETS['anim-http-multiplexing'] = function (root) {
+    var shell = makeShell(root, 'HTTP/1.1 vs HTTP/2 vs HTTP/3 (QUIC)', 'L06 · Transport');
+    var proto = 'http1', loss = true;
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var svg = svgEl('svg', { viewBox: '0 0 600 130', class: 'ss-w-svg' });
+    var note = el('div', { class: 'ss-w-note' });
+
+    function render() {
+      ctrl.innerHTML = '';
+      [['http1', 'HTTP/1.1 (1 Conn)'], ['http2', 'HTTP/2 (TCP Mux)'], ['http3', 'HTTP/3 (QUIC UDP)']].forEach(function (p) {
+        ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(proto === p[0]), text: p[1], onClick: function () { proto = p[0]; render(); } }));
+      });
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(loss), text: loss ? 'Packet 2 Lost: YES' : 'Packet 2 Lost: NO', onClick: function () { loss = !loss; render(); } }));
+      svg.innerHTML = '';
+      var streams = ['Stream A (HTML)', 'Stream B (CSS)', 'Stream C (API)'];
+      streams.forEach(function (s, idx) {
+        var y = 18 + idx * 36;
+        svg.appendChild(svgEl('text', { x: 14, y: y + 18, 'font-size': '12', fill: 'var(--ink,#0f172a)', text: s }));
+        var blocked = loss && ((proto === 'http1' && idx >= 0) || (proto === 'http2') || (proto === 'http3' && idx === 0));
+        var startX = proto === 'http1' ? 140 + idx * 130 : 140;
+        var w = proto === 'http1' ? 110 : 380;
+        svg.appendChild(svgEl('rect', {
+          x: startX, y: y + 4, width: w, height: 22, rx: 4,
+          fill: blocked ? 'var(--status-warn,#b45309)' : 'var(--accent,#4f46e5)'
+        }));
+        svg.appendChild(svgEl('text', {
+          x: startX + w / 2, y: y + 19, 'text-anchor': 'middle', 'font-size': '11',
+          fill: '#fff', text: blocked ? 'Stalled waiting TCP retransmit' : 'Delivered smoothly'
+        }));
+      });
+      note.textContent = proto === 'http1'
+        ? 'HTTP/1.1 processes sequentially per connection (application HoL blocking).'
+        : proto === 'http2'
+          ? (loss ? 'HTTP/2 multiplexes frames, but 1 lost TCP packet stalls ALL streams at kernel TCP level!' : 'HTTP/2 multiplexes all streams cleanly over one TCP connection.')
+          : (loss ? 'HTTP/3 over QUIC isolates streams: losing a Stream A packet never stalls Streams B or C!' : 'HTTP/3 delivers 0-RTT/1-RTT setup with independent QUIC streams.');
+    }
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(note); render();
+  };
+
+  // 7. anim-cdn-cache-flow
+  WIDGETS['anim-cdn-cache-flow'] = function (root) {
+    var shell = makeShell(root, 'CDN Edge PoP & Origin Shield Flow', 'L07 · Edge');
+    var hit = true;
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var svg = svgEl('svg', { viewBox: '0 0 600 100', class: 'ss-w-svg' });
+    var note = el('div', { class: 'ss-w-note' });
+    function render() {
+      ctrl.innerHTML = '';
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(hit), text: 'Edge Cache HIT (s-maxage)', onClick: function () { hit = true; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(!hit), text: 'Edge Cache MISS (Fetch Origin)', onClick: function () { hit = false; render(); } }));
+      svg.innerHTML = '';
+      var nodes = [
+        { x: 20, label: 'User (Mumbai)', on: true },
+        { x: 220, label: 'Edge PoP (18ms)', on: true },
+        { x: 430, label: 'Origin (US-East)', on: !hit }
+      ];
+      svg.appendChild(svgEl('line', { x1: 150, y1: 50, x2: 220, y2: 50, stroke: 'var(--accent,#4f46e5)', 'stroke-width': '3' }));
+      svg.appendChild(svgEl('line', { x1: 360, y1: 50, x2: 430, y2: 50, stroke: !hit ? 'var(--status-warn,#b45309)' : 'var(--border,#cbd5e1)', 'stroke-width': !hit ? '3' : '1.5', 'stroke-dasharray': hit ? '4 4' : 'none' }));
+      nodes.forEach(function (n) {
+        svg.appendChild(svgEl('rect', { x: n.x, y: 28, width: 140, height: 44, rx: 6, fill: n.on ? 'var(--accent,#4f46e5)' : 'var(--surface,#f8fafc)', stroke: 'var(--border,#cbd5e1)' }));
+        svg.appendChild(svgEl('text', { x: n.x + 70, y: 54, 'text-anchor': 'middle', 'font-size': '12', 'font-weight': '600', fill: n.on ? 'var(--accent-ink,#fff)' : 'var(--ink-muted,#475569)', text: n.label }));
+      });
+      note.textContent = hit ? 'Cache HIT: Served in ~18ms from nearest Edge PoP. Origin receives zero load.' : 'Cache MISS: Edge pulls from Origin (~190ms), caches response according to Cache-Control: s-maxage.';
+    }
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(note); render();
+  };
+
+  // 8. sim-load-balancer
+  WIDGETS['sim-load-balancer'] = function (root) {
+    var shell = makeShell(root, 'Load Balancer Algorithm & Slow-Node Sim', 'L08 · Traffic');
+    var algo = 'rr', slow3 = true, counts = [0, 0, 0], inflight = [1, 1, 8], next = 0;
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var svg = svgEl('svg', { viewBox: '0 0 600 130', class: 'ss-w-svg' });
+    var note = el('div', { class: 'ss-w-note' });
+
+    function sendBatch() {
+      for (var k = 0; k < 12; k++) {
+        var idx = 0;
+        if (algo === 'rr') { idx = next % 3; next++; }
+        else if (algo === 'lc') {
+          idx = inflight[0] <= inflight[1] && inflight[0] <= inflight[2] ? 0 : (inflight[1] <= inflight[2] ? 1 : 2);
+        } else {
+          var weights = slow3 ? [0, 0, 1, 1, 2] : [0, 1, 2];
+          idx = weights[next % weights.length]; next++;
+        }
+        counts[idx]++;
+        inflight[idx] += (idx === 2 && slow3) ? 2 : 0;
+      }
+      render();
+    }
+
+    function render() {
+      ctrl.innerHTML = '';
+      [['rr', 'Round-Robin'], ['lc', 'Least-Connections'], ['w', 'Weighted']].forEach(function (a) {
+        ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(algo === a[0]), text: a[1], onClick: function () { algo = a[0]; counts = [0, 0, 0]; inflight = [1, 1, slow3 ? 8 : 1]; render(); } }));
+      });
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(slow3), text: slow3 ? 'Node 3 Slow: YES' : 'Node 3 Slow: NO', onClick: function () { slow3 = !slow3; inflight = [1, 1, slow3 ? 8 : 1]; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn primary', text: 'Send 12 Requests', onClick: sendBatch }));
+
+      svg.innerHTML = '';
+      [0, 1, 2].forEach(function (i) {
+        var y = 16 + i * 38;
+        var label = 'Backend ' + (i + 1) + (i === 2 && slow3 ? ' (Slow)' : '');
+        svg.appendChild(svgEl('text', { x: 14, y: y + 19, 'font-size': '12', fill: 'var(--ink,#0f172a)', text: label }));
+        var w = Math.min(340, counts[i] * 10 + 16);
+        svg.appendChild(svgEl('rect', { x: 145, y: y + 4, width: w, height: 22, rx: 4, fill: i === 2 && slow3 ? 'var(--status-warn,#b45309)' : 'var(--accent,#4f46e5)' }));
+        svg.appendChild(svgEl('text', { x: 155 + w, y: y + 19, 'font-size': '12', 'font-weight': '600', fill: 'var(--ink,#0f172a)', text: counts[i] + ' reqs · queue: ' + inflight[i] }));
+      });
+      note.textContent = algo === 'rr' && slow3
+        ? 'Round-Robin blindly keeps piling requests onto Slow Node 3.'
+        : algo === 'lc'
+          ? 'Least-Connections routes away from Slow Node 3 while its in-flight queue stays elevated.'
+          : 'Weighted routing shifts capacity ratio proactively away from degraded/smaller nodes.';
+    }
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(note); render();
+  };
+
+  // 9. anim-idempotency-retry
+  WIDGETS['anim-idempotency-retry'] = function (root) {
+    var shell = makeShell(root, 'Idempotency Key on Network Timeout Retry', 'L09 · API Safety');
+    var keyOn = true, step = 0;
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var svg = svgEl('svg', { viewBox: '0 0 600 110', class: 'ss-w-svg' });
+    var note = el('div', { class: 'ss-w-note' });
+
+    function render() {
+      ctrl.innerHTML = '';
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(keyOn), text: keyOn ? 'Idempotency-Key: ON' : 'Idempotency-Key: OFF', onClick: function () { keyOn = !keyOn; step = 0; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn primary', text: 'Next Step (' + (step + 1) + '/3)', onClick: function () { step = (step + 1) % 3; render(); } }));
+      svg.innerHTML = '';
+      var msgs = [
+        '1. POST /payments ($50) reaches DB, charge #1 succeeds — response drops in transit!',
+        '2. Client times out and safely retries identical POST ' + (keyOn ? 'with same Idempotency-Key' : 'WITHOUT Idempotency-Key'),
+        keyOn ? '3. Server detects key in store → returns cached 201! Total charged: $50' : '3. Server treats retry as new request → DOUBLE CHARGE! Total charged: $100'
+      ];
+      var color = step === 2 ? (keyOn ? 'var(--status-ok,#15803d)' : 'var(--status-err,#b91c1c)') : 'var(--accent,#4f46e5)';
+      svg.appendChild(svgEl('rect', { x: 20, y: 24, width: 560, height: 60, rx: 6, fill: 'var(--surface,#f8fafc)', stroke: color, 'stroke-width': '2' }));
+      svg.appendChild(svgEl('text', { x: 300, y: 59, 'text-anchor': 'middle', 'font-size': '13', 'font-weight': '600', fill: 'var(--ink,#0f172a)', text: msgs[step] }));
+      note.textContent = 'Store idempotency keys atomically alongside the business state update inside the same transaction.';
+    }
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(note); render();
+  };
+
+  // 10. sim-btree-vs-lsm
+  WIDGETS['sim-btree-vs-lsm'] = function (root) {
+    var shell = makeShell(root, 'B+Tree vs LSM-Tree Write & Read Path', 'L11 · Storage Engines');
+    var writes = 4, sstables = 3;
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+    function render() {
+      ctrl.innerHTML = '';
+      ctrl.appendChild(el('button', { class: 'ss-w-btn primary', text: 'Append 1K Writes', onClick: function () { writes++; if (writes % 3 === 0) sstables++; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', text: 'Run LSM Compaction', onClick: function () { sstables = Math.max(1, Math.ceil(sstables / 2)); render(); } }));
+      stats.innerHTML = '';
+      [
+        ['B+Tree Write I/O', 'Random 4–16KB Page Updates'],
+        ['LSM Write Path', 'Seq WAL + MemTable (' + sstables + ' SSTables)'],
+        ['LSM Point Lookup', 'Bloom Filter + max ' + sstables + ' SSTable checks'],
+        ['B+Tree Point Lookup', 'O(log N) ~3–4 Page Reads']
+      ].forEach(function (s) {
+        stats.appendChild(el('div', { class: 'ss-w-stat' }, [
+          el('span', { class: 'ss-w-stat-k', text: s[0] }),
+          el('span', { class: 'ss-w-stat-v', text: s[1] })
+        ]));
+      });
+    }
+    shell.appendChild(ctrl); shell.appendChild(stats);
+    shell.appendChild(el('div', { class: 'ss-w-note', text: 'LSM-Trees turn random writes into sequential appends (high write throughput), trading background compaction work and multi-SSTable read checks.' }));
+    render();
+  };
+
+  // 11. anim-isolation-anomalies
+  WIDGETS['anim-isolation-anomalies'] = function (root) {
+    var shell = makeShell(root, 'Transaction Isolation & Write Skew Stepper', 'L13 · ACID');
+    var iso = 'si';
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var svg = svgEl('svg', { viewBox: '0 0 600 90', class: 'ss-w-svg' });
+    var note = el('div', { class: 'ss-w-note' });
+    function render() {
+      ctrl.innerHTML = '';
+      [['rc', 'Read Committed'], ['si', 'Snapshot / Repeatable Read'], ['ssi', 'Serializable (SSI)']].forEach(function (m) {
+        ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(iso === m[0]), text: m[1], onClick: function () { iso = m[0]; render(); } }));
+      });
+      var ok = iso === 'ssi';
+      svg.innerHTML = '';
+      svg.appendChild(svgEl('rect', { x: 16, y: 18, width: 568, height: 54, rx: 6, fill: 'var(--surface,#f8fafc)', stroke: ok ? 'var(--status-ok,#15803d)' : 'var(--status-err,#b91c1c)', 'stroke-width': '2' }));
+      svg.appendChild(svgEl('text', {
+        x: 300, y: 50, 'text-anchor': 'middle', 'font-size': '13', 'font-weight': '600', fill: 'var(--ink,#0f172a)',
+        text: ok ? 'Serializable detects read-set conflict → aborts Tx2! At least 1 doctor stays on call.' : 'Both Tx1 and Tx2 read count=2 simultaneously and both sign off → 0 doctors on call (Write Skew)!'
+      }));
+      note.textContent = 'To prevent write skew under Read Committed/Snapshot Isolation, use Serializable OR explicit SELECT ... FOR UPDATE.';
+    }
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(note); render();
+  };
+
+  // 12. sim-eviction-policies
+  WIDGETS['sim-eviction-policies'] = function (root) {
+    var shell = makeShell(root, 'Cache Eviction Policy Simulator (LRU vs LFU vs FIFO)', 'L16 · Caching');
+    var policy = 'lru', cap = 3;
+    var stream = ['A', 'B', 'A', 'C', 'A', 'D', 'A', 'E', 'A', 'B'];
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+
+    function sim(p) {
+      var cache = [], freq = {}, hits = 0;
+      stream.forEach(function (k) {
+        freq[k] = (freq[k] || 0) + 1;
+        var idx = cache.indexOf(k);
+        if (idx !== -1) {
+          hits++;
+          if (p === 'lru') { cache.splice(idx, 1); cache.push(k); }
+        } else {
+          if (cache.length >= cap) {
+            if (p === 'lfu') {
+              cache.sort(function (x, y) { return freq[x] - freq[y]; });
+            }
+            cache.shift();
+          }
+          cache.push(k);
+        }
+      });
+      return { hits: hits, pct: Math.round((hits / stream.length) * 100), finalKeys: cache.join(', ') };
+    }
+
+    function render() {
+      ctrl.innerHTML = '';
+      [['lru', 'LRU'], ['lfu', 'LFU'], ['fifo', 'FIFO']].forEach(function (m) {
+        ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(policy === m[0]), text: m[1], onClick: function () { policy = m[0]; render(); } }));
+      });
+      var res = sim(policy);
+      stats.innerHTML = '';
+      [['Trace', stream.join(' ')], ['Hits / Total', res.hits + ' / ' + stream.length], ['Hit Ratio', res.pct + '%'], ['Final Cache (cap=3)', res.finalKeys]].forEach(function (s) {
+        stats.appendChild(el('div', { class: 'ss-w-stat' }, [
+          el('span', { class: 'ss-w-stat-k', text: s[0] }),
+          el('span', { class: 'ss-w-stat-v', text: s[1] })
+        ]));
+      });
+    }
+    shell.appendChild(ctrl); shell.appendChild(stats); render();
+  };
+
+  // 13. sim-cache-stampede
+  WIDGETS['sim-cache-stampede'] = function (root) {
+    var shell = makeShell(root, 'Cache Stampede & Singleflight Defense', 'L17 · Resilience');
+    var singleflight = true, jitter = true;
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+    function render() {
+      ctrl.innerHTML = '';
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(singleflight), text: 'Singleflight: ' + (singleflight ? 'ON' : 'OFF'), onClick: function () { singleflight = !singleflight; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(jitter), text: 'TTL Jitter: ' + (jitter ? 'ON' : 'OFF'), onClick: function () { jitter = !jitter; render(); } }));
+      var dbHits = singleflight ? 1 : 250;
+      var avalancheRisk = jitter ? 'Low (spread expiry)' : 'High (synchronized expiry)';
+      stats.innerHTML = '';
+      [['Concurrent Misses', '250 reqs'], ['Origin DB Queries', String(dbHits)], ['Cache Avalanche Risk', avalancheRisk]].forEach(function (s) {
+        stats.appendChild(el('div', { class: 'ss-w-stat' }, [
+          el('span', { class: 'ss-w-stat-k', text: s[0] }),
+          el('span', { class: 'ss-w-stat-v', text: s[1] })
+        ]));
+      });
+    }
+    shell.appendChild(ctrl); shell.appendChild(stats); render();
+  };
+
+  // 14. sim-consistent-hashing
+  WIDGETS['sim-consistent-hashing'] = function (root) {
+    var shell = makeShell(root, 'Consistent Hashing Ring + Virtual Nodes', 'L20 · Sharding');
+    var nodes = 3, vnodes = 8;
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var svg = svgEl('svg', { viewBox: '0 0 600 180', class: 'ss-w-svg' });
+    var stats = el('div', { class: 'ss-w-stats' });
+
+    function render() {
+      ctrl.innerHTML = '';
+      ctrl.appendChild(el('button', { class: 'ss-w-btn primary', text: '+ Add Shard (' + nodes + ')', onClick: function () { nodes = Math.min(8, nodes + 1); render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', text: '- Remove Shard', onClick: function () { nodes = Math.max(2, nodes - 1); render(); } }));
+      var inp = el('input', { type: 'range', min: '1', max: '20', value: String(vnodes) });
+      var lbl = el('span', { text: String(vnodes) });
+      inp.addEventListener('input', function () { vnodes = Number(inp.value); lbl.textContent = String(vnodes); render(); });
+      ctrl.appendChild(el('label', { class: 'ss-w-slider' }, ['VNodes/Shard:', inp, lbl]));
+
+      svg.innerHTML = '';
+      svg.appendChild(svgEl('circle', { cx: 140, cy: 90, r: 66, fill: 'none', stroke: 'var(--border,#cbd5e1)', 'stroke-width': '3' }));
+      var colors = ['#4f46e5', '#15803d', '#b45309', '#0284c7', '#7c3aed', '#be123c', '#0f766e', '#a16207'];
+      for (var n = 0; n < nodes; n++) {
+        for (var v = 0; v < vnodes; v++) {
+          var ang = (((n * 137 + v * 53) % 360) * Math.PI) / 180;
+          var x = 140 + Math.cos(ang) * 66;
+          var y = 90 + Math.sin(ang) * 66;
+          svg.appendChild(svgEl('circle', { cx: x, cy: y, r: v === 0 ? 6 : 3.5, fill: colors[n % colors.length] }));
+        }
+      }
+      svg.appendChild(svgEl('text', { x: 140, y: 94, 'text-anchor': 'middle', 'font-size': '12', 'font-weight': '700', fill: 'var(--ink,#0f172a)', text: nodes + ' Shards' }));
+      svg.appendChild(svgEl('text', { x: 255, y: 65, 'font-size': '13', 'font-weight': '600', fill: 'var(--ink,#0f172a)', text: 'Keys remapped on +1 shard ≈ ' + Math.round(100 / (nodes + 1)) + '%' }));
+      svg.appendChild(svgEl('text', { x: 255, y: 92, 'font-size': '12', fill: 'var(--ink-muted,#475569)', text: 'Total ring points: ' + (nodes * vnodes) + ' (higher vnodes = lower variance)' }));
+      svg.appendChild(svgEl('text', { x: 255, y: 116, 'font-size': '12', fill: 'var(--ink-muted,#475569)', text: 'Modulo hash(key) % N would remap ~' + Math.round((nodes / (nodes + 1)) * 100) + '% of keys!' }));
+
+      stats.innerHTML = '';
+    }
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
+  };
+
+  // 15. anim-saga-compensation
+  WIDGETS['anim-saga-compensation'] = function (root) {
+    var shell = makeShell(root, 'Saga Forward & Compensating Rollback Flow', 'L25 · Distributed Tx');
+    var fail = false;
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var svg = svgEl('svg', { viewBox: '0 0 600 95', class: 'ss-w-svg' });
+    function render() {
+      ctrl.innerHTML = '';
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(!fail), text: 'Happy Path', onClick: function () { fail = false; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(fail), text: 'Step 3 Inventory Fails → Compensate', onClick: function () { fail = true; render(); } }));
+      svg.innerHTML = '';
+      var labels = fail ? ['1. Order Pending', '2. Payment Charged', '3. Inventory FAIL', '4. Refund Payment', '5. Order Cancelled'] : ['1. Create Order', '2. Charge Card', '3. Reserve Stock', '4. Confirm Order'];
+      var w = fail ? 106 : 132;
+      labels.forEach(function (l, i) {
+        var x = 14 + i * (w + 10);
+        var c = fail && i === 2 ? 'var(--status-err,#b91c1c)' : (fail && i > 2 ? 'var(--status-warn,#b45309)' : 'var(--accent,#4f46e5)');
+        svg.appendChild(svgEl('rect', { x: x, y: 26, width: w, height: 42, rx: 6, fill: c }));
+        svg.appendChild(svgEl('text', { x: x + w / 2, y: 51, 'text-anchor': 'middle', 'font-size': '11', 'font-weight': '600', fill: '#fff', text: l }));
+      });
+    }
+    shell.appendChild(ctrl); shell.appendChild(svg); render();
+  };
+
+  // 16. sim-retry-jitter-circuit
+  WIDGETS['sim-retry-jitter-circuit'] = function (root) {
+    var shell = makeShell(root, 'Retry Storm vs Full Jitter + Circuit Breaker', 'L28 · Partial Failure');
+    var mode = 'jitter', cb = true;
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+    function render() {
+      ctrl.innerHTML = '';
+      [['none', 'Immediate Retry'], ['exp', 'Fixed Exp Backoff'], ['jitter', 'Exp + Full Jitter']].forEach(function (m) {
+        ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(mode === m[0]), text: m[1], onClick: function () { mode = m[0]; render(); } }));
+      });
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(cb), text: 'Circuit Breaker: ' + (cb ? 'ON' : 'OFF'), onClick: function () { cb = !cb; render(); } }));
+      var spike = mode === 'none' ? '4.0× Retry Storm' : (mode === 'exp' ? '2.4× Synchronized Waves' : '1.15× Smooth Recovery');
+      var state = cb ? 'OPEN → Fail Fast (0ms)' : 'Blocking on 5s Timeouts';
+      stats.innerHTML = '';
+      [['Traffic Multiplier', spike], ['Dependency Outage Behavior', state]].forEach(function (s) {
+        stats.appendChild(el('div', { class: 'ss-w-stat' }, [
+          el('span', { class: 'ss-w-stat-k', text: s[0] }),
+          el('span', { class: 'ss-w-stat-v', text: s[1] })
+        ]));
+      });
+    }
+    shell.appendChild(ctrl); shell.appendChild(stats); render();
+  };
+
+  // 17. anim-fencing-tokens
+  WIDGETS['anim-fencing-tokens'] = function (root) {
+    var shell = makeShell(root, 'Fencing Tokens Against Stale Lock Holders', 'L29 · Coordination');
+    var enforce = true;
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var svg = svgEl('svg', { viewBox: '0 0 600 95', class: 'ss-w-svg' });
+    function render() {
+      ctrl.innerHTML = '';
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(enforce), text: 'Storage Fencing Check: ' + (enforce ? 'ON' : 'OFF'), onClick: function () { enforce = !enforce; render(); } }));
+      svg.innerHTML = '';
+      svg.appendChild(svgEl('rect', { x: 16, y: 18, width: 568, height: 56, rx: 6, fill: 'var(--surface,#f8fafc)', stroke: enforce ? 'var(--status-ok,#15803d)' : 'var(--status-err,#b91c1c)', 'stroke-width': '2' }));
+      svg.appendChild(svgEl('text', {
+        x: 300, y: 42, 'text-anchor': 'middle', 'font-size': '12', 'font-weight': '600', fill: 'var(--ink,#0f172a)',
+        text: 'Client A wakes from GC pause with Token #33 (Client B already wrote with Token #34)'
+      }));
+      svg.appendChild(svgEl('text', {
+        x: 300, y: 62, 'text-anchor': 'middle', 'font-size': '12', 'font-weight': '700', fill: enforce ? 'var(--status-ok,#15803d)' : 'var(--status-err,#b91c1c)',
+        text: enforce ? 'REJECTED (33 < 34): Data integrity preserved!' : 'ACCEPTED WITHOUT CHECK: Silent data corruption!'
+      }));
+    }
+    shell.appendChild(ctrl); shell.appendChild(svg); render();
+  };
+
+  // 18. sim-quorum-rw
+  WIDGETS['sim-quorum-rw'] = function (root) {
+    var shell = makeShell(root, 'Quorum Overlap Explorer (R + W > N)', 'L30 · Consistency');
+    var N = 5, W = 3, R = 3;
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var svg = svgEl('svg', { viewBox: '0 0 600 85', class: 'ss-w-svg' });
+    var stats = el('div', { class: 'ss-w-stats' });
+
+    function slider(lbl, getter, setter, min, max) {
+      var v = el('span', { text: String(getter()) });
+      var i = el('input', { type: 'range', min: min, max: max, value: String(getter()) });
+      i.addEventListener('input', function () { setter(Number(i.value)); v.textContent = String(getter()); render(); });
+      ctrl.appendChild(el('label', { class: 'ss-w-slider' }, [lbl + ':', i, v]));
+    }
+    slider('N Replicas', function () { return N; }, function (x) { N = x; W = Math.min(W, N); R = Math.min(R, N); }, 3, 7);
+    slider('W Write Quorum', function () { return W; }, function (x) { W = Math.min(x, N); }, 1, 7);
+    slider('R Read Quorum', function () { return R; }, function (x) { R = Math.min(x, N); }, 1, 7);
+
+    function render() {
+      var strong = (R + W) > N;
+      svg.innerHTML = '';
+      for (var i = 0; i < N; i++) {
+        var isW = i < W;
+        var isR = i >= N - R;
+        var overlap = isW && isR;
+        var x = 25 + i * 80;
+        svg.appendChild(svgEl('rect', {
+          x: x, y: 18, width: 64, height: 48, rx: 6,
+          fill: overlap ? 'var(--accent,#4f46e5)' : (isW || isR ? 'var(--surface,#f1f5f9)' : 'var(--bg,#fff)'),
+          stroke: overlap ? 'var(--accent,#4f46e5)' : 'var(--border,#cbd5e1)', 'stroke-width': overlap ? '2.5' : '1.5'
+        }));
+        svg.appendChild(svgEl('text', {
+          x: x + 32, y: 46, 'text-anchor': 'middle', 'font-size': '12', 'font-weight': '700',
+          fill: overlap ? '#fff' : 'var(--ink,#0f172a)',
+          text: overlap ? 'W∩R' : (isW ? 'W' : (isR ? 'R' : 'N' + (i + 1)))
+        }));
+      }
+      stats.innerHTML = '';
+      [
+        ['R + W vs N', R + ' + ' + W + ' = ' + (R + W) + (strong ? ' > ' : ' ≤ ') + N],
+        ['Guarantee', strong ? 'Overlap Guaranteed' : 'Stale Reads Possible'],
+        ['Fault Tolerance', 'Write tolerates ' + (N - W) + ' down · Read tolerates ' + (N - R) + ' down']
+      ].forEach(function (s) {
+        stats.appendChild(el('div', { class: 'ss-w-stat' }, [
+          el('span', { class: 'ss-w-stat-k', text: s[0] }),
+          el('span', { class: 'ss-w-stat-v', text: s[1] })
+        ]));
+      });
+    }
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
+  };
+
+  // 19. sim-raft-election
+  WIDGETS['sim-raft-election'] = function (root) {
+    var shell = makeShell(root, 'Raft Leader Election & Split-Brain Prevention', 'L31 · Consensus');
+    var term = 1, alive = 5;
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+    function render() {
+      ctrl.innerHTML = '';
+      ctrl.appendChild(el('button', { class: 'ss-w-btn primary', text: 'Kill Leader & Elect New', onClick: function () { term++; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(alive === 5), text: '5/5 Nodes Up', onClick: function () { alive = 5; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(alive === 3), text: 'Partition: 3 vs 2', onClick: function () { alive = 3; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(alive === 2), text: 'Minority Side (2/5)', onClick: function () { alive = 2; render(); } }));
+      var canElect = alive >= 3;
+      stats.innerHTML = '';
+      [
+        ['Raft Term', 'Term #' + term],
+        ['Reachable Nodes', alive + ' / 5 (Quorum = 3)'],
+        ['Cluster State', canElect ? 'Leader Active (Commits Allowed)' : 'No Majority Quorum (Read/Write Halted Safely)']
+      ].forEach(function (s) {
+        stats.appendChild(el('div', { class: 'ss-w-stat' }, [
+          el('span', { class: 'ss-w-stat-k', text: s[0] }),
+          el('span', { class: 'ss-w-stat-v', text: s[1] })
+        ]));
+      });
+    }
+    shell.appendChild(ctrl); shell.appendChild(stats); render();
+  };
+
+  // 20. sim-rate-limiter-algorithms
+  WIDGETS['sim-rate-limiter-algorithms'] = function (root) {
+    var shell = makeShell(root, 'Rate Limiter Burst Comparison (Limit: 5 req/min)', 'L35 · Security');
+    var algo = 'tb', tokens = 5, accepted = 0, rejected = 0;
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+    function burst() {
+      for (var i = 0; i < 4; i++) {
+        if (algo === 'fw') { accepted++; } // simulates boundary double burst
+        else if (tokens > 0) { tokens--; accepted++; }
+        else { rejected++; }
+      }
+      render();
+    }
+    function render() {
+      ctrl.innerHTML = '';
+      [['tb', 'Token Bucket'], ['sw', 'Sliding Window'], ['fw', 'Fixed Window (Boundary Bug)']].forEach(function (a) {
+        ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(algo === a[0]), text: a[1], onClick: function () { algo = a[0]; tokens = 5; accepted = 0; rejected = 0; render(); } }));
+      });
+      ctrl.appendChild(el('button', { class: 'ss-w-btn primary', text: 'Send 4-Req Burst', onClick: burst }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', text: 'Refill (+2 Tokens)', onClick: function () { tokens = Math.min(5, tokens + 2); render(); } }));
+      stats.innerHTML = '';
+      [
+        ['Tokens Remaining', algo === 'fw' ? 'Window Counter' : tokens + ' / 5'],
+        ['Accepted', String(accepted)],
+        ['429 Rejected', String(rejected)],
+        ['Boundary Burst Risk', algo === 'fw' ? 'Up to 2× Limit at 00:59–01:01' : 'Bounded Safely']
+      ].forEach(function (s) {
+        stats.appendChild(el('div', { class: 'ss-w-stat' }, [
+          el('span', { class: 'ss-w-stat-k', text: s[0] }),
+          el('span', { class: 'ss-w-stat-v', text: s[1] })
+        ]));
+      });
+    }
+    shell.appendChild(ctrl); shell.appendChild(stats); render();
+  };
+
+  function statGrid(statsEl, pairs) {
+    statsEl.innerHTML = '';
+    pairs.forEach(function (s) {
+      statsEl.appendChild(el('div', { class: 'ss-w-stat' }, [
+        el('span', { class: 'ss-w-stat-k', text: s[0] }),
+        el('span', { class: 'ss-w-stat-v', text: s[1] })
+      ]));
+    });
+  }
+
+  // 21. anim-schema-access-patterns
+  WIDGETS['anim-schema-access-patterns'] = function (root) {
+    var shell = makeShell(root, 'Schema Access Patterns: SQL Join vs Document vs Wide-Column', 'L10 · Data Models');
+    var mode = 'sql';
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+    function render() {
+      ctrl.innerHTML = '';
+      [['sql', 'Normalized SQL (3NF)'], ['doc', 'Document Embed'], ['wide', 'Wide-Column Partition']].forEach(function (m) {
+        ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(mode === m[0]), text: m[1], onClick: function () { mode = m[0]; render(); } }));
+      });
+      var info = mode === 'sql'
+        ? [['Read Joins', '2–3 Tables'], ['Write Fan-out', '1 Row'], ['Consistency', 'Foreign Keys + ACID']]
+        : mode === 'doc'
+          ? [['Read Joins', '0 (Single Document)'], ['Write Fan-out', 'Update Embedded Copies'], ['Consistency', 'Document-Atomic']]
+          : [['Read Joins', '0 (Partition Key Scan)'], ['Write Fan-out', 'Duplicated Query Tables'], ['Consistency', 'Tunable Quorum']];
+      statGrid(stats, info);
+    }
+    shell.appendChild(ctrl); shell.appendChild(stats); render();
+  };
+
+  // 22. anim-composite-index
+  WIDGETS['anim-composite-index'] = function (root) {
+    var shell = makeShell(root, 'Composite Index Leftmost Prefix: INDEX (tenant_id, created_at)', 'L12 · Indexing');
+    var query = 'both';
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+    function render() {
+      ctrl.innerHTML = '';
+      [['both', 'WHERE tenant_id=? AND created_at>?'], ['left', 'WHERE tenant_id=?'], ['right', 'WHERE created_at>? (Skips Leftmost)']].forEach(function (q) {
+        ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(query === q[0]), text: q[1], onClick: function () { query = q[0]; render(); } }));
+      });
+      var hit = query !== 'right';
+      statGrid(stats, [
+        ['Index Used?', hit ? 'YES (Index Range Seek)' : 'NO (Full Table Scan)'],
+        ['Rows Examined (10M table)', query === 'both' ? '~120 rows' : (query === 'left' ? '~2,500 rows' : '10,000,000 rows')],
+        ['Estimated Latency', query === 'both' ? '1.2 ms' : (query === 'left' ? '6 ms' : '1,850 ms')]
+      ]);
+    }
+    shell.appendChild(ctrl); shell.appendChild(stats); render();
+  };
+
+  // 23. anim-presigned-upload
+  WIDGETS['anim-presigned-upload'] = function (root) {
+    var shell = makeShell(root, 'API Proxy Upload vs Direct Presigned Multipart Upload', 'L14 · Object Storage');
+    var direct = true;
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+    function render() {
+      ctrl.innerHTML = '';
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(direct), text: 'Direct Presigned Multipart (2 GB)', onClick: function () { direct = true; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(!direct), text: 'Proxy Through API Server', onClick: function () { direct = false; render(); } }));
+      statGrid(stats, [
+        ['API Server Payload Bytes', direct ? '~2 KB (JSON Metadata Only)' : '2,000,000 KB (Full Video Stream)'],
+        ['Worker Thread Tie-Up', direct ? '< 15 ms per sign call' : 'Minutes per upload (OOM risk)'],
+        ['Retry Granularity', direct ? 'Retry failed 8 MB part only' : 'Restart whole 2 GB upload']
+      ]);
+    }
+    shell.appendChild(ctrl); shell.appendChild(stats); render();
+  };
+
+  // 24. anim-cache-aside-vs-through
+  WIDGETS['anim-cache-aside-vs-through'] = function (root) {
+    var shell = makeShell(root, 'Cache-Aside vs Write-Through vs Write-Behind', 'L15 · Caching');
+    var mode = 'aside';
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+    function render() {
+      ctrl.innerHTML = '';
+      [['aside', 'Cache-Aside'], ['through', 'Write-Through'], ['behind', 'Write-Behind (Write-Back)']].forEach(function (m) {
+        ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(mode === m[0]), text: m[1], onClick: function () { mode = m[0]; render(); } }));
+      });
+      var data = mode === 'aside'
+        ? [['Write Latency', 'Fast (DB only)'], ['Cold Miss Penalty', 'Yes (App fetches DB)'], ['Data Loss on Cache Crash', 'None (DB authoritative)']]
+        : mode === 'through'
+          ? [['Write Latency', 'Slower (Cache + DB sync)'], ['Cold Miss Penalty', 'Low (Cache warmed)'], ['Data Loss on Cache Crash', 'None']]
+          : [['Write Latency', 'Ultra-fast (Memory ACK)'], ['Batch DB Smoothing', 'High (Coalesced flushes)'], ['Data Loss on Cache Crash', 'Risky (Unflushed dirty keys)']];
+      statGrid(stats, data);
+    }
+    shell.appendChild(ctrl); shell.appendChild(stats); render();
+  };
+
+  // 25. anim-thread-vs-eventloop
+  WIDGETS['anim-thread-vs-eventloop'] = function (root) {
+    var shell = makeShell(root, 'Thread-Per-Request vs Non-Blocking Event Loop (2,000 Concurrent I/O Calls)', 'L18 · Concurrency');
+    var model = 'event';
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+    function render() {
+      ctrl.innerHTML = '';
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(model === 'thread'), text: 'Blocking Thread Pool (200 threads)', onClick: function () { model = 'thread'; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(model === 'event'), text: 'Async Event Loop + Pool', onClick: function () { model = 'event'; render(); } }));
+      statGrid(stats, model === 'thread'
+        ? [['Active Threads Blocked', '200 / 200 (100% Saturated)'], ['Queued Requests', '1,800 Waiting'], ['RAM Overhead', '~200 MB+ Thread Stacks']]
+        : [['Event Loop Threads', '1–4 Non-Blocking Loops'], ['Pending Sockets', '2,000 Epoll/Kqueue FDs'], ['Bottleneck Shifts To', 'Downstream DB Connection Pool']]);
+    }
+    shell.appendChild(ctrl); shell.appendChild(stats); render();
+  };
+
+  // 26. anim-replication-lag
+  WIDGETS['anim-replication-lag'] = function (root) {
+    var shell = makeShell(root, 'Async Replication Lag & Read-Your-Writes Mitigation', 'L19 · Replication');
+    var lagMs = 450, pinPrimary = false;
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+    var inp = el('input', { type: 'range', min: '50', max: '2000', step: '50', value: String(lagMs) });
+    var lbl = el('span', { text: lagMs + 'ms' });
+    inp.addEventListener('input', function () { lagMs = Number(inp.value); lbl.textContent = lagMs + 'ms'; render(); });
+    function render() {
+      ctrl.innerHTML = '';
+      ctrl.appendChild(el('label', { class: 'ss-w-slider' }, ['Replica Lag:', inp, lbl]));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(pinPrimary), text: 'Route Own Writes Window to Leader: ' + (pinPrimary ? 'ON' : 'OFF'), onClick: function () { pinPrimary = !pinPrimary; render(); } }));
+      statGrid(stats, [
+        ['User Posts Comment', 'Committed on Primary at t=0ms'],
+        ['User Refreshes at t=120ms', pinPrimary ? 'Reads Primary → Sees New Comment!' : 'Reads Lagging Replica (' + lagMs + 'ms behind) → Comment Missing!'],
+        ['Replica Consistency', pinPrimary ? 'Session Read-Your-Writes Preserved' : 'Stale Read Anomaly']
+      ]);
+    }
+    shell.appendChild(ctrl); shell.appendChild(stats); render();
+  };
+
+  // 27. anim-key-salting
+  WIDGETS['anim-key-salting'] = function (root) {
+    var shell = makeShell(root, 'Celebrity Hot Partition Mitigation via Key Salting', 'L21 · Sharding');
+    var salted = false;
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var svg = svgEl('svg', { viewBox: '0 0 600 110', class: 'ss-w-svg' });
+    function render() {
+      ctrl.innerHTML = '';
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(!salted), text: 'Unsalted Key: celeb_id', onClick: function () { salted = false; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(salted), text: 'Salted Key: celeb_id#[0..3]', onClick: function () { salted = true; render(); } }));
+      var loads = salted ? [28, 26, 24, 22] : [92, 3, 3, 2];
+      svg.innerHTML = '';
+      loads.forEach(function (pct, idx) {
+        var y = 14 + idx * 24;
+        svg.appendChild(svgEl('text', { x: 14, y: y + 14, 'font-size': '12', fill: 'var(--ink,#0f172a)', text: 'Shard ' + (idx + 1) }));
+        svg.appendChild(svgEl('rect', { x: 85, y: y + 2, width: pct * 4.2, height: 16, rx: 3, fill: pct > 70 ? 'var(--status-err,#b91c1c)' : 'var(--accent,#4f46e5)' }));
+        svg.appendChild(svgEl('text', { x: 95 + pct * 4.2, y: y + 14, 'font-size': '11', 'font-weight': '700', fill: 'var(--ink,#0f172a)', text: pct + '% Traffic' }));
+      });
+    }
+    shell.appendChild(ctrl); shell.appendChild(svg); render();
+  };
+
+  // 28. anim-uuid4-vs-uuid7-btree
+  WIDGETS['anim-uuid4-vs-uuid7-btree'] = function (root) {
+    var shell = makeShell(root, 'B-Tree Index Behavior: Random UUIDv4 vs Time-Ordered UUIDv7 / Snowflake', 'L22 · Distributed IDs');
+    var idType = 'uuid7';
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+    function render() {
+      ctrl.innerHTML = '';
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(idType === 'uuid4'), text: 'UUIDv4 (Random)', onClick: function () { idType = 'uuid4'; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(idType === 'uuid7'), text: 'UUIDv7 / Snowflake (Time-Ordered)', onClick: function () { idType = 'uuid7'; render(); } }));
+      statGrid(stats, idType === 'uuid4'
+        ? [['Insert Locality', 'Random across entire B-Tree'], ['Buffer Pool Cache Hit', 'Low (Cold page thrashing)'], ['Page Splits & Write Amp', 'High (50% sparse pages)']]
+        : [['Insert Locality', 'Monotonic right-edge append'], ['Buffer Pool Cache Hit', 'High (Hot rightmost leaf)'], ['Page Splits & Write Amp', 'Minimal (Dense sequential fill)']]);
+    }
+    shell.appendChild(ctrl); shell.appendChild(stats); render();
+  };
+
+  // 29. sim-consumer-group
+  WIDGETS['sim-consumer-group'] = function (root) {
+    var shell = makeShell(root, 'Kafka-Style Partitioned Log & Consumer Group Scaling', 'L23 · Streaming');
+    var partitions = 4, consumers = 2;
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+    function render() {
+      ctrl.innerHTML = '';
+      ctrl.appendChild(el('button', { class: 'ss-w-btn primary', text: '+ Add Consumer (' + consumers + ')', onClick: function () { consumers = Math.min(6, consumers + 1); render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', text: '- Remove Consumer', onClick: function () { consumers = Math.max(1, consumers - 1); render(); } }));
+      var active = Math.min(consumers, partitions);
+      var idle = Math.max(0, consumers - partitions);
+      statGrid(stats, [
+        ['Topic Partitions', String(partitions)],
+        ['Active Consumers', active + ' (max 1 consumer per partition)'],
+        ['Idle Consumers', idle > 0 ? idle + ' Idle (Increase partitions to scale further)' : '0 Idle']
+      ]);
+    }
+    shell.appendChild(ctrl); shell.appendChild(stats); render();
+  };
+
+  // 30. anim-delivery-semantics
+  WIDGETS['anim-delivery-semantics'] = function (root) {
+    var shell = makeShell(root, 'Message Delivery Semantics & Crash Timing', 'L24 · Messaging');
+    var crash = 'before-ack';
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+    function render() {
+      ctrl.innerHTML = '';
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(crash === 'before-work'), text: 'At-Most-Once (ACK first, crash in work)', onClick: function () { crash = 'before-work'; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(crash === 'before-ack'), text: 'At-Least-Once (Work first, crash before ACK)', onClick: function () { crash = 'before-ack'; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(crash === 'idem'), text: 'At-Least-Once + Idempotent Dedup', onClick: function () { crash = 'idem'; render(); } }));
+      statGrid(stats, crash === 'before-work'
+        ? [['Outcome', 'Message LOST permanently'], ['Safe For', 'Best-effort metrics / telemetry']]
+        : crash === 'before-ack'
+          ? [['Outcome', 'Broker redelivers → Side effect runs TWICE'], ['Safe For', 'Needs idempotent handler']]
+          : [['Outcome', 'Redelivery detected via event_id → Side effect runs ONCE'], ['Safe For', 'Payments, emails, inventory']]);
+    }
+    shell.appendChild(ctrl); shell.appendChild(stats); render();
+  };
+
+  // 31. anim-inverted-index-lookup
+  WIDGETS['anim-inverted-index-lookup'] = function (root) {
+    var shell = makeShell(root, 'Inverted Index Posting List Intersection', 'L26 · Search');
+    var q = 'both';
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+    function render() {
+      ctrl.innerHTML = '';
+      [['sys', 'Query: "system"'], ['des', 'Query: "design"'], ['both', 'Query: "system design"']].forEach(function (x) {
+        ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(q === x[0]), text: x[1], onClick: function () { q = x[0]; render(); } }));
+      });
+      statGrid(stats, [
+        ['Posting List: "system"', '[Doc 1, Doc 4, Doc 9]'],
+        ['Posting List: "design"', '[Doc 2, Doc 4, Doc 9]'],
+        ['Matched Docs (BM25 Ranked)', q === 'sys' ? '[Doc 1, Doc 4, Doc 9]' : (q === 'des' ? '[Doc 2, Doc 4, Doc 9]' : '[Doc 4, Doc 9] (Intersection)')]
+      ]);
+    }
+    shell.appendChild(ctrl); shell.appendChild(stats); render();
+  };
+
+  // 32. anim-watermark-late-events
+  WIDGETS['anim-watermark-late-events'] = function (root) {
+    var shell = makeShell(root, 'Event-Time Stream Window & Watermark Lateness', 'L27 · Streaming');
+    var slack = 2;
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+    var inp = el('input', { type: 'range', min: '0', max: '10', value: String(slack) });
+    var lbl = el('span', { text: slack + 's' });
+    inp.addEventListener('input', function () { slack = Number(inp.value); lbl.textContent = slack + 's'; render(); });
+    ctrl.appendChild(el('label', { class: 'ss-w-slider' }, ['Allowed Watermark Slack:', inp, lbl]));
+    function render() {
+      var lateEventDelay = 6;
+      statGrid(stats, [
+        ['Window Closed At', '12:01:00 + ' + slack + 's slack'],
+        ['Mobile Event Delayed 6s', lateEventDelay <= slack ? 'Included in Primary Window Aggregate' : 'Dropped or Routed to Late-Data Side Output'],
+        ['Latency vs Completeness', slack < 3 ? 'Fast Results (Lower Completeness)' : 'Higher Completeness (+' + slack + 's Window Delay)']
+      ]);
+    }
+    shell.appendChild(ctrl); shell.appendChild(stats); render();
+  };
+
+  // 33. anim-lease-expiry
+  WIDGETS['anim-lease-expiry'] = function (root) {
+    var shell = makeShell(root, 'etcd / ZooKeeper Ephemeral Lease Renewal & Handoff', 'L32 · Coordination');
+    var alive = true;
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+    function render() {
+      ctrl.innerHTML = '';
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(alive), text: 'Leader Heartbeat: ' + (alive ? 'HEALTHY' : 'STOPPED (Network Cut)'), onClick: function () { alive = !alive; render(); } }));
+      statGrid(stats, [
+        ['Lease TTL', '10 seconds (Heartbeat every 3s)'],
+        ['Current Leader', alive ? 'Node A (Lease Renewed)' : 'Lease Expired → Node B Acquires Key'],
+        ['Safety Requirement', 'Node A must step down & storage enforces Fencing Token']
+      ]);
+    }
+    shell.appendChild(ctrl); shell.appendChild(stats); render();
+  };
+
+  // 34. sim-load-shedding
+  WIDGETS['sim-load-shedding'] = function (root) {
+    var shell = makeShell(root, 'Overload Control: Unbounded FIFO vs Priority Load Shedding', 'L33 · Reliability');
+    var load = 130, shed = true;
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+    var inp = el('input', { type: 'range', min: '70', max: '160', step: '10', value: String(load) });
+    var lbl = el('span', { text: load + '%' });
+    inp.addEventListener('input', function () { load = Number(inp.value); lbl.textContent = load + '%'; render(); });
+    function render() {
+      ctrl.innerHTML = '';
+      ctrl.appendChild(el('label', { class: 'ss-w-slider' }, ['Incoming Load (% Capacity):', inp, lbl]));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(shed), text: 'Priority Load Shedding: ' + (shed ? 'ON' : 'OFF'), onClick: function () { shed = !shed; render(); } }));
+      var over = load > 100;
+      statGrid(stats, [
+        ['Critical Checkout p99', !over ? '45 ms' : (shed ? '58 ms (Protected!)' : '8,500+ ms (Timeout Collapse)')],
+        ['Low-Priority Traffic', !over ? '100% Served' : (shed ? 'Shed with 503 + Retry-After' : 'Queues & Starves Everything')],
+        ['Goodput (Useful Work/s)', !over ? load + '%' : (shed ? '98% Capacity' : '< 15% (Death Spiral)')]
+      ]);
+    }
+    shell.appendChild(ctrl); shell.appendChild(stats); render();
+  };
+
+  // 35. anim-distributed-trace
+  WIDGETS['anim-distributed-trace'] = function (root) {
+    var shell = makeShell(root, 'Distributed Trace Waterfall (OpenTelemetry)', 'L34 · Observability');
+    var fixed = false;
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var svg = svgEl('svg', { viewBox: '0 0 600 120', class: 'ss-w-svg' });
+    function render() {
+      ctrl.innerHTML = '';
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(!fixed), text: 'Buggy Trace (N+1 DB Calls · 420ms)', onClick: function () { fixed = false; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(fixed), text: 'Batched Query Fix (65ms)', onClick: function () { fixed = true; render(); } }));
+      svg.innerHTML = '';
+      var spans = [
+        { name: 'Gateway', x: 120, w: fixed ? 80 : 440, c: 'var(--accent,#4f46e5)' },
+        { name: 'Auth Check', x: 130, w: 30, c: 'var(--status-ok,#15803d)' },
+        { name: 'Order DB', x: 165, w: fixed ? 28 : 370, c: fixed ? 'var(--status-ok,#15803d)' : 'var(--status-err,#b91c1c)' },
+        { name: 'Kafka Pub', x: fixed ? 195 : 538, w: 20, c: 'var(--accent,#4f46e5)' }
+      ];
+      spans.forEach(function (sp, i) {
+        var y = 14 + i * 26;
+        svg.appendChild(svgEl('text', { x: 12, y: y + 14, 'font-size': '12', fill: 'var(--ink,#0f172a)', text: sp.name }));
+        svg.appendChild(svgEl('rect', { x: sp.x, y: y + 2, width: sp.w, height: 16, rx: 3, fill: sp.c }));
+      });
+    }
+    shell.appendChild(ctrl); shell.appendChild(svg); render();
+  };
+
+  // 36. anim-canary-rollback
+  WIDGETS['anim-canary-rollback'] = function (root) {
+    var shell = makeShell(root, 'SLO-Gated Progressive Canary Rollout', 'L36 · Deployments');
+    var stage = 1, errorSpike = false;
+    var pcts = ['1%', '10%', '50%', '100%'];
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+    function render() {
+      ctrl.innerHTML = '';
+      ctrl.appendChild(el('button', { class: 'ss-w-btn primary', text: 'Advance Canary (' + pcts[stage] + ')', onClick: function () { if (!errorSpike) stage = (stage + 1) % 4; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(errorSpike), text: errorSpike ? 'Clear Error Spike' : 'Inject 5xx Error Spike', onClick: function () { errorSpike = !errorSpike; if (errorSpike) stage = 0; render(); } }));
+      statGrid(stats, [
+        ['Canary Traffic Weight', errorSpike ? '0% (Auto-Rolled Back!)' : pcts[stage]],
+        ['Canary 5xx Error Rate', errorSpike ? '4.8% (> 0.5% SLO Gate)' : '0.02% (Healthy)'],
+        ['Blast Radius', errorSpike ? 'Contained to initial 1–10% canary slice' : 'Safe progressive promotion']
+      ]);
+    }
+    shell.appendChild(ctrl); shell.appendChild(stats); render();
+  };
+
+  // 37. anim-region-failover
+  WIDGETS['anim-region-failover'] = function (root) {
+    var shell = makeShell(root, 'Multi-Region Failover: RPO & RTO Simulator', 'L37 · Multi-Region');
+    var mode = 'active-passive', outage = false;
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+    function render() {
+      ctrl.innerHTML = '';
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(mode === 'active-passive'), text: 'Active-Passive (Warm Standby)', onClick: function () { mode = 'active-passive'; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(mode === 'active-active'), text: 'Active-Active (Multi-Region)', onClick: function () { mode = 'active-active'; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(outage), text: outage ? 'Restore US-East' : 'Blackout US-East', onClick: function () { outage = !outage; render(); } }));
+      statGrid(stats, [
+        ['US-East Status', outage ? 'DOWN' : 'Serving 50–100%'],
+        ['Expected RTO (Recovery Time)', !outage ? '0s' : (mode === 'active-active' ? '~10–30s (Healthcheck DNS shift)' : '~5–15 min (Promote standby)')],
+        ['RPO (Async Replication Gap)', mode === 'active-active' ? 'Sub-second to few seconds' : 'Seconds to minutes depending on WAL lag']
+      ]);
+    }
+    shell.appendChild(ctrl); shell.appendChild(stats); render();
+  };
+
+  // 38. anim-adr-tradeoff-radar
+  WIDGETS['anim-adr-tradeoff-radar'] = function (root) {
+    var shell = makeShell(root, 'Architecture Option Trade-Off Matrix (ADR Explorer)', 'L38 · Mastery');
+    var opt = 'mod';
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+    function render() {
+      ctrl.innerHTML = '';
+      [['mod', 'Modular Monolith'], ['micro', 'Event-Driven Microservices'], ['sl', 'Serverless Functions']].forEach(function (o) {
+        ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(opt === o[0]), text: o[1], onClick: function () { opt = o[0]; render(); } }));
+      });
+      var rows = opt === 'mod'
+        ? [['Operational Cost', 'Lowest'], ['Tail Latency', 'In-Process (< 5ms)'], ['Team Autonomy at 100+ Devs', 'Harder (Shared Deploy)']]
+        : opt === 'micro'
+          ? [['Operational Cost', 'High (Mesh + Tracing + Queues)'], ['Tail Latency', 'Network Hops + Serialization'], ['Team Autonomy at 100+ Devs', 'High (Independent Releases)']]
+          : [['Operational Cost', 'Pay-Per-Use (Spiky Fit)'], ['Tail Latency', 'Cold Starts Possible'], ['Stateful Connection Limits', 'Needs HTTP DB Proxy']];
+      statGrid(stats, rows);
+    }
+    shell.appendChild(ctrl); shell.appendChild(stats); render();
+  };
+
+  // 39. anim-llm-token-streaming
+  WIDGETS['anim-llm-token-streaming'] = function (root) {
+    var shell = makeShell(root, 'LLM Gateway: Semantic Cache & Token Streaming Latency', 'L39 · AI Systems');
+    var cacheHit = false, batching = true;
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+    function render() {
+      ctrl.innerHTML = '';
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(cacheHit), text: 'Semantic Cache Hit: ' + (cacheHit ? 'YES' : 'NO'), onClick: function () { cacheHit = !cacheHit; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(batching), text: 'Continuous Batching: ' + (batching ? 'ON' : 'OFF'), onClick: function () { batching = !batching; render(); } }));
+      statGrid(stats, [
+        ['Time to First Token (TTFT)', cacheHit ? '35 ms (Vector Cache)' : (batching ? '420 ms' : '1,800 ms (Head-of-Line Queue)')],
+        ['GPU Cost / 1M Tokens', cacheHit ? '$0 (Bypassed Inference)' : (batching ? '1× Baseline' : '3.5× Under-Utilized')],
+        ['Transport', 'HTTP SSE Token Stream + Per-Tenant Token Bucket']
+      ]);
+    }
+    shell.appendChild(ctrl); shell.appendChild(stats); render();
+  };
+
+  // 40. anim-strangler-cutover
+  WIDGETS['anim-strangler-cutover'] = function (root) {
+    var shell = makeShell(root, 'Strangler Fig Incremental Monolith Extraction', 'L40 · Evolution');
+    var pct = 25;
+    var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var stats = el('div', { class: 'ss-w-stats' });
+    var inp = el('input', { type: 'range', min: '0', max: '100', step: '25', value: String(pct) });
+    var lbl = el('span', { text: pct + '%' });
+    inp.addEventListener('input', function () { pct = Number(inp.value); lbl.textContent = pct + '%'; render(); });
+    ctrl.appendChild(el('label', { class: 'ss-w-slider' }, ['Extracted Service Traffic:', inp, lbl]));
+    function render() {
+      statGrid(stats, [
+        ['Legacy Monolith Traffic', (100 - pct) + '%'],
+        ['New Service Traffic', pct + '%'],
+        ['Safety Phase', pct === 0 ? 'Shadow Dual-Read Verification' : (pct < 100 ? 'Canary / Progressive Rollback Ready' : 'Monolith Route Retired')]
+      ]);
+    }
+    shell.appendChild(ctrl); shell.appendChild(stats); render();
+  };
+
+  function mountOne(node) {
+    var id = node.getAttribute('data-stackshade-anim');
+    if (!id) return;
+    injectBaseStyles();
+    if (WIDGETS[id]) {
+      WIDGETS[id](node);
+    } else {
+      var shell = makeShell(node, 'Interactive Diagram: ' + id, 'Interactive Spec');
+      shell.appendChild(el('div', { class: 'ss-w-note', text: 'Interactive visualization stub (' + id + '). Refer to lesson diagram & simulation spec.' }));
+    }
+  }
+
+  function mountAll(scope) {
+    var list = (scope || document).querySelectorAll('[data-stackshade-anim]');
+    for (var i = 0; i < list.length; i++) mountOne(list[i]);
+  }
+
+  global.StackShadeVisuals = { mountAll: mountAll, mountOne: mountOne, ids: Object.keys(WIDGETS) };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+  </script>
+  <script>
+    (function(){
+      var slides = Array.prototype.slice.call(document.querySelectorAll('.ss-slide'));
+      var notesData = ["Today we trace OAuth 2.1 + PKCE across trust boundaries, close JWT and BOLA authorization gaps, compare RBAC/ABAC/ReBAC, and benchmark rate-limiter algorithms.","Emphasize that cryptographic signature checks are only one piece of security—object ownership, revocation, and abuse limits are equally critical.","Explain why RFC 9700 mandates PKCE for ALL Authorization Code clients and bans Implicit flow.","Contrast stateless JWT latency (~0.08 ms local) vs opaque token instant revocation (~0.4 ms Redis lookup).","BOLA (Broken Object Level Authorization) is #1 on OWASP API Top 10 because teams trust IDs from URL paths/bodies.","Envelope encryption prevents hammering KMS over the network for 100 MB/s file streams while enabling fast KEK rotation.","Emphasize atomic Redis Lua execution so concurrent requests cannot race GET->compute->SET.","Point out how Token Bucket cleanly absorbs small user page-load bursts up to bucket_capacity while rejecting sustained floods.","Always ask \"how many active keys * how many timestamps?\" before proposing a ZSET sliding log in an interview.","Never let a Redis outage lock out 100% of paying checkout users when a local pod cap can protect the DB safely.","Answers: (1) auth code interception/injection, (2) aud (and scope/iss), (3) prevents concurrent TOCTOU race conditions."];
+      var idx = Math.max(0, Math.min(slides.length - 1, (parseInt((location.hash || '').replace('#slide-',''), 10) || 1) - 1));
+      var counter = document.getElementById('counter');
+      var progress = document.getElementById('progress');
+      var notesEl = document.getElementById('notes');
+      var gridEl = document.getElementById('grid');
+
+      function show(n, revealAll) {
+        idx = Math.max(0, Math.min(slides.length - 1, n));
+        slides.forEach(function(s, i) {
+          s.classList.toggle('active', i === idx);
+          var steps = s.querySelectorAll('.ss-step');
+          steps.forEach(function(st) { st.classList.toggle('revealed', !!revealAll && i === idx); });
+        });
+        counter.textContent = (idx + 1) + ' / ' + slides.length;
+        progress.style.width = (((idx + 1) / slides.length) * 100) + '%';
+        notesEl.innerHTML = '<strong>Speaker Notes · Slide ' + (idx + 1) + '</strong><p style="margin:6px 0 0">' + (notesData[idx] ? notesData[idx].replace(/</g,'&lt;') : 'No notes for this slide.') + '</p>';
+        history.replaceState(null, '', '#slide-' + (idx + 1));
+        if (window.StackShadeVisuals) StackShadeVisuals.mountAll(slides[idx]);
+      }
+      function next() {
+        var unrevealed = slides[idx].querySelector('.ss-step:not(.revealed)');
+        if (unrevealed) { unrevealed.classList.add('revealed'); return; }
+        if (idx < slides.length - 1) show(idx + 1, false);
+      }
+      function prev() {
+        var revealed = slides[idx].querySelectorAll('.ss-step.revealed');
+        if (revealed.length) { revealed[revealed.length - 1].classList.remove('revealed'); return; }
+        if (idx > 0) show(idx - 1, true);
+      }
+      function toggleGrid() {
+        if (!gridEl.hidden) { gridEl.hidden = true; return; }
+        gridEl.innerHTML = '';
+        slides.forEach(function(s, i) {
+          var h = s.querySelector('h1,h2,h3');
+          var btn = document.createElement('button');
+          btn.className = 'ss-thumb' + (i === idx ? ' cur' : '');
+          btn.innerHTML = '<div style="font-size:11px;opacity:.7">Slide ' + (i + 1) + '</div><div style="font-weight:700;margin-top:4px">' + (h ? h.textContent : 'Slide') + '</div>';
+          btn.onclick = function() { gridEl.hidden = true; show(i, false); };
+          gridEl.appendChild(btn);
+        });
+        gridEl.hidden = false;
+      }
+
+      // Optional local-only webcam bubble (never uploads or records)
+      var camStream = null, camBox = document.getElementById('camBox'), camVid = document.getElementById('camVid'), camBtn = document.getElementById('camBtn');
+      function stopCam() {
+        if (camStream) { camStream.getTracks().forEach(function(t){ t.stop(); }); camStream = null; }
+        camVid.srcObject = null; camBox.style.display = 'none'; camBtn.textContent = 'Camera: Off';
+      }
+      function toggleCam() {
+        if (camStream) { stopCam(); return; }
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { alert('Camera API unavailable in this browser.'); return; }
+        navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(function(stream) {
+          camStream = stream; camVid.srcObject = stream; camBox.style.display = 'block'; camBtn.textContent = 'Camera: On';
+        }).catch(function() { alert('Camera permission denied or device unavailable.'); });
+      }
+      window.addEventListener('beforeunload', stopCam);
+
+      // Drag webcam bubble
+      var drag = null;
+      camBox.addEventListener('pointerdown', function(e) { drag = { x: e.clientX - camBox.offsetLeft, y: e.clientY - camBox.offsetTop }; camBox.setPointerCapture(e.pointerId); });
+      camBox.addEventListener('pointermove', function(e) { if (!drag) return; camBox.style.left = (e.clientX - drag.x) + 'px'; camBox.style.top = (e.clientY - drag.y) + 'px'; camBox.style.right = 'auto'; camBox.style.bottom = 'auto'; });
+      camBox.addEventListener('pointerup', function() { drag = null; });
+
+      document.getElementById('nextBtn').onclick = next;
+      document.getElementById('prevBtn').onclick = prev;
+      document.getElementById('gridBtn').onclick = toggleGrid;
+      document.getElementById('notesBtn').onclick = function(){ notesEl.hidden = !notesEl.hidden; };
+      document.getElementById('themeBtn').onclick = function(){
+        var root = document.documentElement;
+        root.setAttribute('data-theme', root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+      };
+      document.getElementById('camBtn').onclick = toggleCam;
+      document.getElementById('fsBtn').onclick = function(){
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(function(){});
+        else document.exitFullscreen();
+      };
+      document.addEventListener('keydown', function(e) {
+        if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+        if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+        else if (e.key === 'ArrowLeft' || e.key === 'Backspace') { e.preventDefault(); prev(); }
+        else if (e.key.toLowerCase() === 'g') toggleGrid();
+        else if (e.key.toLowerCase() === 'n') notesEl.hidden = !notesEl.hidden;
+        else if (e.key.toLowerCase() === 't') document.getElementById('themeBtn').click();
+        else if (e.key.toLowerCase() === 'c') toggleCam();
+        else if (e.key.toLowerCase() === 'f') document.getElementById('fsBtn').click();
+        else if (e.key === 'Escape') { gridEl.hidden = true; notesEl.hidden = true; }
+      });
+
+      show(idx, false);
+    })();
+  </script>
+  <script type="module">
+    try {
+      const m = await import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs');
+      m.default.initialize({ startOnLoad: false, theme: document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'neutral' });
+      await m.default.run({ querySelector: 'pre.mermaid' });
+    } catch (_) {
+      // Offline graceful fallback: crisp monospace Mermaid source stays readable inside .ss-mermaid-box
+    }
+  </script>
+</body>
+</html>

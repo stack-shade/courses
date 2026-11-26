@@ -1,0 +1,10 @@
+flowchart LR
+  P([Product Constraint]) -->|Drives| R[Quality Requirement]
+  R -->|Defines| SLI[Measurable SLI]
+  SLI -->|Sets target| SLO[SLO & Error Budget]
+  SLO -->|Latency target| L1[Cache / Edge / Indexing]
+  SLO -->|Availability target| L2[Redundancy & Health Checks]
+  SLO -->|Durability target| L3[WAL & Multi-AZ Replicas]
+  L1 -.->|Trade-off| C1[Staleness & invalidation]
+  L2 -.->|Trade-off| C2[Higher infra & ops cost]
+  L3 -.->|Trade-off| C3[Write latency overhead]

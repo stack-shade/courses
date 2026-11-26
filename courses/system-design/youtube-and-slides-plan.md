@@ -52,47 +52,47 @@ See [Downloadable Animated HTML Slides Spec](../../shared/guides/downloadable-ht
 
 | Ep | Module | Slide Source (`slides/`) | Downloadable HTML Deck (`downloads/`) | Target Video Length | Status |
 |---|---|---|---|---:|---|
-| **EP01** | M00 | [01-course-kickoff.md](slides/01-course-kickoff.md) | `01-course-kickoff.html` | 12–15 min | Slide source ready |
-| **EP02** | M00 | [02-requirements-and-estimation.md](slides/02-requirements-and-estimation.md) | `02-requirements-and-estimation.html` | 15–18 min | Slide source ready |
-| **EP03** | M00 | `03-capacity-estimation.md` | `03-capacity-estimation.html` | 15–18 min | Planned |
-| **EP04** | M00 | `04-latency-and-bottlenecks.md` | `04-latency-and-bottlenecks.html` | 15–18 min | Planned |
-| **EP05** | M01 | `05-web-request-dns.md` | `05-web-request-dns.html` | 16–20 min | Planned |
-| **EP06** | M01 | `06-transport-tls-http.md` | `06-transport-tls-http.html` | 18–22 min | Planned |
-| **EP07** | M01 | `07-proxies-cdn-gateway.md` | `07-proxies-cdn-gateway.html` | 14–18 min | Planned |
-| **EP08** | M01 | `08-load-balancing.md` | `08-load-balancing.html` | 15–18 min | Planned |
-| **EP09** | M01 | `09-api-contracts.md` | `09-api-contracts.html` | 18–22 min | Planned |
-| **EP10** | M02 | `10-data-models.md` | `10-data-models.html` | 18–20 min | Planned |
-| **EP11** | M02 | `11-storage-engines.md` | `11-storage-engines.html` | 20–25 min | Planned |
-| **EP12** | M02 | `12-indexing-query-plans.md` | `12-indexing-query-plans.html` | 18–22 min | Planned |
-| **EP13** | M02 | `13-transactions-isolation.md` | `13-transactions-isolation.html` | 20–24 min | Planned |
-| **EP14** | M02 | `14-object-storage.md` | `14-object-storage.html` | 14–18 min | Planned |
-| **EP15** | M03 | `15-caching-patterns.md` | `15-caching-patterns.html` | 15–18 min | Planned |
-| **EP16** | M03 | `16-eviction-invalidation.md` | `16-eviction-invalidation.html` | 15–18 min | Planned |
-| **EP17** | M03 | `17-cache-failure-modes.md` | `17-cache-failure-modes.html` | 16–20 min | Planned |
-| **EP18** | M03 | `18-stateless-concurrency.md` | `18-stateless-concurrency.html` | 15–18 min | Planned |
-| **EP19** | M04 | `19-replication.md` | `19-replication.html` | 18–22 min | Planned |
-| **EP20** | M04 | `20-sharding-hashing.md` | `20-sharding-hashing.html` | 18–22 min | Planned |
-| **EP21** | M04 | `21-hot-shards-migrations.md` | `21-hot-shards-migrations.html` | 16–20 min | Planned |
-| **EP22** | M04 | `22-distributed-ids.md` | `22-distributed-ids.html` | 14–16 min | Planned |
-| **EP23** | M05 | `23-queues-vs-streams.md` | `23-queues-vs-streams.html` | 16–20 min | Planned |
-| **EP24** | M05 | `24-delivery-semantics.md` | `24-delivery-semantics.html` | 15–18 min | Planned |
-| **EP25** | M05 | `25-outbox-saga-cqrs.md` | `25-outbox-saga-cqrs.html` | 20–24 min | Planned |
-| **EP26** | M05 | `26-search-pipelines.md` | `26-search-pipelines.html` | 18–22 min | Planned |
-| **EP27** | M05 | `27-stream-olap.md` | `27-stream-olap.html` | 18–22 min | Planned |
-| **EP28** | M06 | `28-partial-failure.md` | `28-partial-failure.html` | 16–20 min | Planned |
-| **EP29** | M06 | `29-clocks-and-fencing.md` | `29-clocks-and-fencing.html` | 18–22 min | Planned |
-| **EP30** | M06 | `30-consistency-quorums.md` | `30-consistency-quorums.html` | 20–24 min | Planned |
-| **EP31** | M06 | `31-cap-consensus-raft.md` | `31-cap-consensus-raft.html` | 22–26 min | Planned |
-| **EP32** | M06 | `32-distributed-coordination.md` | `32-distributed-coordination.html` | 15–18 min | Planned |
-| **EP33** | M07 | `33-reliability-overload.md` | `33-reliability-overload.html` | 18–22 min | Planned |
-| **EP34** | M07 | `34-observability-chaos.md` | `34-observability-chaos.html` | 18–22 min | Planned |
-| **EP35** | M07 | `35-security-identity.md` | `35-security-identity.html` | 20–24 min | Planned |
-| **EP36** | M07 | `36-cloud-deployments.md` | `36-cloud-deployments.html` | 16–20 min | Planned |
-| **EP37** | M07 | `37-multi-region-finops.md` | `37-multi-region-finops.html` | 20–24 min | Planned |
-| **EP38** | M08 | `38-problem-decomposition.md` | `38-problem-decomposition.html` | 18–20 min | Planned |
-| **EP39** | M08 | `39-ai-systems-architecture.md` | `39-ai-systems-architecture.html` | 20–25 min | Planned |
-| **EP40** | M08 | `40-system-evolution.md` | `40-system-evolution.html` | 18–22 min | Planned |
-| **CS01–16** | M08 | `cs-01-url-shortener.md` … `cs-16-multitenant-saas.md` | `cs-01-url-shortener.html` … | 20–30 min each | Planned |
+| **EP01** | M00 | [01-course-kickoff.md](slides/01-course-kickoff.md) | [01-course-kickoff.html](downloads/01-course-kickoff.html) | 12–15 min | Ready to record |
+| **EP02** | M00 | [02-requirements-and-estimation.md](slides/02-requirements-and-estimation.md) | [02-requirements-and-estimation.html](downloads/02-requirements-and-estimation.html) | 15–18 min | Ready to record |
+| **EP03** | M00 | [03-capacity-estimation.md](slides/03-capacity-estimation.md) | [03-capacity-estimation.html](downloads/03-capacity-estimation.html) | 15–18 min | Ready to record |
+| **EP04** | M00 | [04-latency-and-bottlenecks.md](slides/04-latency-and-bottlenecks.md) | [04-latency-and-bottlenecks.html](downloads/04-latency-and-bottlenecks.html) | 15–18 min | Ready to record |
+| **EP05** | M01 | [05-web-request-dns.md](slides/05-web-request-dns.md) | [05-web-request-dns.html](downloads/05-web-request-dns.html) | 16–20 min | Ready to record |
+| **EP06** | M01 | [06-transport-tls-http.md](slides/06-transport-tls-http.md) | [06-transport-tls-http.html](downloads/06-transport-tls-http.html) | 18–22 min | Ready to record |
+| **EP07** | M01 | [07-proxies-cdn-gateway.md](slides/07-proxies-cdn-gateway.md) | [07-proxies-cdn-gateway.html](downloads/07-proxies-cdn-gateway.html) | 14–18 min | Ready to record |
+| **EP08** | M01 | [08-load-balancing.md](slides/08-load-balancing.md) | [08-load-balancing.html](downloads/08-load-balancing.html) | 15–18 min | Ready to record |
+| **EP09** | M01 | [09-api-contracts.md](slides/09-api-contracts.md) | [09-api-contracts.html](downloads/09-api-contracts.html) | 18–22 min | Ready to record |
+| **EP10** | M02 | [10-data-models.md](slides/10-data-models.md) | [10-data-models.html](downloads/10-data-models.html) | 18–20 min | Ready to record |
+| **EP11** | M02 | [11-storage-engines.md](slides/11-storage-engines.md) | [11-storage-engines.html](downloads/11-storage-engines.html) | 20–25 min | Ready to record |
+| **EP12** | M02 | [12-indexing-query-plans.md](slides/12-indexing-query-plans.md) | [12-indexing-query-plans.html](downloads/12-indexing-query-plans.html) | 18–22 min | Ready to record |
+| **EP13** | M02 | [13-transactions-isolation.md](slides/13-transactions-isolation.md) | [13-transactions-isolation.html](downloads/13-transactions-isolation.html) | 20–24 min | Ready to record |
+| **EP14** | M02 | [14-object-storage.md](slides/14-object-storage.md) | [14-object-storage.html](downloads/14-object-storage.html) | 14–18 min | Ready to record |
+| **EP15** | M03 | [15-caching-patterns.md](slides/15-caching-patterns.md) | [15-caching-patterns.html](downloads/15-caching-patterns.html) | 15–18 min | Ready to record |
+| **EP16** | M03 | [16-eviction-invalidation.md](slides/16-eviction-invalidation.md) | [16-eviction-invalidation.html](downloads/16-eviction-invalidation.html) | 15–18 min | Ready to record |
+| **EP17** | M03 | [17-cache-failure-modes.md](slides/17-cache-failure-modes.md) | [17-cache-failure-modes.html](downloads/17-cache-failure-modes.html) | 16–20 min | Ready to record |
+| **EP18** | M03 | [18-stateless-concurrency.md](slides/18-stateless-concurrency.md) | [18-stateless-concurrency.html](downloads/18-stateless-concurrency.html) | 15–18 min | Ready to record |
+| **EP19** | M04 | [19-replication.md](slides/19-replication.md) | [19-replication.html](downloads/19-replication.html) | 18–22 min | Ready to record |
+| **EP20** | M04 | [20-sharding-hashing.md](slides/20-sharding-hashing.md) | [20-sharding-hashing.html](downloads/20-sharding-hashing.html) | 18–22 min | Ready to record |
+| **EP21** | M04 | [21-hot-shards-migrations.md](slides/21-hot-shards-migrations.md) | [21-hot-shards-migrations.html](downloads/21-hot-shards-migrations.html) | 16–20 min | Ready to record |
+| **EP22** | M04 | [22-distributed-ids.md](slides/22-distributed-ids.md) | [22-distributed-ids.html](downloads/22-distributed-ids.html) | 14–16 min | Ready to record |
+| **EP23** | M05 | [23-queues-vs-streams.md](slides/23-queues-vs-streams.md) | [23-queues-vs-streams.html](downloads/23-queues-vs-streams.html) | 16–20 min | Ready to record |
+| **EP24** | M05 | [24-delivery-semantics.md](slides/24-delivery-semantics.md) | [24-delivery-semantics.html](downloads/24-delivery-semantics.html) | 15–18 min | Ready to record |
+| **EP25** | M05 | [25-outbox-saga-cqrs.md](slides/25-outbox-saga-cqrs.md) | [25-outbox-saga-cqrs.html](downloads/25-outbox-saga-cqrs.html) | 20–24 min | Ready to record |
+| **EP26** | M05 | [26-search-pipelines.md](slides/26-search-pipelines.md) | [26-search-pipelines.html](downloads/26-search-pipelines.html) | 18–22 min | Ready to record |
+| **EP27** | M05 | [27-stream-olap.md](slides/27-stream-olap.md) | [27-stream-olap.html](downloads/27-stream-olap.html) | 18–22 min | Ready to record |
+| **EP28** | M06 | [28-partial-failure.md](slides/28-partial-failure.md) | [28-partial-failure.html](downloads/28-partial-failure.html) | 16–20 min | Ready to record |
+| **EP29** | M06 | [29-clocks-and-fencing.md](slides/29-clocks-and-fencing.md) | [29-clocks-and-fencing.html](downloads/29-clocks-and-fencing.html) | 18–22 min | Ready to record |
+| **EP30** | M06 | [30-consistency-quorums.md](slides/30-consistency-quorums.md) | [30-consistency-quorums.html](downloads/30-consistency-quorums.html) | 20–24 min | Ready to record |
+| **EP31** | M06 | [31-cap-consensus-raft.md](slides/31-cap-consensus-raft.md) | [31-cap-consensus-raft.html](downloads/31-cap-consensus-raft.html) | 22–26 min | Ready to record |
+| **EP32** | M06 | [32-distributed-coordination.md](slides/32-distributed-coordination.md) | [32-distributed-coordination.html](downloads/32-distributed-coordination.html) | 15–18 min | Ready to record |
+| **EP33** | M07 | [33-reliability-overload.md](slides/33-reliability-overload.md) | [33-reliability-overload.html](downloads/33-reliability-overload.html) | 18–22 min | Ready to record |
+| **EP34** | M07 | [34-observability-chaos.md](slides/34-observability-chaos.md) | [34-observability-chaos.html](downloads/34-observability-chaos.html) | 18–22 min | Ready to record |
+| **EP35** | M07 | [35-security-identity.md](slides/35-security-identity.md) | [35-security-identity.html](downloads/35-security-identity.html) | 20–24 min | Ready to record |
+| **EP36** | M07 | [36-cloud-deployments.md](slides/36-cloud-deployments.md) | [36-cloud-deployments.html](downloads/36-cloud-deployments.html) | 16–20 min | Ready to record |
+| **EP37** | M07 | [37-multi-region-finops.md](slides/37-multi-region-finops.md) | [37-multi-region-finops.html](downloads/37-multi-region-finops.html) | 20–24 min | Ready to record |
+| **EP38** | M08 | [38-problem-decomposition.md](slides/38-problem-decomposition.md) | [38-problem-decomposition.html](downloads/38-problem-decomposition.html) | 18–20 min | Ready to record |
+| **EP39** | M08 | [39-ai-systems-architecture.md](slides/39-ai-systems-architecture.md) | [39-ai-systems-architecture.html](downloads/39-ai-systems-architecture.html) | 20–25 min | Ready to record |
+| **EP40** | M08 | [40-system-evolution.md](slides/40-system-evolution.md) | [40-system-evolution.html](downloads/40-system-evolution.html) | 18–22 min | Ready to record |
+| **CS01–16** | M08 | See [Case Studies](curriculum.md#essential-case-study-library-16-end-to-end-systems) | Planned case walkthrough decks | 20–30 min each | Case briefs ready |
 
 ---
 

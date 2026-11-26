@@ -1,0 +1,27 @@
+sequenceDiagram
+  participant C as ([Client])
+  participant API as [Upload API]
+  participant DB as [(Metadata DB)]
+  participant S3 as [(Object Store)]
+  participant Q as [/Processing Queue/]
+
+  C->>API: POST /uploads/init (filename, sizeBytes, sha256)
+  API->>S3: CreateMultipartUpload
+  S3-->>API: uploadId
+  API->>DB: INSERT upload_sessions (status='initiated')
+  API-->>C: 201 Created (uploadId + presigned part URLs)
+
+  par Direct Parallel Chunk PUTs
+    C->>S3: PUT part 1 (5 MiB) + SigV4 URL
+    S3-->>C: 200 OK (ETag-1)
+  and
+    C->>S3: PUT part N (5 MiB) + SigV4 URL
+    S3-->>C: 200 OK (ETag-N)
+  end
+
+  C->>API: POST /uploads/complete (uploadId, parts + ETags)
+  API->>S3: CompleteMultipartUpload
+  S3-->>API: 200 OK (Final Object ETag)
+  API->>DB: UPDATE upload_sessions SET status='ready'
+  API-.->Q: Enqueue thumbnail / transcode job
+  API-->>C: 200 OK (assetId)

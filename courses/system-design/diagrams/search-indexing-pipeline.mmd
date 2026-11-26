@@ -1,0 +1,10 @@
+flowchart LR
+  API[Catalog Service] -->|ACID Write| DB[(Primary Product DB)]
+  DB ==>|WAL / CDC stream| Q[/Catalog Change Stream/]
+  Q -.->|Async batch| IDX[Indexing Pipeline Worker]
+  IDX -->|Tokenize + normalize + stem| INV[(Inverted Index: BM25)]
+  IDX -->|Generate vector embedding| VEC[(HNSW Vector Index)]
+  U([Search Client]) -->|HTTPS GET /search?q=...| QRY[Search Query Coordinator]
+  QRY -->|Lexical match| INV
+  QRY -->|Semantic match| VEC
+  QRY -.->|RRF / Rerank top-K| U

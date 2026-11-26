@@ -1,6 +1,35 @@
+---
+id: "02"
+module: "00"
+title: "Functional Requirements & Quality Attributes"
+level: "Beginner"
+status: "draft"
+durationMinutes: 18
+prerequisites:
+  - "01-thinking-in-systems"
+objectives:
+  - "Turn an open-ended prompt into explicit functional and non-functional requirements"
+  - "Identify workload shape: users, read/write mix, peak traffic, payload sizes and growth"
+  - "Calculate average and peak request rates, rough storage and bandwidth"
+  - "State assumptions and identify which estimate matters most"
+slides: "../slides/02-requirements-and-estimation.md"
+downloadHtml: "../downloads/02-requirements-and-estimation.html"
+diagrams:
+  - "../diagrams/nfr-tradeoff-tree.mmd"
+animations:
+  - "anim-tail-latency"
+youtube:
+  videoId: null
+  publishedAt: null
+  chapters: []
+  transcriptUrl: null
+---
+
 # 02 · Requirements and Capacity
 
 **Level:** Beginner · **Status:** First draft · **Prerequisite:** [Thinking in systems](01-thinking-in-systems.md)
+
+> **Slides & Visuals:** [Requirements & Estimation Deck](../slides/02-requirements-and-estimation.md) · Diagram: [nfr-tradeoff-tree.mmd](../diagrams/nfr-tradeoff-tree.mmd) · Interactive visual: `anim-tail-latency` ([catalog](../animations-and-visuals.md)) · Deep dive next: [03 · Capacity estimation](03-capacity-estimation.md)
 
 ## Learning objectives
 - Turn an open-ended prompt into explicit functional and non-functional requirements.

@@ -1,8 +1,10 @@
 ---
 marp: true
-theme: default
+theme: dark
 paginate: true
 size: 16:9
+slug: 02-requirements-and-estimation
+lesson: ../lessons/02-requirements-and-capacity.md
 title: Requirements and Capacity Estimation
 description: A first-principles system design module
 style: |
@@ -44,6 +46,14 @@ Don't confuse "use Redis" with a requirement.
 | Cost | What is the operating budget? |
 
 Targets need a workload, scope and measurement window.
+
+---
+
+# Interactive Tail Latency Explorer (p95 / p99)
+
+<!-- anim: anim-tail-latency -->
+
+<!-- note: Drag the Slow Requests % slider live to show why average latency hides p99 pain. -->
 
 ---
 

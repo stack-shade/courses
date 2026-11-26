@@ -1,0 +1,22 @@
+sequenceDiagram
+  participant UA as User / Browser (Untrusted Zone)
+  participant App as Client App (Public / BFF)
+  participant AS as Authorization Server (IdP)
+  participant API as Resource API (Protected Zone)
+
+  Note over UA,App: Trust Boundary 1: Public client cannot hold a secret safely
+  App->>App: Generate random code_verifier + SHA-256 code_challenge
+  App->>UA: Redirect to /authorize (code_challenge, S256, state, scope)
+  UA->>AS: HTTPS GET /authorize + user login & MFA
+  AS-->>UA: 302 Redirect w/ one-time authorization code + state
+  UA->>App: Deliver callback (code, state)
+
+  Note over App,AS: Trust Boundary 2: Token exchange bound to code_verifier
+  App->>AS: HTTPS POST /token (code, code_verifier, redirect_uri)
+  AS->>AS: Verify SHA256(code_verifier) == stored code_challenge
+  AS-->>App: Short-lived Access Token (JWT, 5 min) + Refresh Token (rotated)
+
+  Note over App,API: Trust Boundary 3: Resource API validates signature, aud, iss, scope
+  App->>API: HTTPS GET /v1/orders (Authorization: Bearer <access_token>)
+  API->>API: Verify JWKS sig, exp, aud, scope + tenant RBAC check
+  API-->>App: 200 OK (scoped JSON payload)

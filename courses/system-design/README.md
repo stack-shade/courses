@@ -3,10 +3,18 @@
 **Learn to design, measure, scale, secure, and defend real-world software systems from first principles.**
 
 - **Level:** Beginner → Intermediate → Advanced → Staff Architecture
-- **Scope:** 9 Modules · 40 Structured Lessons · 14 Hands-On Labs · 16 End-to-End Case Studies · 4 Stage Projects + 1 Capstone · 5 Checkpoints
-- **Formats:** Written articles · 45+ Mermaid diagrams · 20 animated/interactive visuals · Downloadable standalone HTML slides & PPTX · YouTube video lectures
-- **Status:** In progress (Foundation drafts live; full syllabus mapped)
+- **Scope:** 9 Modules · 40 Written Lessons · 14 Hands-On Labs · 16 End-to-End Case Studies · 4 Stage Projects · 5 Checkpoints
+- **Interactive Teaching Assets:** 19 `.mmd` + 40+ inline Mermaid diagrams · 40 zero-dependency interactive visualizations · 40 standalone animated `.html` slide decks (with built-in presenter webcam bubble)
+- **Status:** Content drafts complete (`L01–L40`, `Labs 01–14`, `Case Studies 01–16`, `Slides 01–40`); YouTube video recordings in progress
 - **YouTube Channel:** [@StackShade](https://www.youtube.com/@StackShade)
+
+---
+
+## Start Studying or Teaching Immediately
+
+- **Open Offline Slides & Interactive Visuals Hub:** [`downloads/index.html`](downloads/index.html) *(40 animated `.html` decks + all 40 live simulations, works offline)*
+- **Browse Full Curriculum:** [Full Curriculum Map](curriculum.md) · [Staged Roadmap](roadmap.md) · [Detailed Syllabus](syllabus.md)
+- **First Lesson:** [01 · Thinking in Systems](lessons/01-thinking-in-systems.md)
 
 ---
 
@@ -23,54 +31,22 @@
 
 ## Course Snapshot
 
-| Track | Modules | Lessons | Labs | Milestone / Project |
-|---|---:|---:|---:|---|
-| **Stage 1 · Foundations** | Modules 0–2 | L01–L14 | Labs 01–05 | System map, API spec, Storage ADR |
-| **Stage 2 · Building Blocks & Scale** | Modules 3–5 | L15–L27 | Labs 06–10 | URL Shortener, Notification & Feed Platforms |
-| **Stage 3 · Distributed & Reliable** | Modules 6–7 | L28–L37 | Labs 11–14 | Multi-Region Chat & Presence + Chaos Drill |
-| **Stage 4 · Architecture Mastery** | Module 8 | L38–L40 | 16 Case Studies | Production Capstone + Recorded Review |
+| Track | Modules | Lessons | Labs & Checkpoints | Stage Project / Milestone |
+|---|---:|---:|---|---|
+| **Stage 1 · Foundations** | Modules 0–2 | [L01](lessons/01-thinking-in-systems.md)–[L14](lessons/14-object-storage.md) | Labs `01–05` · [Checkpoint 01](assessments/checkpoint-01.md) & [02](assessments/checkpoint-02.md) | System map, API spec, Storage ADR |
+| **Stage 2 · Building Blocks & Scale** | Modules 3–5 | [L15](lessons/15-caching-patterns.md)–[L27](lessons/27-stream-olap.md) | Labs `06–10` · [Checkpoint 03](assessments/checkpoint-03.md) | [Project 01 · URL Shortener](projects/01-url-shortener-platform/README.md) · [Project 02 · Notification & Feed](projects/02-notification-and-feed/README.md) |
+| **Stage 3 · Distributed & Reliable** | Modules 6–7 | [L28](lessons/28-partial-failure.md)–[L37](lessons/37-multi-region-finops.md) | Labs `11–14` · [Checkpoint 04](assessments/checkpoint-04.md) & [05](assessments/checkpoint-05.md) | [Project 03 · Multi-Region Chat](projects/03-multi-region-chat/README.md) |
+| **Stage 4 · Architecture Mastery** | Module 8 | [L38](lessons/38-problem-decomposition.md)–[L40](lessons/40-system-evolution.md) | 16 Case Studies (`01–16`) | [Project 04 · Capstone](projects/04-capstone/README.md) |
 
 ---
 
-## Curriculum Navigation
+## Course Directory & Tools
 
-| Document | Purpose |
+| Resource | Link |
 |---|---|
-| [Full Curriculum Map](curriculum.md) | 9-module master table (40 lessons, 14 labs, 16 case studies, 5 checkpoints) |
-| [Detailed Lesson Syllabus](syllabus.md) | Objectives, Mermaid specs, animations, resources & YT slots for L01–L40 |
-| [Staged Roadmap](roadmap.md) | Sequential checklist with weekly study cycle & readiness rubric |
-| [Animations & Visuals Catalog](animations-and-visuals.md) | All 45+ Mermaid diagrams & 20 interactive/animated visualizations |
-| [YouTube & Slides Production Plan](youtube-and-slides-plan.md) | Episode plan, HTML slide deck manifest & video-linking workflow |
-| [Downloadable Slides & Assets](downloads/README.md) | Standalone animated `.html` decks + PPTX/PDF downloads |
-| [Curated Resource Library](resources/README.md) & [Topic Index](resources/topic-index.md) | RFCs, official docs, research papers & engineering blogs mapped to every module |
-| [Glossary](glossary.md) | Concise working definitions linked across all stages |
-
----
-
-## Live Drafts Available Today
-
-- **Lessons:**
-  - [01 · Thinking in Systems](lessons/01-thinking-in-systems.md) *(First draft)*
-  - [02 · Requirements and Capacity](lessons/02-requirements-and-capacity.md) *(First draft)*
-  - [03 · The Life of a Web Request](lessons/03-the-web-request.md) *(First draft)*
-- **Lab:** [Lab 01 · Back-of-the-Envelope Capacity Estimation](labs/01-capacity-estimation.md)
-- **Case Study:** [Case Study 01 · URL Shortener](case-studies/01-url-shortener.md)
-- **Assessment:** [Checkpoint 01 · Foundations](assessments/checkpoint-01.md)
-- **Slides (Markdown Source):** [01 · Course Kickoff](slides/01-course-kickoff.md) · [02 · Requirements & Estimation](slides/02-requirements-and-estimation.md)
-- **Worksheets & Templates:** [System Design Worksheet](templates/system-design.md) · [ADR Template](templates/adr.md) · [Learning Log](templates/learning-log.md)
-
----
-
-## Prerequisites & Who This Course Is For
-
-- **Beginners & students:** Basic programming comfort and familiarity with building simple HTTP endpoints or SQL queries.
-- **Backend / full-stack engineers:** Preparing for senior design reviews, production scaling, or system-design interviews.
-- **Self-learners:** Prefer first-principles explanations, interactive diagrams, and real failure analysis over memorizing buzzwords.
-
----
-
-## Teaching & Study Method
-
-> **Learn → Understand → Visualize → Build → Experiment → Break → Explain**
-
-Every lesson teaches **why a problem exists before introducing any vendor product**. See [How to Learn System Design](learning-system.md) for the weekly study loop and [Content Authoring Playbook](../../shared/guides/content-authoring-playbook.md) if you are authoring or recording lessons.
+| **Downloadable Animated HTML Decks** | [Downloads Guide](downloads/README.md) · [`downloads/index.html`](downloads/index.html) |
+| **Slide Markdown Sources (`01–40`)** | [`slides/`](slides/01-course-kickoff.md) (compiled via `node scripts/build-slides.mjs`) |
+| **Visualizations & Mermaid Catalog** | [Animations & Visuals](animations-and-visuals.md) |
+| **YouTube Production Tracker** | [YouTube & Slides Plan](youtube-and-slides-plan.md) |
+| **Curated References & Glossary** | [Resource Library](resources/README.md) · [Topic Matrix](resources/topic-index.md) · [Glossary](glossary.md) |
+| **Templates & Learning Guide** | [System Design Template](templates/system-design.md) · [ADR](templates/adr.md) · [Learning Loop](learning-system.md) |

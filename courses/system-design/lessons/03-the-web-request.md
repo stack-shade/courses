@@ -1,6 +1,36 @@
+---
+id: "05"
+module: "01"
+title: "DNS & The Web Request Lifecycle"
+level: "Beginner to Intermediate"
+status: "draft"
+durationMinutes: 20
+prerequisites:
+  - "04-latency-and-bottlenecks"
+objectives:
+  - "Trace a browser request from a URL to an application response"
+  - "Explain DNS, TCP, TLS, HTTP and the roles of proxies and load balancers"
+  - "Identify which parts of latency come from network setup, application work and dependencies"
+  - "Draw a sequence diagram and identify likely failure points"
+slides: "../slides/05-web-request-dns.md"
+downloadHtml: "../downloads/05-web-request-dns.html"
+diagrams:
+  - "../diagrams/request-sequence.mmd"
+  - "../diagrams/dns-recursive-lookup.mmd"
+animations:
+  - "anim-dns-resolution"
+youtube:
+  videoId: null
+  publishedAt: null
+  chapters: []
+  transcriptUrl: null
+---
+
 # 03 · The Life of a Web Request
 
 **Level:** Beginner → Intermediate · **Status:** First draft · **Prerequisite:** Basic networking vocabulary
+
+> **Slides & Visuals:** [Web Request & DNS Deck](../slides/05-web-request-dns.md) · Diagrams: [request-sequence.mmd](../diagrams/request-sequence.mmd) · [dns-recursive-lookup.mmd](../diagrams/dns-recursive-lookup.mmd) · Interactive visual: `anim-dns-resolution` ([catalog](../animations-and-visuals.md)) · Next in Module 01: [06 · Transport, TLS & HTTP](06-transport-tls-http.md)
 
 ## Learning objectives
 - Trace a browser request from a URL to an application response.
@@ -86,3 +116,6 @@ Use browser developer tools → Network:
 - [MDN · HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP) — practical protocol documentation.
 - [RFC 9110 · HTTP Semantics](https://www.rfc-editor.org/rfc/rfc9110).
 - [RFC 8446 · TLS 1.3](https://www.rfc-editor.org/rfc/rfc8446).
+
+## Next
+Continue to [06 · TCP, UDP, TLS 1.3 & HTTP/1.1–HTTP/3](06-transport-tls-http.md).

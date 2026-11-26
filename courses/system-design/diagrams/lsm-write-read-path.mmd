@@ -1,0 +1,13 @@
+flowchart LR
+  U([Client]) -->|Write key, val| W[WAL Append on Disk]
+  U -->|Write key, val| M{{MemTable SkipList}}
+  M -->|Size >= 64 MiB| IM{{Immutable MemTable}}
+  IM -->|Flush sequential I/O| L0[(L0 SSTables)]
+  L0 -->|Compaction merge-sort| L1[(L1+ SSTables)]
+
+  U -->|Read key| M
+  M -.->|Miss| IM
+  IM -.->|Miss| BF{{Bloom Filter}}
+  BF -.->|Definitely absent| N([404 Not Found])
+  BF -->|Maybe present| L0
+  L0 -.->|Check newest to oldest| L1

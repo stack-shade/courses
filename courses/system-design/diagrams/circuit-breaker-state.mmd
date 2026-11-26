@@ -1,0 +1,8 @@
+stateDiagram-v2
+  [*] --> Closed: Startup (healthy baseline)
+  Closed --> Closed: Request succeeds / reset consecutive errors
+  Closed --> Open: Failure rate > 50% over min 20 reqs OR 5 consecutive timeouts
+  Open --> Open: Fail-fast locally (0 ms network wait, 503 returned)
+  Open --> HalfOpen: Cooldown timer expires (e.g., 15 s)
+  HalfOpen --> Closed: N probe requests succeed (e.g., 3/3 OK)
+  HalfOpen --> Open: Any probe fails or times out (reset cooldown)

@@ -1,0 +1,8 @@
+flowchart LR
+  S1[1. Expand: Add new column or table] -->|Deploy dual-write app| S2[2. Dual Write: Write old + new]
+  S2 -->|Async chunked job| S3[3. Backfill: Copy historical rows]
+  S3 -->|Shadow reads & diff check| S4[4. Verify: Parity = 100%]
+  S4 -->|Flip read/write primary| S5[5. Cutover: Serve from new schema]
+  S5 -->|After rollback window| S6[6. Contract: Drop old column / triggers]
+  S2 -.->|Rollback safe| S1
+  S4 -.->|Rollback safe| S2

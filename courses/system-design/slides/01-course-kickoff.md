@@ -1,8 +1,10 @@
 ---
 marp: true
-theme: default
+theme: dark
 paginate: true
 size: 16:9
+slug: 01-course-kickoff
+lesson: ../lessons/01-thinking-in-systems.md
 title: System Design — Beginner to Advanced
 description: StackShade Courses · Course kickoff
 style: |
@@ -79,6 +81,14 @@ flowchart TB
 ```
 
 A small product may combine several boxes. This is a responsibility map, not a mandatory microservice architecture.
+
+---
+
+# Interactive 5-Layer Request Tracer
+
+<!-- anim: anim-request-layers -->
+
+<!-- note: Switch between Sync Read, Sync Write, and Async Queue live while teaching to explain latency vs durability decoupling. -->
 
 ---
 

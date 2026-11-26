@@ -1,0 +1,15 @@
+sequenceDiagram
+  participant C as Client / Stub Resolver
+  participant R as Recursive Resolver
+  participant Root as Root Nameserver (.)
+  participant TLD as .com TLD Nameserver
+  participant Auth as Authoritative NS (example.com)
+
+  C->>R: Query A/AAAA for api.example.com
+  R->>Root: Where is api.example.com?
+  Root-->>R: Referral to .com TLD NS
+  R->>TLD: Where is api.example.com?
+  TLD-->>R: Referral to example.com Authoritative NS
+  R->>Auth: Query A/AAAA for api.example.com
+  Auth-->>R: 93.184.216.34 (TTL = 300s)
+  R-->>C: 93.184.216.34 (cached until TTL expires)

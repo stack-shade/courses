@@ -1,0 +1,18 @@
+flowchart TB
+  U1([US Clients]) -->|HTTPS| DNS[Geo-DNS / Anycast Edge]
+  U2([EU Clients]) -->|HTTPS| DNS
+
+  DNS -->|Route by latency / health| LB1[US-East ALB / Gateway]
+  DNS -->|Route by latency / health| LB2[EU-West ALB / Gateway]
+
+  LB1 -->|Sync read/write| S1[US-East App Cluster]
+  LB2 -->|Sync read/write| S2[EU-West App Cluster]
+
+  S1 --> C1{{US-East Redis Cache}}
+  S2 --> C2{{EU-West Redis Cache}}
+
+  S1 -->|Local write + read| DB1[(US-East DB Shard / Writer)]
+  S2 -->|Local write + read| DB2[(EU-West DB Shard / Writer)]
+
+  DB1 ==>|Async CRR / CDC stream 80 ms RTT| DB2
+  DB2 ==>|Async CRR / CDC stream 80 ms RTT| DB1
