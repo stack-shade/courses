@@ -7,6 +7,9 @@ dist/
 coverage/
 .turbo/
 .cache/
+apps/web/public/downloads/
+apps/web/public/visuals/
+apps/web/public/search-index.json
 
 # Generated presentation exports and local media captures
 courses/*/downloads/*.pptx

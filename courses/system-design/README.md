@@ -47,6 +47,7 @@
 | **Downloadable Animated HTML Decks** | [Downloads Guide](downloads/README.md) · [`downloads/index.html`](downloads/index.html) |
 | **Slide Markdown Sources (`01–40`)** | [`slides/`](slides/01-course-kickoff.md) (compiled via `node scripts/build-slides.mjs`) |
 | **Visualizations & Mermaid Catalog** | [Animations & Visuals](animations-and-visuals.md) |
+| **Practice, Quizzes & Interview Prep** | [Neuroscience Study & Interview Guide](interview-practice.md) · [Quizzes & Flashcards JSON](practice-and-quizzes.json) |
 | **YouTube Production Tracker** | [YouTube & Slides Plan](youtube-and-slides-plan.md) |
 | **Curated References & Glossary** | [Resource Library](resources/README.md) · [Topic Matrix](resources/topic-index.md) · [Glossary](glossary.md) |
 | **Templates & Learning Guide** | [System Design Template](templates/system-design.md) · [ADR](templates/adr.md) · [Learning Loop](learning-system.md) |

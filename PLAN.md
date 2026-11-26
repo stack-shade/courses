@@ -1,6 +1,6 @@
 # StackShade Courses — Product & Content Plan
 
-> **Purpose:** Build the educational home for the [StackShade YouTube channel](https://www.youtube.com/@StackShade). This is the product and content blueprint. The website implementation is intentionally delegated to Claude using [CLAUDE_BUILD_PROMPT.md](CLAUDE_BUILD_PROMPT.md).
+> **Purpose:** Build the educational home for the [StackShade YouTube channel](https://www.youtube.com/@StackShade). This is the product and content blueprint, implemented in [`apps/web/`](apps/web/package.json) and deployed via [`.github/workflows/pages.yml`](.github/workflows/pages.yml).
 
 **Repository:** https://github.com/stack-shade/courses  
 **YouTube:** https://www.youtube.com/@StackShade  
@@ -101,7 +101,6 @@ The repository is a **course monorepo**: shared platform material once, independ
 .
 ├── README.md
 ├── PLAN.md
-├── CLAUDE_BUILD_PROMPT.md
 ├── CONTRIBUTING.md
 ├── courses/
 │   ├── catalog.json

@@ -7,9 +7,9 @@ This repository organizes multiple beginner-to-advanced educational courses. Eve
 ## Start here
 
 - [Product and multi-course plan](PLAN.md)
-- [Claude website build prompt](CLAUDE_BUILD_PROMPT.md)
 - [Minimal design system doc (Udemy-inspired)](shared/design-system/README.md)
 - [Content authoring, visuals & HTML slides playbook](shared/guides/content-authoring-playbook.md)
+- [Web application (`apps/web/`)](apps/web/package.json)
 - [Course catalogue](courses/README.md)
 - [Repository structure standard](shared/standards/course-structure.md)
 - [Shared templates & guides](shared/README.md)
@@ -29,12 +29,13 @@ More courses will be added independently under `courses/<course-slug>/`.
 .
 ├── README.md
 ├── PLAN.md
-├── CLAUDE_BUILD_PROMPT.md
+├── apps/web/      # Next.js static site + presenter mode + neuroscience practice arena
 ├── courses/       # Independent courses and course catalogue
-├── shared/        # Reusable templates, standards and resources
-└── scripts/       # Course scaffolding and authoring helpers
+├── shared/        # Minimal design system, visuals engine, templates and guides
+├── scripts/       # Slide HTML compiler and course scaffolding helpers
+└── .github/workflows/pages.yml
 ```
 
-The website is intentionally not implemented in this content-planning phase. The approved architecture and detailed implementation instructions are in `CLAUDE_BUILD_PROMPT.md`. The intended public site is https://stack-shade.github.io/courses/ after the Next.js implementation and GitHub Pages deployment are complete.
+The static site deploys to `https://stack-shade.github.io/courses/` via GitHub Actions (`apps/web/out/`).
 
 **Learning philosophy:** Learn → Understand → Visualize → Build → Experiment → Explain.

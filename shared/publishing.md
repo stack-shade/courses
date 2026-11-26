@@ -1,6 +1,6 @@
 # Publishing architecture and GitHub Pages
 
-This file describes the publishing target. The website implementation is delegated to Claude; see the root [Claude build prompt](../CLAUDE_BUILD_PROMPT.md).
+This file describes the publishing target, implemented in [`apps/web/`](../apps/web/package.json) and [`.github/workflows/pages.yml`](../.github/workflows/pages.yml).
 
 ## Intended architecture
 

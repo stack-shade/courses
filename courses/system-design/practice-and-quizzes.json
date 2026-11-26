@@ -1,0 +1,756 @@
+{
+  "schemaVersion": 1,
+  "courseSlug": "system-design",
+  "quizzes": [
+    {
+      "id": "q-01-thinking",
+      "moduleId": "00",
+      "lessonSlug": "01-thinking-in-systems",
+      "question": "A prompt asks you to 'design a notification system for 1M users.' What should you clarify BEFORE choosing Kafka or Redis?",
+      "options": [
+        "Which Kubernetes ingress controller to install",
+        "Delivery channels, latency/durability expectations, expected peak burst, and acceptable duplicate rate",
+        "Whether to use JSON or YAML for config files",
+        "Which cloud vendor has cheaper managed Redis"
+      ],
+      "correctIndex": 1,
+      "explanation": "Requirements and constraints determine architecture; vendor tools like Kafka or Redis are implementation choices made after understanding workload shape."
+    },
+    {
+      "id": "q-02-tail-latency",
+      "moduleId": "00",
+      "lessonSlug": "02-requirements-and-capacity",
+      "question": "An API shows a 38ms average response time, yet support tickets report slowness. Which metric reveals the user pain most directly?",
+      "options": [
+        "Mean latency sampled once per hour",
+        "p95 and p99 tail latency percentiles",
+        "Total CPU core count",
+        "Minimum latency (p0)"
+      ],
+      "correctIndex": 1,
+      "explanation": "Averages hide skewed tails; p95/p99 expose the slowest 1–5% of requests affecting power users or multi-call pages."
+    },
+    {
+      "id": "q-03-qps-math",
+      "moduleId": "00",
+      "lessonSlug": "03-capacity-estimation",
+      "question": "A service receives 43.2 million requests per day with a 5× peak burst multiplier. Roughly what is the Peak QPS?",
+      "options": [
+        "500 QPS",
+        "2,500 QPS",
+        "5,000 QPS",
+        "10,000 QPS"
+      ],
+      "correctIndex": 1,
+      "explanation": "43,200,000 / 86,400 seconds = 500 average QPS. Multiplying by 5× peak gives 2,500 Peak QPS."
+    },
+    {
+      "id": "q-04-fanout-tail",
+      "moduleId": "00",
+      "lessonSlug": "04-latency-and-bottlenecks",
+      "question": "A gateway calls 20 independent backend services in parallel, each with a 1% chance (p99) of taking >500ms. Roughly how often does the user wait >500ms?",
+      "options": [
+        "1%",
+        "About 18.2%",
+        "20% exactly",
+        "0.01%"
+      ],
+      "correctIndex": 1,
+      "explanation": "Probability all 20 are fast is 0.99^20 ≈ 0.818, so 1 - 0.818 ≈ 18.2% of requests hit tail latency (tail amplification)."
+    },
+    {
+      "id": "q-05-dns-ttl",
+      "moduleId": "01",
+      "lessonSlug": "03-the-web-request",
+      "question": "You update a DNS A record from an old IP to a new IP with a previous TTL of 3600s. Why do some users still hit the old IP 20 minutes later?",
+      "options": [
+        "TCP pins DNS records permanently in kernel space",
+        "Recursive resolvers and client caches retain the old record until the previous 3600s TTL expires",
+        "TLS certificates block DNS refreshes",
+        "HTTP/2 caches DNS inside cookies"
+      ],
+      "correctIndex": 1,
+      "explanation": "DNS caches honor the TTL that was active when the record was cached; lower TTLs beforehand before cutovers."
+    },
+    {
+      "id": "q-06-http3-quic",
+      "moduleId": "01",
+      "lessonSlug": "06-transport-tls-http",
+      "question": "Why does HTTP/3 (QUIC over UDP) outperform HTTP/2 on lossy mobile networks?",
+      "options": [
+        "UDP skips encryption entirely",
+        "QUIC multiplexes independent streams so losing one packet does not stall unrelated streams at the transport layer",
+        "HTTP/3 removes DNS resolution",
+        "QUIC disables congestion control"
+      ],
+      "correctIndex": 1,
+      "explanation": "HTTP/2 suffers TCP head-of-line blocking when one TCP packet is lost; QUIC isolates packet loss per stream."
+    },
+    {
+      "id": "q-07-cdn-miss",
+      "moduleId": "01",
+      "lessonSlug": "07-proxies-cdn-gateway",
+      "question": "You put a CDN in front of your API, yet origin bandwidth hardly drops. Which header is the most common culprit?",
+      "options": [
+        "Content-Type: application/json",
+        "Cache-Control: private, no-store (or Vary: Cookie / Authorization)",
+        "Strict-Transport-Security",
+        "Accept-Encoding: gzip"
+      ],
+      "correctIndex": 1,
+      "explanation": "Private or cookie-varied responses bypass shared edge caches, forcing every request back to origin."
+    },
+    {
+      "id": "q-08-lb-least-conn",
+      "moduleId": "01",
+      "lessonSlug": "08-load-balancing",
+      "question": "One backend server becomes 5× slower due to GC pauses while others are fast. Which load-balancing algorithm adapts best without manual weights?",
+      "options": [
+        "Strict Round-Robin",
+        "Random Selection",
+        "Least-Connections (or Peak EWMA)",
+        "Source IP Hash"
+      ],
+      "correctIndex": 2,
+      "explanation": "Least-Connections notices the slow node's in-flight queue growing and automatically routes new requests to faster peers."
+    },
+    {
+      "id": "q-09-idempotency",
+      "moduleId": "01",
+      "lessonSlug": "09-api-contracts",
+      "question": "A mobile client sends POST /charges, the payment succeeds, but the HTTP response drops on a tunnel disconnect. How do you make retrying safe?",
+      "options": [
+        "Use HTTP GET instead of POST",
+        "Require a client-generated Idempotency-Key persisted atomically with the payment record",
+        "Disable client retries",
+        "Increase TCP keepalive timeout to 10 minutes"
+      ],
+      "correctIndex": 1,
+      "explanation": "An Idempotency-Key lets the server recognize the retry and return the original 201 outcome instead of double-charging."
+    },
+    {
+      "id": "q-10-db-model",
+      "moduleId": "02",
+      "lessonSlug": "10-data-models",
+      "question": "You are building a financial double-entry ledger requiring strict multi-row balance invariants. Which data model fits best?",
+      "options": [
+        "Eventually consistent key-value store",
+        "Relational SQL database with ACID transactions",
+        "Time-series append store",
+        "Full-text inverted index"
+      ],
+      "correctIndex": 1,
+      "explanation": "Relational databases enforce ACID multi-row atomicity, foreign-key constraints, and strict serializability for monetary invariants."
+    },
+    {
+      "id": "q-11-lsm-btree",
+      "moduleId": "02",
+      "lessonSlug": "11-storage-engines",
+      "question": "Why are LSM-Tree storage engines (e.g., RocksDB) often chosen over B+Trees for write-heavy ingestion workloads?",
+      "options": [
+        "LSM-Trees store all data in RAM with no disk persistence",
+        "LSM-Trees convert random mutations into sequential WAL + MemTable appends and periodic SSTable compaction",
+        "LSM-Trees never require indexes",
+        "B+Trees cannot support point lookups"
+      ],
+      "correctIndex": 1,
+      "explanation": "Sequential writes maximize disk throughput; Bloom filters mitigate read amplification across SSTables."
+    },
+    {
+      "id": "q-12-composite-index",
+      "moduleId": "02",
+      "lessonSlug": "12-indexing-query-plans",
+      "question": "A table has a composite B-Tree index on (org_id, created_at). Which query CANNOT efficiently use this index alone?",
+      "options": [
+        "WHERE org_id = 42 AND created_at > '2026-01-01'",
+        "WHERE org_id = 42",
+        "WHERE created_at > '2026-01-01'",
+        "WHERE org_id = 42 ORDER BY created_at DESC LIMIT 20"
+      ],
+      "correctIndex": 2,
+      "explanation": "Because of the leftmost-prefix rule, filtering only on the second column (created_at) cannot seek efficiently in (org_id, created_at)."
+    },
+    {
+      "id": "q-13-write-skew",
+      "moduleId": "02",
+      "lessonSlug": "13-transactions-isolation",
+      "question": "Two transactions concurrently check that >= 2 doctors are on call, then each updates a DIFFERENT doctor's row to off-duty, leaving 0 on call. Which isolation level blocks this anomaly?",
+      "options": [
+        "Read Uncommitted",
+        "Read Committed",
+        "Snapshot Isolation without explicit locks",
+        "Serializable (SSI)"
+      ],
+      "correctIndex": 3,
+      "explanation": "Write skew happens across disjoint rows under Snapshot Isolation; Serializable (or explicit SELECT ... FOR UPDATE) prevents it."
+    },
+    {
+      "id": "q-14-presigned-upload",
+      "moduleId": "02",
+      "lessonSlug": "14-object-storage",
+      "question": "How should a system handle 2 GB video uploads without exhausting API server memory and worker threads?",
+      "options": [
+        "Base64-encode the 2 GB file inside a JSON POST body",
+        "Issue short-lived presigned URLs so clients upload multipart chunks directly to object storage",
+        "Store chunks as BLOB columns in the primary PostgreSQL table",
+        "Stream uploads through the auth service"
+      ],
+      "correctIndex": 1,
+      "explanation": "Presigned multipart URLs keep heavy binary payload traffic off application servers while retaining auth control."
+    },
+    {
+      "id": "q-15-write-behind",
+      "moduleId": "03",
+      "lessonSlug": "15-caching-patterns",
+      "question": "What is the biggest hazard of Write-Behind (Write-Back) caching compared to Cache-Aside?",
+      "options": [
+        "Reads are slower than disk",
+        "A cache node crash before asynchronous flush loses acknowledged writes",
+        "Cache-Aside cannot use TTLs",
+        "Write-Behind forbids batching"
+      ],
+      "correctIndex": 1,
+      "explanation": "Write-Behind ACKs writes in memory before persisting to durable storage, risking data loss on sudden cache failure."
+    },
+    {
+      "id": "q-16-eviction",
+      "moduleId": "03",
+      "lessonSlug": "16-eviction-invalidation",
+      "question": "A nightly batch backup reads millions of cold records once through an LRU cache, wiping out hot user profiles. What is this called, and how does TinyLFU help?",
+      "options": [
+        "Cache stampede; solved by increasing TTL",
+        "Cache pollution (scan resistance failure); TinyLFU uses frequency sketches to reject one-hit cold keys",
+        "Split-brain; solved by Raft",
+        "Write skew; solved by MVCC"
+      ],
+      "correctIndex": 1,
+      "explanation": "Pure LRU promotes one-time scan keys; frequency-aware admission (Window-TinyLFU) protects hot items."
+    },
+    {
+      "id": "q-17-stampede",
+      "moduleId": "03",
+      "lessonSlug": "17-cache-failure-modes",
+      "question": "A hot key expires and 1,000 concurrent requests miss Redis at once, crashing the database. Which combination solves both the burst and synchronized expiry?",
+      "options": [
+        "Singleflight (request coalescing) + randomized TTL jitter",
+        "Sticky sessions + TCP Keepalive",
+        "Switching from HTTP/2 to HTTP/1.1",
+        "Removing database indexes"
+      ],
+      "correctIndex": 0,
+      "explanation": "Singleflight ensures only 1 in-flight DB fetch per key; TTL jitter spreads expiration times so keys do not expire together."
+    },
+    {
+      "id": "q-18-conn-pool",
+      "moduleId": "03",
+      "lessonSlug": "18-stateless-concurrency",
+      "question": "You autoscale from 20 to 200 microservice pods, each opening 25 DB connections, and PostgreSQL fails with 'too many clients'. What fixes this?",
+      "options": [
+        "Add more read-only DNS records",
+        "Place a connection pooler (e.g., PgBouncer transaction pooling) in front of PostgreSQL and bound per-pod pool sizes",
+        "Switch from JSON to XML",
+        "Disable TLS between app and DB"
+      ],
+      "correctIndex": 1,
+      "explanation": "200 × 25 = 5,000 connections overwhelms PostgreSQL process memory/locks; transaction pooling multiplexes thousands of app sockets onto bounded DB connections."
+    },
+    {
+      "id": "q-19-replication-lag",
+      "moduleId": "04",
+      "lessonSlug": "19-replication",
+      "question": "A user edits their profile (writes to Leader) and immediately reloads the page (reads from an async Replica), seeing old data. Which guarantee was violated?",
+      "options": [
+        "Read-your-own-writes consistency",
+        "Zero compaction overhead",
+        "Partition tolerance",
+        "Bloom filter accuracy"
+      ],
+      "correctIndex": 0,
+      "explanation": "Read-your-writes can be restored by routing the user's own reads to the leader briefly after a write or checking replication LSN offsets."
+    },
+    {
+      "id": "q-20-consistent-hash",
+      "moduleId": "04",
+      "lessonSlug": "20-sharding-hashing",
+      "question": "Why do production consistent-hashing rings assign 50–200 virtual nodes per physical shard instead of just 1 position per shard?",
+      "options": [
+        "To eliminate network encryption",
+        "To keep key distribution balanced and spread a failed shard's load evenly across all remaining shards",
+        "To turn hash partitioning into range queries",
+        "To remove the need for replication"
+      ],
+      "correctIndex": 1,
+      "explanation": "With 1 token per node, key distribution skews heavily and one neighbor absorbs 100% of a failed node's traffic; vnodes smooth variance."
+    },
+    {
+      "id": "q-21-salting",
+      "moduleId": "04",
+      "lessonSlug": "21-hot-shards-migrations",
+      "question": "A single celebrity account receives 40% of all writes in a hash-sharded table. How do you break the single-shard bottleneck?",
+      "options": [
+        "Increase the shard key string length",
+        "Append a bounded random salt suffix (e.g., user_id#0..9) for writes and fan out reads across those 10 sub-keys",
+        "Remove the partition key",
+        "Switch from UUIDv7 to UUIDv4"
+      ],
+      "correctIndex": 1,
+      "explanation": "Key salting spreads hot writes across K shards at the trade-off of reading/aggregating K sub-keys on read."
+    },
+    {
+      "id": "q-22-uuid7",
+      "moduleId": "04",
+      "lessonSlug": "22-distributed-ids",
+      "question": "Why does UUIDv7 (or Snowflake ID) outperform random UUIDv4 as a clustered B-Tree primary key on large relational tables?",
+      "options": [
+        "UUIDv4 cannot represent 128 bits",
+        "Time-ordered IDs append sequentially at the right edge of the B-Tree, avoiding random page splits and buffer-pool thrashing",
+        "Snowflake IDs guarantee cryptographic secrecy",
+        "UUIDv7 disables WAL logging"
+      ],
+      "correctIndex": 1,
+      "explanation": "Random UUIDv4 keys insert across random disk pages, causing 50%-full fragmented pages and heavy random I/O."
+    },
+    {
+      "id": "q-23-kafka-groups",
+      "moduleId": "05",
+      "lessonSlug": "23-queues-vs-streams",
+      "question": "A Kafka topic has 4 partitions and a consumer group scales up to 6 identical consumer instances. How many instances stay idle?",
+      "options": [
+        "0 — all 6 share partition 1",
+        "2 — at most 1 consumer per group can read a partition simultaneously",
+        "4",
+        "5"
+      ],
+      "correctIndex": 1,
+      "explanation": "In Kafka consumer groups, partition count caps parallel consumers within a single group; 6 consumers on 4 partitions leaves 2 idle."
+    },
+    {
+      "id": "q-24-dlq",
+      "moduleId": "05",
+      "lessonSlug": "24-delivery-semantics",
+      "question": "A malformed 'poison pill' event crashes a worker repeatedly under at-least-once delivery, blocking healthy messages behind it. What fixes this?",
+      "options": [
+        "Infinite immediate retries",
+        "Bounded retries with exponential backoff + Dead-Letter Queue (DLQ) quarantine + alerting",
+        "Switching to UDP",
+        "Deleting the entire topic"
+      ],
+      "correctIndex": 1,
+      "explanation": "Routing unprocessable messages to a DLQ after N retries preserves queue throughput while keeping failed events inspectable."
+    },
+    {
+      "id": "q-25-outbox",
+      "moduleId": "05",
+      "lessonSlug": "25-outbox-saga-cqrs",
+      "question": "An Order service commits to PostgreSQL and then tries to publish an OrderCreated event to Kafka, but crashes right between the two calls. Which pattern fixes this dual-write bug?",
+      "options": [
+        "Client-side caching",
+        "Transactional Outbox (write order + outbox row in one DB transaction, relay via CDC/poller)",
+        "Round-robin load balancing",
+        "Adding more DB replicas"
+      ],
+      "correctIndex": 1,
+      "explanation": "Writing business state and outbox event atomically inside one local ACID transaction guarantees at-least-once event publishing."
+    },
+    {
+      "id": "q-26-search",
+      "moduleId": "05",
+      "lessonSlug": "26-search-pipelines",
+      "question": "Why do teams keep a dedicated inverted index (e.g., OpenSearch/Elasticsearch) synced asynchronously via CDC instead of running LIKE '%term%' on a 500M-row PostgreSQL table?",
+      "options": [
+        "Leading-wildcard LIKE scans cannot use standard B-Tree prefixes and trigger full scans, whereas inverted indexes map tokens directly to doc lists with BM25 scoring",
+        "PostgreSQL cannot store strings longer than 255 bytes",
+        "Inverted indexes provide ACID serializability",
+        "B-Trees do not support equality lookups"
+      ],
+      "correctIndex": 0,
+      "explanation": "Inverted indexes pre-tokenize text into term → posting-list lookups with relevance ranking (BM25)."
+    },
+    {
+      "id": "q-27-watermark",
+      "moduleId": "05",
+      "lessonSlug": "27-stream-olap",
+      "question": "In event-time stream processing, what is a watermark?",
+      "options": [
+        "A PNG logo placed on video frames",
+        "A heuristic timestamp threshold declaring that no earlier events are expected for a window, trading completeness vs latency",
+        "A Redis eviction algorithm",
+        "A TLS certificate chain"
+      ],
+      "correctIndex": 1,
+      "explanation": "Watermarks bound how long a streaming window waits for delayed/out-of-order mobile events before emitting an aggregate."
+    },
+    {
+      "id": "q-28-jitter",
+      "moduleId": "06",
+      "lessonSlug": "28-partial-failure",
+      "question": "10,000 clients time out simultaneously and use deterministic exponential backoff (2s, 4s, 8s) WITHOUT jitter. What happens?",
+      "options": [
+        "Traffic spreads smoothly across time",
+        "All 10,000 clients retry in synchronized thundering waves, repeatedly knocking the recovering server back down",
+        "Servers immediately scale to zero",
+        "Circuit breakers cannot open"
+      ],
+      "correctIndex": 1,
+      "explanation": "Full jitter randomizes delay within [0, cap] to desynchronize client retries and let dependencies recover."
+    },
+    {
+      "id": "q-29-fencing",
+      "moduleId": "06",
+      "lessonSlug": "29-clocks-and-fencing",
+      "question": "Worker A acquires a Redis lock, pauses 20s for Stop-The-World GC past lease TTL, and wakes up thinking it still holds the lock while Worker B is active. What prevents Worker A from corrupting storage?",
+      "options": [
+        "Monotonic fencing tokens verified by the storage server on every write",
+        "Using NTP on Worker A",
+        "Setting a longer HTTP timeout",
+        "Using UUIDv4 for log lines"
+      ],
+      "correctIndex": 0,
+      "explanation": "The storage layer rejects writes carrying a fencing token older than the highest token it has already observed."
+    },
+    {
+      "id": "q-30-quorum",
+      "moduleId": "06",
+      "lessonSlug": "30-consistency-quorums",
+      "question": "A Dynamo-style store has N=5 replicas and W=2. What minimum Read Quorum (R) guarantees overlapping at least one latest-written replica (ignoring sloppy quorums)?",
+      "options": [
+        "R = 2",
+        "R = 3",
+        "R = 4",
+        "R = 1"
+      ],
+      "correctIndex": 2,
+      "explanation": "R + W > N requires R + 2 > 5, so R >= 4 guarantees at least 1 overlapping replica."
+    },
+    {
+      "id": "q-31-cap-raft",
+      "moduleId": "06",
+      "lessonSlug": "31-cap-consensus-raft",
+      "question": "A 5-node Raft cluster splits into a 3-node side and a 2-node side during a network partition. What happens?",
+      "options": [
+        "Both sides elect leaders and accept writes",
+        "The 3-node majority elects/keeps a leader and commits writes; the 2-node minority cannot reach quorum (3) and halts writes",
+        "All 5 nodes shut down",
+        "The 2-node side overwrites the 3-node side"
+      ],
+      "correctIndex": 1,
+      "explanation": "Majority quorum (floor(5/2)+1 = 3) guarantees at most one partition side can elect a leader, preventing split-brain."
+    },
+    {
+      "id": "q-32-coord",
+      "moduleId": "06",
+      "lessonSlug": "32-distributed-coordination",
+      "question": "Why should you NOT route high-throughput user business payloads through etcd or ZooKeeper?",
+      "options": [
+        "They are consensus-backed coordination stores optimized for small metadata, leases, and config—not high-QPS bulk data",
+        "They cannot persist data to disk",
+        "They only support UDP",
+        "They lack watch notifications"
+      ],
+      "correctIndex": 0,
+      "explanation": "Consensus replication across a quorum adds RTT coordination cost; keep etcd/ZK on the control plane."
+    },
+    {
+      "id": "q-33-load-shed",
+      "moduleId": "07",
+      "lessonSlug": "33-reliability-overload",
+      "question": "A checkout service is at 140% CPU capacity with an unbounded FIFO request queue, so requests wait 15 seconds and time out anyway. What stabilizes core checkout goodput?",
+      "options": [
+        "Increase the FIFO queue limit to 1 million",
+        "Bound queues + LIFO/priority load shedding rejecting low-priority calls fast with 503 + Retry-After",
+        "Disable health checks",
+        "Remove timeouts"
+      ],
+      "correctIndex": 1,
+      "explanation": "Unbounded FIFO queues create cascading timeout waste; shedding excess or lower-priority work early preserves p99 for admitted requests."
+    },
+    {
+      "id": "q-34-otel",
+      "moduleId": "07",
+      "lessonSlug": "34-observability-chaos",
+      "question": "Why is putting raw `user_id` as a Prometheus metric label usually an anti-pattern?",
+      "options": [
+        "Prometheus cannot parse integers",
+        "High-cardinality labels explode time-series memory and index size; high-cardinality IDs belong in structured logs and trace spans",
+        "Metrics do not support timestamps",
+        "Labels break TLS"
+      ],
+      "correctIndex": 1,
+      "explanation": "Metrics need bounded cardinality (route, status, region); use structured logs and OpenTelemetry trace spans for per-user/request debugging."
+    },
+    {
+      "id": "q-35-ratelimit",
+      "moduleId": "07",
+      "lessonSlug": "35-security-identity",
+      "question": "A Fixed-Window rate limiter enforces 100 req/min, yet a client sends 200 requests between 12:00:55 and 12:01:05. Why?",
+      "options": [
+        "Redis leaked memory",
+        "Boundary burst: 100 requests fit at the end of minute 0 and 100 at the start of minute 1",
+        "Token Bucket never limits bursts",
+        "PKCE bypassed the counter"
+      ],
+      "correctIndex": 1,
+      "explanation": "Fixed windows allow up to 2× limit across minute edges; Sliding Window Counter or Token Bucket avoids sharp boundary spikes."
+    },
+    {
+      "id": "q-36-canary",
+      "moduleId": "07",
+      "lessonSlug": "36-cloud-deployments",
+      "question": "What distinguishes a Canary deployment from a Blue/Green deployment?",
+      "options": [
+        "Canary shifts a small traffic slice (e.g., 1%→10%) validated by SLO metrics before full rollout; Blue/Green switches 100% of traffic between two full environments",
+        "Blue/Green requires zero databases",
+        "Canary disables rollbacks",
+        "They are identical terms"
+      ],
+      "correctIndex": 0,
+      "explanation": "Canary limits blast radius to a small percentage of live requests gated by error/latency SLOs."
+    },
+    {
+      "id": "q-37-rpo-rto",
+      "moduleId": "07",
+      "lessonSlug": "37-multi-region-finops",
+      "question": "A disaster recovery SLA specifies RPO <= 5 seconds and RTO <= 2 minutes. What do these mean?",
+      "options": [
+        "Max 5s of recent committed data loss on failover; max 2m of downtime to restore service",
+        "5 servers per region; 2 regions total",
+        "5% error budget; 2ms latency",
+        "5 backups per year; 2 TB max database"
+      ],
+      "correctIndex": 0,
+      "explanation": "RPO bounds data loss across replication lag/backups; RTO bounds total recovery duration."
+    },
+    {
+      "id": "q-38-adr",
+      "moduleId": "08",
+      "lessonSlug": "38-problem-decomposition",
+      "question": "What belongs in an Architecture Decision Record (ADR) that regular code comments miss?",
+      "options": [
+        "Line-by-line variable names",
+        "Context/constraints, alternatives considered, explicit trade-offs accepted, and validation signals that would trigger revisiting the choice",
+        "Full binary artifacts",
+        "CSS color hex codes"
+      ],
+      "correctIndex": 1,
+      "explanation": "ADRs preserve *why* a consequential architectural trade-off was chosen over rejected alternatives."
+    },
+    {
+      "id": "q-39-ai-llm",
+      "moduleId": "08",
+      "lessonSlug": "39-ai-systems-architecture",
+      "question": "Why do production LLM gateways meter rate limits by tokens-per-minute (TPM) and stream responses over SSE instead of standard RPM + buffered JSON?",
+      "options": [
+        "One prompt with 32K tokens consumes vastly more GPU KV-cache and compute than a 50-token prompt, and SSE streams tokens immediately to minimize perceived wait",
+        "HTTP POST cannot return JSON",
+        "SSE disables TLS",
+        "Vector indexes only accept SSE"
+      ],
+      "correctIndex": 0,
+      "explanation": "Token volume dictates GPU memory/compute saturation, while SSE delivers low Time-To-First-Token (TTFT) UX."
+    },
+    {
+      "id": "q-40-strangler",
+      "moduleId": "08",
+      "lessonSlug": "40-system-evolution",
+      "question": "When migrating a busy monolith to an extracted service using the Strangler Fig pattern, what is the safest sequence?",
+      "options": [
+        "Shut down the monolith for a weekend rewrite",
+        "Put an edge router/proxy in front, verify the new service via shadow reads/CDC sync, shift traffic incrementally (1%→100%), then retire old routes",
+        "Delete the monolith database immediately",
+        "Share the same in-memory heap across networks"
+      ],
+      "correctIndex": 1,
+      "explanation": "Strangler Fig reduces cutover risk through progressive routing, data parity checks, and instant rollback."
+    }
+  ],
+  "flashcards": [
+    { "id": "fc-01", "moduleId": "00", "lessonSlug": "03-capacity-estimation", "front": "Seconds in a day (for QPS math)", "back": "86,400 seconds (~10^5 for rough mental bounds; exact 86,400 for clean estimates).", "hook": "1M req/day ÷ 86,400 ≈ 11.57 QPS." },
+    { "id": "fc-02", "moduleId": "00", "lessonSlug": "03-capacity-estimation", "front": "Little's Law Formula", "back": "L = λ × W (Average concurrent items in system = Arrival rate × Average time spent in system).", "hook": "2,000 QPS × 0.05s latency = 100 concurrent in-flight requests." },
+    { "id": "fc-03", "moduleId": "00", "lessonSlug": "04-latency-and-bottlenecks", "front": "Parallel Fan-Out Tail Amplification", "back": "If a page calls N independent services each with p99 slowness, P(any slow) = 1 - (0.99)^N.", "hook": "At N=30 calls, ~26% of user loads hit tail latency." },
+    { "id": "fc-04", "moduleId": "01", "lessonSlug": "03-the-web-request", "front": "Anycast Routing", "back": "Multiple global edge PoPs announce the same IP via BGP; routers naturally direct users to the topologically closest healthy PoP.", "hook": "Used by DNS roots and CDNs like Cloudflare." },
+    { "id": "fc-05", "moduleId": "01", "lessonSlug": "06-transport-tls-http", "front": "TCP Head-of-Line (HoL) Blocking vs QUIC", "back": "In HTTP/2 over TCP, 1 lost packet stalls all multiplexed streams. QUIC (HTTP/3) runs over UDP so streams recover independently.", "hook": "Stream isolation = faster mobile tail latency." },
+    { "id": "fc-06", "moduleId": "01", "lessonSlug": "07-proxies-cdn-gateway", "front": "Cache-Control: s-maxage vs max-age", "back": "s-maxage overrides max-age specifically for shared caches (CDNs/proxies), letting edge cache longer than browsers.", "hook": "s = shared cache." },
+    { "id": "fc-07", "moduleId": "01", "lessonSlug": "09-api-contracts", "front": "Idempotency Key Semantics", "back": "Client-generated unique UUID per logical action stored atomically by the server so network retries return the original result without duplicating side effects.", "hook": "Essential for POST /payments and order creation." },
+    { "id": "fc-08", "moduleId": "02", "lessonSlug": "11-storage-engines", "front": "B+Tree vs LSM-Tree Trade-off", "back": "B+Tree = fast predictable point/range reads, random page writes. LSM-Tree = sequential append-only writes (WAL+MemTable), background compaction & Bloom filters.", "hook": "Read-heavy SQL → B+Tree; Write-heavy log/KV → LSM." },
+    { "id": "fc-09", "moduleId": "02", "lessonSlug": "11-storage-engines", "front": "Bloom Filter Guarantee", "back": "Answers 'Definitely NOT in SSTable' (0% false negatives) or 'Possibly in SSTable' (small tunable false positive rate).", "hook": "Saves unnecessary disk seeks on missing keys." },
+    { "id": "fc-10", "moduleId": "02", "lessonSlug": "12-indexing-query-plans", "front": "Covering Index (Index-Only Scan)", "back": "An index containing all columns required by the query (SELECT + WHERE), avoiding table heap lookups completely.", "hook": "INCLUDE (col) in PostgreSQL." },
+    { "id": "fc-11", "moduleId": "02", "lessonSlug": "13-transactions-isolation", "front": "Write Skew Anomaly", "back": "Two concurrent transactions read overlapping sets and update disjoint rows, breaking a cross-row invariant under Snapshot Isolation.", "hook": "Prevented by Serializable (SSI) or SELECT FOR UPDATE." },
+    { "id": "fc-12", "moduleId": "02", "lessonSlug": "14-object-storage", "front": "Presigned Multipart Upload", "back": "API authorizes short-lived signed URLs; client uploads chunks directly to object storage (S3/R2), bypassing API server bandwidth.", "hook": "Keep DB for metadata, Object Store for blobs." },
+    { "id": "fc-13", "moduleId": "03", "lessonSlug": "15-caching-patterns", "front": "Write-Through vs Write-Behind", "back": "Write-Through updates cache + DB synchronously (safe, slower write). Write-Behind updates cache and flushes DB async (ultra-fast, crash risk).", "hook": "Never use Write-Behind for non-recoverable ledger writes." },
+    { "id": "fc-14", "moduleId": "03", "lessonSlug": "17-cache-failure-modes", "front": "Cache Stampede vs Cache Penetration vs Cache Avalanche", "back": "Stampede = 1 hot key expires under concurrency (fix: Singleflight). Penetration = misses for nonexistent keys hit DB (fix: Bloom filter/null cache). Avalanche = mass synchronized expiry (fix: TTL jitter).", "hook": "Three distinct cache failure modes." },
+    { "id": "fc-15", "moduleId": "03", "lessonSlug": "18-stateless-concurrency", "front": "Why Transaction Connection Pooling (PgBouncer) Matters", "back": "Relational DBs allocate ~5–10MB RAM + lock slots per backend connection; pooling multiplexes 1000s of stateless pod requests onto ~50–100 DB connections.", "hook": "Connections ≈ (CPU cores × 2) + disk spindles." },
+    { "id": "fc-16", "moduleId": "04", "lessonSlug": "19-replication", "front": "Read-Your-Own-Writes Consistency", "back": "Guaranteeing a user immediately sees their own committed mutation by routing their short-window reads to the leader or tracking replica LSN.", "hook": "Prevents 'I saved my post and it vanished!' bugs." },
+    { "id": "fc-17", "moduleId": "04", "lessonSlug": "20-sharding-hashing", "front": "Consistent Hashing Key Movement", "back": "Adding or removing 1 node out of N remaps only ~1/N of keys (vs ~N/(N+1) with modulo hash % N).", "hook": "Virtual nodes prevent skewed shard hotspots." },
+    { "id": "fc-18", "moduleId": "04", "lessonSlug": "21-hot-shards-migrations", "front": "Expand-Contract Online Migration", "back": "1) Expand (add new col/table), 2) Dual-write + Backfill, 3) Shadow verify reads, 4) Switch reads & Contract old column.", "hook": "Zero-downtime rolling deploy safe." },
+    { "id": "fc-19", "moduleId": "04", "lessonSlug": "22-distributed-ids", "front": "Snowflake 64-bit ID Layout", "back": "1 unused sign bit + 41 bits ms timestamp (~69 yrs) + 10 bits worker/datacenter ID (1024 nodes) + 12 bits sequence (4096 IDs/ms/node).", "hook": "Time-sortable + zero central DB bottleneck." },
+    { "id": "fc-20", "moduleId": "05", "lessonSlug": "23-queues-vs-streams", "front": "Work Queue vs Partitioned Append-Only Log", "back": "Queue deletes messages after worker ACK. Log retains events by offset so multiple independent consumer groups can replay history.", "hook": "SQS/RabbitMQ vs Kafka." },
+    { "id": "fc-21", "moduleId": "05", "lessonSlug": "25-outbox-saga-cqrs", "front": "Transactional Outbox + CDC", "back": "Insert domain row + outbox event row in one local ACID transaction; Debezium/relay reads WAL/outbox to publish reliably without 2PC.", "hook": "Eliminates DB-vs-Kafka dual-write split." },
+    { "id": "fc-22", "moduleId": "05", "lessonSlug": "25-outbox-saga-cqrs", "front": "Saga Pattern", "back": "Break cross-service transaction into local steps; if step K fails, execute compensating undo actions for steps K-1 down to 1.", "hook": "Eventual atomicity without distributed locks." },
+    { "id": "fc-23", "moduleId": "05", "lessonSlug": "26-search-pipelines", "front": "BM25 Ranking Intuition", "back": "Scores documents higher for rare matching query terms (IDF) and term frequency with diminishing returns (TF), normalized by document length.", "hook": "Upgraded TF-IDF used in Lucene/OpenSearch." },
+    { "id": "fc-24", "moduleId": "06", "lessonSlug": "28-partial-failure", "front": "Full Jitter Exponential Backoff", "back": "sleep = random(0, min(cap, base × 2^attempt)) — spreads concurrent retry storms across the whole interval.", "hook": "AWS Builders' Library recommended default." },
+    { "id": "fc-25", "moduleId": "06", "lessonSlug": "28-partial-failure", "front": "Circuit Breaker 3 States", "back": "Closed (normal) → Open (fail fast after error threshold) → Half-Open (let probe request test recovery).", "hook": "Stops cascading thread exhaustion." },
+    { "id": "fc-26", "moduleId": "06", "lessonSlug": "29-clocks-and-fencing", "front": "Why Wall-Clock Time (NTP) Fails Ordering", "back": "NTP steps forward or backward on clock sync; use monotonic clocks for elapsed durations and logical/Lamport clocks or fencing tokens for ordering.", "hook": "Never trust System.currentTimeMillis() across servers." },
+    { "id": "fc-27", "moduleId": "06", "lessonSlug": "30-consistency-quorums", "front": "Strict Quorum Condition", "back": "R + W > N ensures read quorum overlaps with write quorum on >= 1 node holding the latest value.", "hook": "Does NOT automatically mean linearizability without read-repair/coordination." },
+    { "id": "fc-28", "moduleId": "06", "lessonSlug": "31-cap-consensus-raft", "front": "PACELC Theorem", "back": "If Partition (P): choose Availability (A) or Consistency (C); Else (E) normal operation: choose Latency (L) or Consistency (C).", "hook": "Explains why DynamoDB/Cassandra trade consistency for low latency even without partitions." },
+    { "id": "fc-29", "moduleId": "07", "lessonSlug": "33-reliability-overload", "front": "Error Budget", "back": "1 - SLO (e.g., 99.9% availability SLO = 0.1% or ~43.2 min/month allowable downtime). When exhausted, freeze risky releases and focus on reliability.", "hook": "Aligns dev velocity and SRE stability." },
+    { "id": "fc-30", "moduleId": "07", "lessonSlug": "35-security-identity", "front": "JWT vs Opaque Session Token", "back": "JWT allows stateless signature verification but is hard to revoke immediately before exp. Opaque tokens hit Redis/DB for instant revocation.", "hook": "Short-lived JWT (5–15m) + revocable refresh token balances both." },
+    { "id": "fc-31", "moduleId": "08", "lessonSlug": "39-ai-systems-architecture", "front": "Semantic Cache in LLM Systems", "back": "Embed incoming query into vector store; if cosine similarity exceeds high threshold (e.g., >0.95), return cached completion in <40ms at $0 GPU cost.", "hook": "Ideal for FAQ/support workloads." }
+  ],
+  "interviewPrompts": [
+    {
+      "id": "int-01",
+      "level": "Beginner",
+      "moduleId": "03",
+      "title": "Design a URL Shortener (TinyURL / bit.ly)",
+      "prompt": "Design a service that shortens long URLs into 7-character codes and redirects 100M DAU at 100:1 read/write ratio.",
+      "caseStudySlug": "01-url-shortener",
+      "clarifications": [
+        "Custom aliases & expiration TTLs needed?",
+        "Redirect status 301 (browser cached) vs 302 (analytics accurate)?",
+        "Abuse/phishing takedown SLA?"
+      ],
+      "bottlenecks": [
+        "Collision-safe short code generation (Base62 counter/KGS vs random + retry)",
+        "Hot viral link cache stampede defense (CDN + Redis + singleflight)",
+        "Async click analytics decoupled via queue"
+      ]
+    },
+    {
+      "id": "int-02",
+      "level": "Intermediate",
+      "moduleId": "07",
+      "title": "Design a Distributed API Rate Limiter",
+      "prompt": "Protect microservices at 500K RPS with configurable per-user and per-IP rate limits across multiple API gateway instances.",
+      "caseStudySlug": "03-rate-limiter",
+      "clarifications": [
+        "Hard global exactness vs fast local approximate quota?",
+        "Fail-open vs fail-closed if Redis is unreachable?",
+        "Standard headers: X-RateLimit-Remaining, Retry-After?"
+      ],
+      "bottlenecks": [
+        "Atomic read-check-decrement in Redis using Lua scripts",
+        "Sliding Window Counter / Token Bucket to stop boundary 2× bursts",
+        "Sub-millisecond hot-path latency budget"
+      ]
+    },
+    {
+      "id": "int-03",
+      "level": "Intermediate",
+      "moduleId": "05",
+      "title": "Design a Multi-Channel Notification Service",
+      "prompt": "Send 50M push, email, and SMS alerts daily with priority lanes (OTP < 2s vs marketing batch) and user opt-out preferences.",
+      "caseStudySlug": "04-notification-service",
+      "clarifications": [
+        "At-least-once + dedup window per notification_id?",
+        "Per-channel vendor rate limits and failover providers?",
+        "Quiet hours / preference enforcement?"
+      ],
+      "bottlenecks": [
+        "Separate priority queues so marketing spikes never delay OTP codes",
+        "Transactional Outbox + worker idempotency keys to avoid duplicate SMS",
+        "Circuit breakers + DLQ around flaky third-party SMS/SMTP providers"
+      ]
+    },
+    {
+      "id": "int-04",
+      "level": "Intermediate",
+      "moduleId": "05",
+      "title": "Design a Social News Feed / Home Timeline",
+      "prompt": "Support 50M DAU posting text/media and loading personalized feeds under 200ms p95, including celebrity accounts with 20M followers.",
+      "caseStudySlug": "05-news-feed",
+      "clarifications": [
+        "Chronological vs ML-ranked feed?",
+        "Max acceptable post-to-feed visibility lag?",
+        "Media attachment handling?"
+      ],
+      "bottlenecks": [
+        "Hybrid fan-out: push-on-write for regular users, pull-on-read merge for celebrities",
+        "Cursor-based pagination (avoiding OFFSET drift)",
+        "Pre-computed feed caches + object storage CDN for images"
+      ]
+    },
+    {
+      "id": "int-05",
+      "level": "Advanced",
+      "moduleId": "07",
+      "title": "Design Real-Time Chat & Online Presence",
+      "prompt": "Design 1:1 and group chat (up to 500 members) with read receipts, offline message sync, and accurate online/last-seen presence.",
+      "caseStudySlug": "06-chat-and-presence",
+      "clarifications": [
+        "Message ordering guarantee (server-assigned sequence vs Snowflake)?",
+        "Multi-device sync & history retention?",
+        "End-to-end encryption scope?"
+      ],
+      "bottlenecks": [
+        "Stateful WebSocket gateway fleet + session routing registry",
+        "Presence heartbeat storms mitigated via batching/client TTLs",
+        "Time-series / LSM partition design (`channel_id, message_id`)"
+      ]
+    },
+    {
+      "id": "int-06",
+      "level": "Advanced",
+      "moduleId": "06",
+      "title": "Design a Payment Processing & Double-Entry Ledger",
+      "prompt": "Process 5,000 TPS of marketplace checkouts and payouts with zero lost or double-counted money across retries and PSP outages.",
+      "caseStudySlug": "12-payment-ledger",
+      "clarifications": [
+        "Supported currencies and ledger immutability?",
+        "Synchronous authorization vs async settlement reconciliation?",
+        "Audit & regulatory compliance window?"
+      ],
+      "bottlenecks": [
+        "Double-entry append-only ledger (`debit + credit = 0`) under Serializable/locking",
+        "End-to-end Idempotency-Keys across client → API → PSP",
+        "Async reconciliation jobs catching drifted webhook states"
+      ]
+    },
+    {
+      "id": "int-07",
+      "level": "Advanced",
+      "moduleId": "06",
+      "title": "Design Flash-Sale Ticket Booking & Seat Reservation",
+      "prompt": "Handle 100K concurrent buyers racing for 20,000 concert seats with 10-minute checkout holds and zero double-booked seats.",
+      "caseStudySlug": "13-ticket-booking",
+      "clarifications": [
+        "Specific seat map selection vs general admission?",
+        "Hold TTL & automatic expiry release?",
+        "Bot/scalper rate limiting & virtual waiting room?"
+      ],
+      "bottlenecks": [
+        "Virtual waiting room shedding burst traffic before touching DB",
+        "Optimistic version check / Redis TTL seat lock + DB unique constraint",
+        "Lease expiration sweeper releasing abandoned holds reliably"
+      ]
+    },
+    {
+      "id": "int-08",
+      "level": "Staff",
+      "moduleId": "08",
+      "title": "Design a Multi-Tenant Enterprise RAG & LLM Platform",
+      "prompt": "Serve 10,000 organizations querying private documents via RAG + streaming LLM completions with strict tenant isolation and token quotas.",
+      "caseStudySlug": "16-multitenant-saas",
+      "clarifications": [
+        "Document ACL enforcement (ReBAC) inside vector retrieval?",
+        "Latency SLO for Time-To-First-Token (TTFT)?",
+        "Per-tenant data residency & PII redaction?"
+      ],
+      "bottlenecks": [
+        "Pre-filtering or metadata-partitioned vector + BM25 hybrid retrieval respecting ACLs",
+        "Semantic caching + continuous GPU batching + SSE token streaming",
+        "Per-tenant token-bucket TPM quotas preventing noisy-neighbor GPU starvation"
+      ]
+    }
+  ],
+  "externalPractice": [
+    { "name": "System Design Primer (Interview Prompts)", "url": "https://github.com/donnemartin/system-design-primer#system-design-interview-questions-with-solutions", "category": "System Prompts", "access": "Free / Open Source", "note": "Classic prompts with reference architecture walkthroughs." },
+    { "name": "Hello Interview", "url": "https://www.hellointerview.com/", "category": "System Prompts", "access": "Freemium", "note": "Structured senior/staff system design breakdowns and rubrics." },
+    { "name": "Excalidraw Whiteboard", "url": "https://excalidraw.com/", "category": "Diagramming", "access": "Free / Open Source", "note": "Run 15-minute blank-canvas sketching drills before checking solutions." },
+    { "name": "MIT 6.5840 Distributed Systems Labs", "url": "https://pdos.csail.mit.edu/6.5840/labs/lab-raft1.html", "category": "Distributed Coding", "access": "Free", "note": "Implement MapReduce, Raft consensus, and sharded KV stores in Go." },
+    { "name": "PostgreSQL Exercises (pgexercises.com)", "url": "https://pgexercises.com/", "category": "SQL & Indexing", "access": "Free", "note": "Hands-on relational queries, joins, and window functions." },
+    { "name": "Use The Index, Luke", "url": "https://use-the-index-luke.com/", "category": "SQL & Indexing", "access": "Free", "note": "Deep interactive guide to B-Tree index tuning and execution plans." },
+    { "name": "SadServers", "url": "https://sadservers.com/", "category": "Debugging & Ops", "access": "Freemium (Free Tier)", "note": "Real broken Linux servers to debug CPU, disk, DNS, and DB failures." },
+    { "name": "Jepsen Fault Analyses", "url": "https://jepsen.io/analyses", "category": "Consistency Testing", "access": "Free", "note": "Study real consistency failures discovered in production databases." },
+    { "name": "Cloudflare Radar", "url": "https://radar.cloudflare.com/", "category": "Networking Telemetry", "access": "Free", "note": "Inspect live global HTTP/3 adoption, BGP routing, and internet outages." }
+  ]
+}
