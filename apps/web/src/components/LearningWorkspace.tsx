@@ -14,6 +14,7 @@ import {
   Presentation,
   RotateCcw,
 } from 'lucide-react';
+import { Badge, Button, Card, Heading, ProgressBar, Tab, TabList, Text } from '@astryxdesign/core';
 import { MarkdownRenderer } from './MarkdownRenderer';
 import { LessonQuizAndRecall } from './LessonQuizAndRecall';
 import { withBasePath } from '@/lib/paths';
@@ -78,7 +79,6 @@ export function LearningWorkspace({
     }
   }, [storageKey]);
 
-  // Mount animation widgets when switching to Visuals tab
   useEffect(() => {
     if (tab === 'visuals' && typeof window !== 'undefined' && window.StackShadeVisuals) {
       window.StackShadeVisuals.mountAll();
@@ -103,33 +103,35 @@ export function LearningWorkspace({
 
   return (
     <div className="mx-auto flex max-w-[1440px] min-h-[calc(100vh-3.5rem)]">
-      {/* Collapsible Left Syllabus Sidebar */}
       {sidebarOpen && (
         <aside className="hidden w-72 shrink-0 border-r border-[var(--border)] bg-[var(--surface)] lg:flex lg:flex-col">
-          <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
-            <div>
+          <div className="border-b border-[var(--border)] px-4 py-3 space-y-2">
+            <div className="flex items-center justify-between gap-2">
               <Link
                 href={`/courses/${courseSlug}/`}
                 className="text-xs font-semibold text-[var(--accent)] hover:underline"
               >
                 ← {courseTitle}
               </Link>
-              <div className="mt-1 text-xs text-[var(--ink-muted)]">
-                Progress: {completed.length} / {totalLessons} lessons
-              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                isIconOnly
+                label="Reset local progress"
+                icon={<RotateCcw className="h-3.5 w-3.5" />}
+                onClick={resetProgress}
+              />
             </div>
-            <button
-              type="button"
-              onClick={resetProgress}
-              title="Reset local progress"
-              className="rounded p-1 text-[var(--ink-muted)] hover:bg-[var(--bg)] hover:text-[var(--ink)]"
-              aria-label="Reset progress"
-            >
-              <RotateCcw className="h-3.5 w-3.5" />
-            </button>
+            <ProgressBar
+              label={`Progress (${completed.length}/${totalLessons})`}
+              value={completed.length}
+              max={Math.max(1, totalLessons)}
+              hasValueLabel
+              variant="accent"
+            />
           </div>
 
-          <div className="flex-1 overflow-y-auto p-3 space-y-4">
+          <div className="flex-1 space-y-4 overflow-y-auto p-3">
             {modules.map((mod) => (
               <div key={mod.id}>
                 <div className="px-2 pb-1 text-[11px] font-bold uppercase tracking-wider text-[var(--ink-muted)]">
@@ -167,18 +169,17 @@ export function LearningWorkspace({
         </aside>
       )}
 
-      {/* Main Learning Stage */}
       <main className="min-w-0 flex-1 px-4 py-6 sm:px-8">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2 text-xs text-[var(--ink-muted)]">
-            <button
-              type="button"
+            <Button
+              variant="secondary"
+              size="sm"
+              label={sidebarOpen ? 'Hide' : 'Syllabus'}
+              icon={sidebarOpen ? <PanelLeftClose className="h-3.5 w-3.5" /> : <PanelLeftOpen className="h-3.5 w-3.5" />}
               onClick={() => setSidebarOpen((v) => !v)}
-              className="hidden items-center gap-1 rounded border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-[var(--ink)] lg:inline-flex"
-            >
-              {sidebarOpen ? <PanelLeftClose className="h-3.5 w-3.5" /> : <PanelLeftOpen className="h-3.5 w-3.5" />}
-              <span>{sidebarOpen ? 'Hide' : 'Syllabus'}</span>
-            </button>
+              className="hidden lg:inline-flex"
+            />
             <Link href={`/courses/${courseSlug}/`} className="hover:text-[var(--ink)]">
               Module {current.moduleId}
             </Link>
@@ -188,57 +189,49 @@ export function LearningWorkspace({
 
           <div className="flex flex-wrap items-center gap-2">
             {current.slidesSlug && (
-              <Link
+              <Button
+                variant="secondary"
+                size="sm"
+                label="Presenter Mode"
+                icon={<Presentation className="h-3.5 w-3.5" />}
                 href={`/present/${courseSlug}/${current.slidesSlug}/`}
-                className="inline-flex items-center gap-1.5 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-xs font-semibold text-[var(--ink)] hover:border-[var(--accent)]"
-              >
-                <Presentation className="h-3.5 w-3.5" />
-                <span>Presenter Mode</span>
-              </Link>
+              />
             )}
             {current.downloadHtmlPath && (
-              <a
+              <Button
+                as="a"
+                variant="secondary"
+                size="sm"
+                label="Download .html Slides"
+                icon={<Download className="h-3.5 w-3.5" />}
                 href={withBasePath(current.downloadHtmlPath)}
-                download
-                className="inline-flex items-center gap-1.5 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-xs font-semibold text-[var(--ink)] hover:border-[var(--accent)]"
-              >
-                <Download className="h-3.5 w-3.5" />
-                <span>Download HTML Slides</span>
-              </a>
+              />
             )}
-            <button
-              type="button"
+            <Button
+              variant={isDone ? 'primary' : 'secondary'}
+              size="sm"
+              label={isDone ? 'Completed' : 'Mark Complete'}
+              icon={<CheckCircle2 className="h-3.5 w-3.5" />}
               onClick={() => toggleDone(current.slug)}
-              className={`inline-flex items-center gap-1.5 rounded-[var(--radius)] px-3 py-1.5 text-xs font-semibold ${
-                isDone
-                  ? 'bg-[var(--status-ok)] text-white'
-                  : 'border border-[var(--border)] bg-[var(--surface)] text-[var(--ink)] hover:border-[var(--accent)]'
-              }`}
-            >
-              <CheckCircle2 className="h-3.5 w-3.5" />
-              <span>{isDone ? 'Completed' : 'Mark Complete'}</span>
-            </button>
+            />
           </div>
         </div>
 
-        {/* Title & Metadata Header */}
         <header className="mb-6 border-b border-[var(--border)] pb-5">
-          <div className="mb-2 flex flex-wrap items-center gap-2 text-xs">
-            <span className="rounded bg-[var(--surface)] border border-[var(--border)] px-2 py-0.5 font-medium">
-              {current.level}
-            </span>
-            <span className="rounded bg-[var(--surface)] border border-[var(--border)] px-2 py-0.5 font-mono uppercase">
-              {current.status}
-            </span>
-            <span className="text-[var(--ink-muted)]">~{current.durationMinutes} min read</span>
+          <div className="mb-2.5 flex flex-wrap items-center gap-2">
+            <Badge variant="neutral" label={current.level} />
+            <Badge variant="info" label={current.status.toUpperCase()} />
+            <Text type="supporting" color="secondary" className="tabular-nums">
+              ~{current.durationMinutes} min read
+            </Text>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+          <Heading level={1} type="display-3">
             {current.id} · {current.title}
-          </h1>
+          </Heading>
         </header>
 
-        {/* YouTube Video Stage (Honest state if recording is upcoming) */}
-        <section className="mb-6 overflow-hidden rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)]">
+        {/* YouTube Video Stage */}
+        <Card variant="muted" padding={0} className="mb-6 overflow-hidden">
           {current.youtubeVideoId ? (
             <div className="aspect-video w-full bg-black">
               <iframe
@@ -255,47 +248,38 @@ export function LearningWorkspace({
                 <PlayCircle className="h-6 w-6 shrink-0 text-[var(--accent)]" />
                 <div>
                   <div className="text-sm font-semibold">Video lecture upcoming on @StackShade</div>
-                  <div className="text-xs text-[var(--ink-muted)]">
-                    Use the interactive lesson article, animated HTML slide deck, and live visualizations below while recording is scheduled.
-                  </div>
+                  <Text type="supporting" color="secondary">
+                    Study with the article, animated HTML slide deck, live simulations, and Recall Quiz below.
+                  </Text>
                 </div>
               </div>
               {current.slidesSlug && (
-                <Link
+                <Button
+                  variant="primary"
+                  size="sm"
+                  label="Open Slide Deck →"
                   href={`/present/${courseSlug}/${current.slidesSlug}/`}
-                  className="rounded-[var(--radius)] bg-[var(--accent)] px-3 py-1.5 text-xs font-semibold text-[var(--accent-ink)]"
-                >
-                  Open Slide Deck →
-                </Link>
+                />
               )}
             </div>
           )}
-        </section>
+        </Card>
 
-        {/* Udemy-Inspired Content Tabs */}
-        <div className="mb-6 flex flex-wrap gap-1 border-b border-[var(--border)]">
-          {[
-            ['notes', 'Article & Diagrams'],
-            ['visuals', `Interactive Visuals (${current.animations.length})`],
-            ['slides', 'Slides & Downloads'],
-            ['quiz', `Quiz & Recall (${questions.length})`],
-          ].map(([key, label]) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => setTab(key as typeof tab)}
-              className={`border-b-2 px-4 py-2 text-sm font-semibold transition-colors ${
-                tab === key
-                  ? 'border-[var(--accent)] text-[var(--ink)]'
-                  : 'border-transparent text-[var(--ink-muted)] hover:text-[var(--ink)]'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
+        {/* Astryx TabList */}
+        <div className="mb-6">
+          <TabList
+            value={tab}
+            onChange={(v) => setTab(v as typeof tab)}
+            role="tablist"
+            hasDivider
+          >
+            <Tab value="notes" label="Article & Diagrams" />
+            <Tab value="visuals" label={`Interactive Visuals (${current.animations.length})`} />
+            <Tab value="slides" label="Slides & Downloads" />
+            <Tab value="quiz" label={`Quiz & Recall (${questions.length})`} />
+          </TabList>
         </div>
 
-        {/* Tab Body + Desktop TOC */}
         <div className="flex gap-10">
           <div className="min-w-0 flex-1">
             {tab === 'notes' && <MarkdownRenderer html={html} />}
@@ -303,9 +287,9 @@ export function LearningWorkspace({
             {tab === 'visuals' && (
               <div className="max-w-3xl space-y-4">
                 {current.animations.length === 0 ? (
-                  <p className="text-sm text-[var(--ink-muted)]">
+                  <Text color="secondary">
                     No interactive widget mapped to this lesson yet. Check the Diagrams in the Article tab.
-                  </p>
+                  </Text>
                 ) : (
                   current.animations.map((id) => <div key={id} data-stackshade-anim={id} />)
                 )}
@@ -313,35 +297,33 @@ export function LearningWorkspace({
             )}
 
             {tab === 'slides' && (
-              <div className="max-w-3xl space-y-4">
+              <div className="max-w-3xl">
                 {current.downloadHtmlPath ? (
-                  <div className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] p-5">
-                    <h2 className="text-lg font-bold">Animated HTML Slide Deck</h2>
-                    <p className="mt-1 text-sm text-[var(--ink-muted)]">
-                      Works offline in any browser with step-by-step animations (<code>→</code>), speaker notes (<code>N</code>), overview grid (<code>G</code>), light/dark toggle (<code>T</code>), and interactive simulations.
-                    </p>
+                  <Card variant="default" padding={5}>
+                    <Heading level={2}>Animated HTML Slide Deck</Heading>
+                    <Text type="supporting" color="secondary" className="mt-1 block">
+                      Works offline in any browser with step-by-step animations (→), speaker notes (N), overview grid (G), light/dark toggle (T), and interactive simulations.
+                    </Text>
                     <div className="mt-4 flex flex-wrap gap-3">
                       {current.slidesSlug && (
-                        <Link
+                        <Button
+                          variant="primary"
+                          label="Launch Presenter Mode (Optional Webcam)"
+                          icon={<Presentation className="h-4 w-4" />}
                           href={`/present/${courseSlug}/${current.slidesSlug}/`}
-                          className="inline-flex items-center gap-1.5 rounded-[var(--radius)] bg-[var(--accent)] px-4 py-2 text-xs font-semibold text-[var(--accent-ink)]"
-                        >
-                          <Presentation className="h-4 w-4" />
-                          <span>Launch Presenter Mode (with Optional Webcam)</span>
-                        </Link>
+                        />
                       )}
-                      <a
+                      <Button
+                        as="a"
+                        variant="secondary"
+                        label="Download Standalone .html Deck"
+                        icon={<Download className="h-4 w-4" />}
                         href={withBasePath(current.downloadHtmlPath)}
-                        download
-                        className="inline-flex items-center gap-1.5 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] px-4 py-2 text-xs font-semibold text-[var(--ink)] hover:border-[var(--accent)]"
-                      >
-                        <Download className="h-4 w-4" />
-                        <span>Download Standalone .html Deck</span>
-                      </a>
+                      />
                     </div>
-                  </div>
+                  </Card>
                 ) : (
-                  <p className="text-sm text-[var(--ink-muted)]">Slide deck not linked for this page.</p>
+                  <Text color="secondary">Slide deck not linked for this page.</Text>
                 )}
               </div>
             )}
@@ -355,7 +337,6 @@ export function LearningWorkspace({
               />
             )}
 
-            {/* Prev / Next Footer */}
             <nav className="mt-12 grid grid-cols-1 gap-4 border-t border-[var(--border)] pt-6 sm:grid-cols-2">
               {prev ? (
                 <Link
@@ -386,7 +367,6 @@ export function LearningWorkspace({
             </nav>
           </div>
 
-          {/* Right-Rail Table of Contents */}
           {tab === 'notes' && toc.length > 0 && (
             <aside className="hidden w-56 shrink-0 xl:block">
               <div className="sticky top-20 space-y-2">
@@ -396,10 +376,7 @@ export function LearningWorkspace({
                 <ul className="space-y-1.5 border-l border-[var(--border)] pl-3 text-xs">
                   {toc.map((t) => (
                     <li key={t.id} className={t.level === 3 ? 'pl-2' : ''}>
-                      <a
-                        href={`#${t.id}`}
-                        className="block text-[var(--ink-muted)] hover:text-[var(--ink)]"
-                      >
+                      <a href={`#${t.id}`} className="block text-[var(--ink-muted)] hover:text-[var(--ink)]">
                         {t.text}
                       </a>
                     </li>

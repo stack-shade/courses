@@ -13,6 +13,7 @@ import {
   Presentation,
   Youtube,
 } from 'lucide-react';
+import { Badge, Button, Card, Divider, Heading, Text } from '@astryxdesign/core';
 import { getAllCourseSlugs, getCourseData } from '@/lib/courses';
 import { CurriculumAccordion } from '@/components/CurriculumAccordion';
 import { withBasePath } from '@/lib/paths';
@@ -48,8 +49,8 @@ export default async function CourseOverviewPage({
 
   return (
     <main>
-      {/* Udemy-Inspired Clean Hero Band */}
-      <section className="border-b border-[var(--border)] bg-[#0f141d] text-[#f1f5f9] py-10 sm:py-14">
+      {/* Editorial Dark Hero Band */}
+      <section className="border-b border-[var(--border)] bg-[#141820] py-10 text-[#f1f5f9] sm:py-14">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="max-w-3xl">
             <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-[#94a3b8]">
@@ -60,11 +61,9 @@ export default async function CourseOverviewPage({
               <span className="text-[#a3e635]">{meta.category ?? 'Software Engineering'}</span>
             </div>
             <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{meta.title}</h1>
-            <p className="mt-3 text-base text-[#cbd5e1]">
-              {meta.subtitle ?? meta.description}
-            </p>
-            <div className="mt-5 flex flex-wrap items-center gap-3 text-xs text-[#cbd5e1]">
-              <span className="rounded bg-[#161c28] border border-[#252f42] px-2.5 py-1 font-semibold text-[#a3e635]">
+            <p className="mt-3 text-base text-[#cbd5e1]">{meta.subtitle ?? meta.description}</p>
+            <div className="mt-5 flex flex-wrap items-center gap-3 text-xs tabular-nums text-[#cbd5e1]">
+              <span className="rounded border border-[#2b3446] bg-[#1b2230] px-2.5 py-1 font-semibold text-[#a3e635]">
                 {meta.level}
               </span>
               <span>{meta.modules.length} Modules</span>
@@ -81,15 +80,12 @@ export default async function CourseOverviewPage({
         </div>
       </section>
 
-      {/* Main Content + Sticky Right Course Card */}
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
         <div className="grid gap-10 lg:grid-cols-3">
-          {/* Left Main Column */}
           <div className="space-y-10 lg:col-span-2">
-            {/* What You'll Learn */}
             {meta.outcomes && meta.outcomes.length > 0 && (
-              <div className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] p-6">
-                <h2 className="text-lg font-bold">What you&apos;ll learn</h2>
+              <Card variant="muted" padding={6}>
+                <Heading level={2}>What you&apos;ll learn</Heading>
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
                   {meta.outcomes.map((item) => (
                     <div key={item} className="flex items-start gap-2.5 text-sm">
@@ -98,33 +94,31 @@ export default async function CourseOverviewPage({
                     </div>
                   ))}
                 </div>
-              </div>
+              </Card>
             )}
 
-            {/* Collapsible Course Content Accordion */}
             <div id="curriculum">
               <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-                <h2 className="text-xl font-bold">Course Content</h2>
-                <span className="text-xs text-[var(--ink-muted)]">
-                  {meta.modules.length} modules · {lessons.length} lessons · {slides.length} animated HTML decks
-                </span>
+                <Heading level={2}>Course Content</Heading>
+                <Text type="supporting" color="secondary" className="tabular-nums">
+                  {meta.modules.length} modules · {lessons.length} lessons · {slides.length} HTML decks
+                </Text>
               </div>
               <CurriculumAccordion courseSlug={courseSlug} modules={groupedModules} />
             </div>
 
-            {/* Hands-on Labs */}
             {labs.length > 0 && (
               <div>
-                <h2 className="mb-3 flex items-center gap-2 text-xl font-bold">
+                <Heading level={2} className="mb-3 flex items-center gap-2">
                   <FlaskConical className="h-5 w-5 text-[var(--accent)]" />
                   <span>Hands-On Labs ({labs.length})</span>
-                </h2>
-                <div className="grid gap-3 sm:grid-cols-2">
+                </Heading>
+                <div className="grid gap-2.5 sm:grid-cols-2">
                   {labs.map((lab) => (
                     <Link
                       key={lab.slug}
                       href={`/courses/${courseSlug}/labs/${lab.slug}/`}
-                      className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] p-3.5 text-sm font-medium hover:border-[var(--accent)]"
+                      className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--card-bg)] p-3.5 text-sm font-medium hover:border-[var(--accent)]"
                     >
                       {lab.title}
                     </Link>
@@ -133,19 +127,18 @@ export default async function CourseOverviewPage({
               </div>
             )}
 
-            {/* 16 Case Studies */}
             {caseStudies.length > 0 && (
               <div>
-                <h2 className="mb-3 flex items-center gap-2 text-xl font-bold">
+                <Heading level={2} className="mb-3 flex items-center gap-2">
                   <Layers className="h-5 w-5 text-[var(--accent)]" />
                   <span>Real-World Case Studies ({caseStudies.length})</span>
-                </h2>
-                <div className="grid gap-3 sm:grid-cols-2">
+                </Heading>
+                <div className="grid gap-2.5 sm:grid-cols-2">
                   {caseStudies.map((cs) => (
                     <Link
                       key={cs.slug}
                       href={`/courses/${courseSlug}/case-studies/${cs.slug}/`}
-                      className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] p-3.5 text-sm font-medium hover:border-[var(--accent)]"
+                      className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--card-bg)] p-3.5 text-sm font-medium hover:border-[var(--accent)]"
                     >
                       {cs.title}
                     </Link>
@@ -154,14 +147,13 @@ export default async function CourseOverviewPage({
               </div>
             )}
 
-            {/* Stage Projects & Assessments */}
             <div className="grid gap-6 sm:grid-cols-2">
               {projects.length > 0 && (
                 <div>
-                  <h2 className="mb-3 flex items-center gap-2 text-lg font-bold">
+                  <Heading level={3} className="mb-3 flex items-center gap-2">
                     <FolderKanban className="h-5 w-5 text-[var(--accent)]" />
                     <span>Stage Projects & Capstone</span>
-                  </h2>
+                  </Heading>
                   <div className="space-y-2">
                     {projects.map((p) => (
                       <Link
@@ -178,10 +170,10 @@ export default async function CourseOverviewPage({
 
               {assessments.length > 0 && (
                 <div>
-                  <h2 className="mb-3 flex items-center gap-2 text-lg font-bold">
+                  <Heading level={3} className="mb-3 flex items-center gap-2">
                     <CheckSquare className="h-5 w-5 text-[var(--accent)]" />
                     <span>Checkpoints ({assessments.length})</span>
-                  </h2>
+                  </Heading>
                   <div className="space-y-2">
                     {assessments.map((a) => (
                       <Link
@@ -198,75 +190,80 @@ export default async function CourseOverviewPage({
             </div>
           </div>
 
-          {/* Sticky Right Course Action Card */}
           <aside className="lg:col-span-1">
-            <div className="sticky top-20 space-y-5 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] p-6">
+            <Card variant="default" padding={6} className="sticky top-20 space-y-5">
               <div>
-                <div className="text-xs font-bold uppercase tracking-wider text-[var(--ink-muted)]">
-                  Free Open Learning Path
-                </div>
-                <div className="mt-1 text-xl font-bold">Start or Teach From This Course</div>
+                <Badge variant="success" label="Free Open Curriculum" />
+                <Heading level={3} className="mt-2">
+                  Start or Teach From This Course
+                </Heading>
               </div>
 
               <div className="space-y-2.5">
                 {firstLesson && (
-                  <Link
+                  <Button
+                    variant="primary"
+                    width="100%"
+                    label="Start Lesson 01"
+                    endContent={<ArrowRight className="h-4 w-4" />}
                     href={`/courses/${courseSlug}/learn/${firstLesson.slug}/`}
-                    className="flex w-full items-center justify-center gap-2 rounded-[var(--radius)] bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-[var(--accent-ink)]"
-                  >
-                    <span>Start Lesson 01</span>
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
+                  />
                 )}
 
-                <a
+                <Button
+                  variant="secondary"
+                  width="100%"
+                  label={`Practice, Quizzes & SRS (${data.practice.quizzes.length})`}
+                  icon={<Brain className="h-4 w-4" />}
+                  href={`/courses/${courseSlug}/practice/`}
+                />
+
+                <Button
+                  as="a"
+                  variant="secondary"
+                  width="100%"
+                  label={`All ${slides.length} HTML Slides & Visuals`}
+                  icon={<Download className="h-4 w-4" />}
                   href={withBasePath(`/downloads/${courseSlug}/index.html`)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex w-full items-center justify-center gap-2 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] px-4 py-2.5 text-sm font-semibold hover:border-[var(--accent)]"
-                >
-                  <Download className="h-4 w-4" />
-                  <span>All {slides.length} HTML Slides & Visuals</span>
-                </a>
+                />
 
                 {slides[0] && (
-                  <Link
+                  <Button
+                    variant="secondary"
+                    width="100%"
+                    label="Open Presenter Mode"
+                    icon={<Presentation className="h-4 w-4" />}
                     href={`/present/${courseSlug}/${slides[0].slug}/`}
-                    className="flex w-full items-center justify-center gap-2 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] px-4 py-2.5 text-sm font-semibold hover:border-[var(--accent)]"
-                  >
-                    <Presentation className="h-4 w-4" />
-                    <span>Open Presenter Mode</span>
-                  </Link>
+                  />
                 )}
 
-                <Link
-                  href={`/courses/${courseSlug}/practice/`}
-                  className="flex w-full items-center justify-center gap-2 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] px-4 py-2.5 text-sm font-semibold hover:border-[var(--accent)]"
-                >
-                  <Brain className="h-4 w-4" />
-                  <span>Practice, Quizzes & SRS ({data.practice.quizzes.length})</span>
-                </Link>
-
-                <a
+                <Button
+                  as="a"
+                  variant="ghost"
+                  width="100%"
+                  label="Watch on @StackShade"
+                  icon={<Youtube className="h-4 w-4" />}
                   href={meta.youtube?.channel ?? 'https://www.youtube.com/@StackShade'}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex w-full items-center justify-center gap-2 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] px-4 py-2.5 text-sm font-semibold hover:border-[var(--accent)]"
-                >
-                  <Youtube className="h-4 w-4" />
-                  <span>Watch on @StackShade</span>
-                </a>
+                />
               </div>
 
-              <div className="border-t border-[var(--border)] pt-4 text-xs text-[var(--ink-muted)] space-y-2">
+              <Divider />
+
+              <div className="space-y-1.5 text-xs text-[var(--ink-muted)]">
                 <div className="font-semibold text-[var(--ink)]">This course includes:</div>
-                <div>• {lessons.length} full lessons + Mermaid diagrams</div>
+                <div>• {lessons.length} lessons + Mermaid diagrams</div>
                 <div>• 40 live interactive SVG/JS simulations</div>
-                <div>• {slides.length} downloadable animated .html slide decks</div>
-                <div>• {labs.length} labs + {caseStudies.length} case studies + {assessments.length} checkpoints</div>
+                <div>• {slides.length} downloadable animated .html decks</div>
+                <div>• {data.practice.quizzes.length} MCQs + {data.practice.flashcards.length} SRS flashcards</div>
               </div>
 
-              <div className="flex flex-wrap gap-3 border-t border-[var(--border)] pt-4 text-xs font-semibold">
+              <Divider />
+
+              <div className="flex flex-wrap gap-4 text-xs font-semibold">
                 <Link
                   href={`/courses/${courseSlug}/glossary/`}
                   className="inline-flex items-center gap-1 text-[var(--accent)] hover:underline"
@@ -274,14 +271,11 @@ export default async function CourseOverviewPage({
                   <BookMarked className="h-3.5 w-3.5" />
                   <span>Glossary ({data.glossary.length})</span>
                 </Link>
-                <Link
-                  href={`/courses/${courseSlug}/resources/`}
-                  className="text-[var(--accent)] hover:underline"
-                >
+                <Link href={`/courses/${courseSlug}/resources/`} className="text-[var(--accent)] hover:underline">
                   Primary Resources →
                 </Link>
               </div>
-            </div>
+            </Card>
           </aside>
         </div>
       </section>

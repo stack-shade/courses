@@ -219,16 +219,17 @@ function buildStandaloneDeckHtml({ title, lessonRel, slidesHtml, notesList, defa
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>${escapeHtml(title)} · StackShade Slides</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'" />
   <style>
     :root {
-      --bg:#ffffff;--surface:#f8fafc;--ink:#0f172a;--ink-muted:#475569;--border:#e2e8f0;
-      --accent:#4f46e5;--accent-ink:#ffffff;--status-ok:#15803d;--status-warn:#b45309;--status-err:#b91c1c;
-      --font-sans:"Inter",system-ui,-apple-system,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+      --bg:oklch(98.1% 0.004 124);--surface:oklch(95.4% 0.006 124);--ink:oklch(18.5% 0.015 248);--ink-muted:oklch(44.5% 0.014 248);--border:oklch(88.8% 0.008 242);
+      --accent:oklch(44.5% 0.145 142);--accent-ink:oklch(98.5% 0.004 142);--status-ok:oklch(45% 0.14 148);--status-warn:oklch(55% 0.15 70);--status-err:oklch(50% 0.19 25);
+      --font-sans:"Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--font-mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,monospace;
       --radius:6px;--ease-out:cubic-bezier(0.22,1,0.36,1);
     }
     [data-theme="dark"] {
-      --bg:#0f141d;--surface:#161c28;--ink:#f1f5f9;--ink-muted:#94a3b8;--border:#252f42;
-      --accent:#a3e635;--accent-ink:#0f141d;--status-ok:#4ade80;--status-warn:#fbbf24;--status-err:#f87171;
+      --bg:oklch(16.8% 0.015 252);--surface:oklch(20.6% 0.017 252);--ink:oklch(94.5% 0.006 240);--ink-muted:oklch(69% 0.013 245);--border:oklch(29.5% 0.018 250);
+      --accent:oklch(87.2% 0.205 124);--accent-ink:oklch(17% 0.02 124);--status-ok:oklch(75% 0.17 148);--status-warn:oklch(82% 0.15 80);--status-err:oklch(70% 0.18 22);
     }
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-sans);height:100vh;overflow:hidden;display:flex;flex-direction:column}
@@ -495,8 +496,8 @@ function buildCourseHubHtml(courseTitle, decks, animIds) {
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>${escapeHtml(courseTitle)} · Offline Teaching & Visuals Hub</title>
   <style>
-    :root{--bg:#ffffff;--surface:#f8fafc;--ink:#0f172a;--ink-muted:#475569;--border:#e2e8f0;--accent:#4f46e5;--accent-ink:#fff;--font-sans:system-ui,-apple-system,sans-serif;--font-mono:ui-monospace,monospace}
-    [data-theme="dark"]{--bg:#0f141d;--surface:#161c28;--ink:#f1f5f9;--ink-muted:#94a3b8;--border:#252f42;--accent:#a3e635;--accent-ink:#0f141d}
+    :root{--bg:oklch(98.1% 0.004 124);--surface:oklch(95.4% 0.006 124);--ink:oklch(18.5% 0.015 248);--ink-muted:oklch(44.5% 0.014 248);--border:oklch(88.8% 0.008 242);--accent:oklch(44.5% 0.145 142);--accent-ink:oklch(98.5% 0.004 142);--font-sans:"Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--font-mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,monospace}
+    [data-theme="dark"]{--bg:oklch(16.8% 0.015 252);--surface:oklch(20.6% 0.017 252);--ink:oklch(94.5% 0.006 240);--ink-muted:oklch(69% 0.013 245);--border:oklch(29.5% 0.018 250);--accent:oklch(87.2% 0.205 124);--accent-ink:oklch(17% 0.02 124)}
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-sans);line-height:1.5}
     header{border-bottom:1px solid var(--border);padding:16px 24px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}

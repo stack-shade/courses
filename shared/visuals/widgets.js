@@ -42,15 +42,15 @@
   function injectBaseStyles() {
     if (document.getElementById('ss-widget-styles')) return;
     var css = [
-      '.ss-w{border:1px solid var(--border,#e2e8f0);border-radius:8px;background:var(--surface,#f8fafc);color:var(--ink,#0f172a);padding:14px 16px;font-family:var(--font-sans,system-ui,sans-serif);font-size:14px;line-height:1.45;margin:12px 0;}',
+      '.ss-w{border:1px solid var(--border,#e2e8f0);border-radius:8px;background:var(--surface,#f8fafc);color:var(--ink,#0f172a);padding:14px 16px;font-family:var(--font-sans,"Figtree",system-ui,sans-serif);font-size:14px;line-height:1.45;margin:12px 0;}',
       '.ss-w-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;border-bottom:1px solid var(--border,#e2e8f0);padding-bottom:8px;}',
       '.ss-w-title{font-weight:700;font-size:14px;margin:0;color:var(--ink,#0f172a);}',
       '.ss-w-tag{font-size:11px;font-family:var(--font-mono,monospace);color:var(--ink-muted,#475569);border:1px solid var(--border,#e2e8f0);border-radius:4px;padding:2px 6px;}',
       '.ss-w-ctrl{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px;}',
       '.ss-w-btn{border:1px solid var(--border,#e2e8f0);background:var(--bg,#fff);color:var(--ink,#0f172a);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer;}',
-      '.ss-w-btn[data-active="true"],.ss-w-btn.primary{background:var(--accent,#4f46e5);color:var(--accent-ink,#fff);border-color:var(--accent,#4f46e5);}',
+      '.ss-w-btn[data-active="true"],.ss-w-btn.primary{background:var(--accent,#15803d);color:var(--accent-ink,#fff);border-color:var(--accent,#15803d);}',
       '.ss-w-slider{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-muted,#475569);}',
-      '.ss-w-slider input{accent-color:var(--accent,#4f46e5);cursor:pointer;}',
+      '.ss-w-slider input{accent-color:var(--accent,#15803d);cursor:pointer;}',
       '.ss-w-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:10px;}',
       '.ss-w-stat{background:var(--bg,#fff);border:1px solid var(--border,#e2e8f0);border-radius:6px;padding:8px 10px;}',
       '.ss-w-stat-k{font-size:11px;color:var(--ink-muted,#475569);display:block;}',

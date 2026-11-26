@@ -1,111 +1,80 @@
-# StackShade Minimal Design System
+# StackShade Design System (Astryx + Impeccable OKLCH Spec)
 
-> **Goal:** The simplest possible, high-clarity educational design system inspired by Udemy's clean course structure and technical reading precision. Zero visual bloat, 12 core CSS tokens, 9 UI primitives, and built-in dark presentation mode.
-
----
-
-## 1. Design Philosophy
-
-1. **Content over chrome:** Every pixel serves comprehension—clear hierarchy, generous whitespace, hairline dividers, and zero decorative shadows or glassmorphism.
-2. **Udemy-grade scanability:** A learner should immediately understand *what they will learn*, *how long it takes*, *what comes next*, and *what artifacts are downloadable* (notes, interactive visuals, HTML slides, code labs).
-3. **Dual-surface discipline:**
-   - **Study Mode (Light-first default):** Crisp white canvas (`#FFFFFF`) and soft slate surface (`#F8FAFC`) for sustained reading without eye fatigue.
-   - **Dark / Teaching Mode:** Deep midnight ink (`#0F141D`) with StackShade lime (`#A3E635`) accent—engineered for screen recording, YouTube tutorials, and full-screen HTML slide decks.
-4. **Minimal token budget:** Twelve core CSS variables drive every component, diagram, and downloadable HTML slide deck.
+> **Foundation:** Built on **Meta Astryx (`@astryxdesign/core` + `@astryxdesign/theme-neutral`)** and audited against **[`impeccable.style`](https://impeccable.style/)** craft standards: perceptual OKLCH tokens, zero pure `#fff`/`#000` clichés, **Figtree** geometric typography paired with tabular monospace, and flat editorial hierarchy.
 
 ---
 
-## 2. Core Design Tokens (`12 Tokens`)
+## 1. Design Principles (Impeccable + Astryx + Udemy Clarity)
+
+1. **Zero AI-slop defaults:** No generic `Inter` font, no `#4f46e5` indigo-purple clichés, no nested cards-inside-cards, and no pure `#ffffff` / `#000000`.
+2. **Perceptual OKLCH harmony:** Light and dark modes share calibrated hue/chroma relationships—warm paper light reading surface tinted gently toward StackShade lime (`124°`), and deep slate-midnight dark surface for presentations and screen recording.
+3. **Typography discipline (`/impeccable typeset`):**
+   - **Display & Body:** **Figtree** (vendored locally via `@astryxdesign/theme-neutral/fonts.css`, weights `400, 500, 600, 700`).
+   - **Code, QPS Math & Badges:** `ui-monospace` / `JetBrains Mono` with `font-variant-numeric: tabular-nums`.
+   - **Optimal measure:** Prose articles strictly capped at `65ch` (`line-height: 1.66` light / `1.70` dark).
+4. **Astryx Component Architecture:** Accessible primitives from `@astryxdesign/core` (`Theme`, `LinkProvider`, `Button`, `Card`, `Badge`, `Heading`, `Text`, `CollapsibleGroup`, `Collapsible`, `TabList`, `Tab`, `ProgressBar`, `Divider`, `Kbd`).
+
+---
+
+## 2. Calibrated OKLCH Design Tokens
 
 ```css
 :root {
-  /* 1–5: Neutral Surfaces, Ink & Hairlines (Udemy-clean light default) */
-  --bg: #ffffff;
-  --surface: #f8fafc;
-  --ink: #0f172a;
-  --ink-muted: #475569;
-  --border: #e2e8f0;
+  /* Surfaces & Ink (Tinted toward StackShade 124deg / 248deg, zero pure #fff/#000) */
+  --bg: oklch(98.1% 0.004 124);
+  --surface: oklch(95.4% 0.006 124);
+  --card-bg: oklch(99.3% 0.002 124);
+  --ink: oklch(18.5% 0.015 248);
+  --ink-muted: oklch(44.5% 0.014 248);
+  --border: oklch(88.8% 0.008 242);
 
-  /* 6–7: Single Brand Accent */
-  --accent: #4f46e5;
-  --accent-ink: #ffffff;
+  /* Brand Accent (Emerald-forest on light for >6:1 AA; chartreuse-lime on dark) */
+  --accent: oklch(44.5% 0.145 142);
+  --accent-ink: oklch(98.5% 0.004 142);
 
-  /* 8–10: Honest Semantic Statuses (max 3) */
-  --status-ok: #15803d;     /* Published / Passed / Healthy */
-  --status-warn: #b45309;   /* Draft / Warning / Degraded */
-  --status-err: #b91c1c;    /* Failure / Bottleneck / Error */
+  /* Semantic Statuses */
+  --status-ok: oklch(45% 0.14 148);
+  --status-warn: oklch(55% 0.15 70);
+  --status-err: oklch(50% 0.19 25);
 
-  /* 11–12: Typography & Shape */
-  --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* Typography */
+  --font-sans: "Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
   --radius: 6px;
 }
 
 [data-theme="dark"] {
-  --bg: #0f141d;
-  --surface: #161c28;
-  --ink: #f1f5f9;
-  --ink-muted: #94a3b8;
-  --border: #252f42;
-  --accent: #a3e635;        /* StackShade teaching lime */
-  --accent-ink: #0f141d;
-  --status-ok: #4ade80;
-  --status-warn: #fbbf24;
-  --status-err: #f87171;
+  --bg: oklch(16.8% 0.015 252);
+  --surface: oklch(20.6% 0.017 252);
+  --card-bg: oklch(22.5% 0.018 252);
+  --ink: oklch(94.5% 0.006 240);
+  --ink-muted: oklch(69% 0.013 245);
+  --border: oklch(29.5% 0.018 250);
+  --accent: oklch(87.2% 0.205 124);
+  --accent-ink: oklch(17% 0.02 124);
+  --status-ok: oklch(75% 0.17 148);
+  --status-warn: oklch(82% 0.15 80);
+  --status-err: oklch(70% 0.18 22);
 }
 ```
 
-### Usage Rules
-- **Never** invent extra background grays or brand colors outside `--bg`, `--surface`, and `--accent`.
-- Use `--border` (`1px solid var(--border)`) instead of drop shadows to separate cards, tables, and diagram frames.
-- Only one primary filled button (`background: var(--accent); color: var(--accent-ink)`) per viewport section.
+---
+
+## 3. Component Mapping (`@astryxdesign/core`)
+
+| UI Role | Astryx Component | Where Used |
+|---|---|---|
+| Theme & Router Context | `Theme`, `LinkProvider`, `neutralTheme` | `AstryxProvider.tsx` (`apps/web`) |
+| Actions & CTAs | `Button`, `Kbd` | `TopNav`, Hero, Course Sticky Card, Slide HUD |
+| Containers | `Card`, `Divider` | Featured Course, Overview Outcomes, Practice Cards |
+| Typography | `Heading`, `Text`, `Badge` | All pages, metadata, status & level tags |
+| Course Syllabus | `CollapsibleGroup`, `Collapsible` | `CurriculumAccordion.tsx` |
+| Workspace & Arena Tabs | `TabList`, `Tab` | `LearningWorkspace.tsx`, `PracticeArena.tsx` |
+| Progress | `ProgressBar` | Lesson Sidebar completion meter |
 
 ---
 
-## 3. Typography & Spacing Scale
-
-### Strict 5-Step Type Scale
-
-| Role | Size / Line-Height | Weight | Notes |
-|---|---|---|---|
-| **Course / Hero Title** | `32px / 1.15` (`2rem`) | `700` | Tracking `-0.02em` |
-| **Section / Lesson H2** | `24px / 1.25` (`1.5rem`) | `600` | `margin-top: 40px` in articles |
-| **Subsection H3** | `18px / 1.35` (`1.125rem`) | `600` | Clear scannable breaks |
-| **Body / Article Prose** | `16px / 1.65` (`1rem`) | `400` | Max line width `68ch` |
-| **Meta / Badges / Captions** | `13px / 1.4` (`0.8125rem`) | `500` | Module counts, durations, status |
-| **Code & Equations** | `14px / 1.55` (`0.875rem`) | `400` | `--font-mono`; inline pills use `--surface` |
-
-### 4px Spacing Scale
-Use only multiples from this fixed set: `4px`, `8px`, `12px`, `16px`, `24px`, `32px`, `48px`, `64px`.
-
----
-
-## 4. Minimal Component Inventory (`9 Primitives`)
-
-| # | Component | Purpose | Minimal Spec |
-|---|---|---|---|
-| 1 | **Top Utility Bar** | Global navigation & quick actions | `56px` height, sticky, brand mark, `Courses`, `Search (Cmd+K)`, theme toggle, YouTube link |
-| 2 | **Course Hero + Sticky Action Card** | Udemy-clean landing banner | Left: title, outcomes, metadata; Right (`340px`): progress bar, `Start / Continue`, `Download All HTML Slides` |
-| 3 | **Module Curriculum Accordion** | Collapsible syllabus map | Header (`Module N · Title · Lessons · Hours`); rows show type icon, title, duration, `Video` / `HTML Deck` / `Lab` pills |
-| 4 | **Split Learning Workspace** | Focused study view | Collapsible `280px` left syllabus + fluid central stage (`72ch` prose or 16:9 video) + desktop TOC |
-| 5 | **Video Stage + Chapter Strip** | YouTube lesson integration | Privacy-enhanced `youtube-nocookie.com` 16:9 embed + clickable chapter timestamps; honest "Recording planned" placeholder when unlinked |
-| 6 | **Article Prose, Math & Callout** | Deep technical notes | Standard GFM tables, KaTeX formulas, 3 semantic callouts (`Mental Model`, `Trade-Off`, `Pitfall`) using left 3px border |
-| 7 | **Diagram & Interactive Sim Frame** | Mermaid + live visualizations | `1px solid var(--border)` frame, concise caption, optional `Step / Reset / Parameter` controls, always includes static fallback |
-| 8 | **HTML Slide Deck & Presenter Shell** | Teaching & offline download | 16:9 stage, keyboard hints, speaker notes drawer, **Download `.html`** button, optional local-only circular webcam bubble |
-| 9 | **Retrieval Quiz & Lab Checklist** | Active recall & tracking | Expandable hints/answers + interactive checkboxes persisted only in `localStorage` |
-
----
-
-## 5. Accessibility & Motion Rules
-
-- **Contrast:** Minimum `4.5:1` for body text and `3:1` for large text/borders (WCAG 2.2 AA).
-- **Focus rings:** `2px solid var(--accent)` with `2px` offset on all keyboard-focusable controls.
-- **Reduced motion:** Wrap all slide/diagram transitions in `@media (prefers-reduced-motion: reduce)` and snap state changes immediately when active.
-- **Honest states:** Never show fake student ratings, inflated learner counters, or "Completed" badges on planned/unwritten lessons.
-
----
-
-## Related Design Docs
+## Related Docs
 
 - [Page Layouts & Udemy-Inspired Wireframes](page-layouts.md)
 - [Slide Grid, Mermaid Grammar & Animation Spec](slide-and-animation-spec.md)

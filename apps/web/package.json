@@ -12,6 +12,9 @@
     "lint": "eslint src next.config.ts"
   },
   "dependencies": {
+    "@astryxdesign/core": "^0.7.17",
+    "@astryxdesign/theme-neutral": "^0.7.17",
+    "@stylexjs/stylex": "^0.19.2",
     "gray-matter": "^4.0.3",
     "lucide-react": "^0.488.0",
     "marked": "^15.0.0",

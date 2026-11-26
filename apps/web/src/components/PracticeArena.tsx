@@ -12,6 +12,7 @@ import {
   Timer,
   XCircle,
 } from 'lucide-react';
+import { Badge, Button, Heading, Tab, TabList, Text } from '@astryxdesign/core';
 import type {
   ExternalPracticeItem,
   FlashcardItem,
@@ -138,40 +139,24 @@ export function PracticeArena({
         </Link>
         <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-              Neuroscience Practice & Interview Arena
-            </h1>
-            <p className="mt-1 text-sm text-[var(--ink-muted)]">
+            <Heading level={1} type="display-3">
+              Neuroscience Practice &amp; Interview Arena
+            </Heading>
+            <Text type="supporting" color="secondary" className="mt-1 block">
               Spaced repetition, interleaved quizzes, timed architecture drills, and curated hands-on practice links.
-            </p>
+            </Text>
           </div>
-          <div className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] px-3.5 py-2 text-xs">
-            <span className="font-mono font-bold text-[var(--accent)]">{dueCount}</span> cards due for review
-          </div>
+          <Badge variant="info" label={`${dueCount} cards due for review`} />
         </div>
       </header>
 
-      {/* Tabs */}
-      <div className="mb-6 flex flex-wrap gap-1 border-b border-[var(--border)]">
-        {[
-          ['srs', `Spaced Repetition (${dueCount} due)`],
-          ['quiz', `Interleaved Quiz (${quizzes.length})`],
-          ['interview', `45-Min Interview Drill (${interviewPrompts.length})`],
-          ['external', `External Practice Links (${externalPractice.length})`],
-        ].map(([k, label]) => (
-          <button
-            key={k}
-            type="button"
-            onClick={() => setTab(k as typeof tab)}
-            className={`border-b-2 px-4 py-2.5 text-sm font-semibold ${
-              tab === k
-                ? 'border-[var(--accent)] text-[var(--ink)]'
-                : 'border-transparent text-[var(--ink-muted)] hover:text-[var(--ink)]'
-            }`}
-          >
-            {label}
-          </button>
-        ))}
+      <div className="mb-6">
+        <TabList value={tab} onChange={(v) => setTab(v as typeof tab)} role="tablist" hasDivider>
+          <Tab value="srs" label={`Spaced Repetition (${dueCount} due)`} />
+          <Tab value="quiz" label={`Interleaved Quiz (${quizzes.length})`} />
+          <Tab value="interview" label={`45-Min Interview Drill (${interviewPrompts.length})`} />
+          <Tab value="external" label={`External Practice Links (${externalPractice.length})`} />
+        </TabList>
       </div>
 
       {/* TAB 1: Spaced Repetition Flashcards */}
@@ -248,13 +233,12 @@ export function PracticeArena({
               ))}
             </div>
           ) : (
-            <button
-              type="button"
+            <Button
+              variant="primary"
+              width="100%"
+              label="Reveal Answer"
               onClick={() => setFlipped(true)}
-              className="w-full rounded-[var(--radius)] bg-[var(--accent)] py-2.5 text-sm font-semibold text-[var(--accent-ink)]"
-            >
-              Reveal Answer
-            </button>
+            />
           )}
         </section>
       )}

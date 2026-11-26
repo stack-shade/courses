@@ -3,27 +3,25 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { BookOpen, Menu, Moon, Search, Sun, X, Youtube } from 'lucide-react';
+import { Button, Kbd } from '@astryxdesign/core';
 import { SearchModal } from './SearchModal';
+import { useStackShadeTheme } from './AstryxProvider';
 import { withBasePath } from '@/lib/paths';
 
 export function TopNav() {
-  const [dark, setDark] = useState(false);
+  const { mode, toggleTheme } = useStackShadeTheme();
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-
-  useEffect(() => {
-    const saved = localStorage.getItem('ss-theme');
-    const isDark = saved === 'dark';
-    setDark(isDark);
-    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-  }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         setSearchOpen((prev) => !prev);
-      } else if (e.key === '/' && !(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) {
+      } else if (
+        e.key === '/' &&
+        !(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)
+      ) {
         e.preventDefault();
         setSearchOpen(true);
       }
@@ -31,13 +29,6 @@ export function TopNav() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
-
-  const toggleTheme = () => {
-    const next = !dark;
-    setDark(next);
-    document.documentElement.setAttribute('data-theme', next ? 'dark' : 'light');
-    localStorage.setItem('ss-theme', next ? 'dark' : 'light');
-  };
 
   return (
     <>
@@ -77,47 +68,45 @@ export function TopNav() {
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              type="button"
+            <Button
+              variant="secondary"
+              size="sm"
+              label="Search"
+              icon={<Search className="h-3.5 w-3.5" />}
+              endContent={<Kbd keys="mod+k" className="hidden sm:inline" />}
               onClick={() => setSearchOpen(true)}
-              className="flex items-center gap-2 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-xs font-medium text-[var(--ink-muted)] hover:border-[var(--accent)] hover:text-[var(--ink)]"
-              aria-label="Open global search"
-            >
-              <Search className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Search lessons, glossary...</span>
-              <kbd className="hidden rounded border border-[var(--border)] bg-[var(--bg)] px-1.5 py-0.5 font-mono text-[10px] sm:inline">
-                Cmd+K
-              </kbd>
-            </button>
+            />
 
-            <button
-              type="button"
+            <Button
+              variant="secondary"
+              size="sm"
+              isIconOnly
+              label="Toggle light or dark theme"
+              icon={mode === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               onClick={toggleTheme}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] text-[var(--ink)] hover:border-[var(--accent)]"
-              aria-label="Toggle light or dark theme"
-              title="Toggle theme"
-            >
-              {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </button>
+            />
 
-            <a
+            <Button
+              as="a"
+              variant="primary"
+              size="sm"
+              label="YouTube"
+              icon={<Youtube className="h-3.5 w-3.5" />}
               href="https://www.youtube.com/@StackShade"
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden items-center gap-1.5 rounded-[var(--radius)] bg-[var(--accent)] px-3 py-1.5 text-xs font-semibold text-[var(--accent-ink)] sm:inline-flex"
-            >
-              <Youtube className="h-3.5 w-3.5" />
-              <span>YouTube</span>
-            </a>
+              className="hidden sm:inline-flex"
+            />
 
-            <button
-              type="button"
+            <Button
+              variant="secondary"
+              size="sm"
+              isIconOnly
+              label="Toggle menu"
+              icon={mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
               onClick={() => setMobileOpen((v) => !v)}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] md:hidden"
-              aria-label="Toggle menu"
-            >
-              {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-            </button>
+              className="md:hidden"
+            />
           </div>
         </div>
 
@@ -127,8 +116,11 @@ export function TopNav() {
               <Link href="/courses/" onClick={() => setMobileOpen(false)} className="py-1">
                 All Courses
               </Link>
-              <Link href="/courses/system-design/" onClick={() => setMobileOpen(false)} className="py-1 flex items-center gap-1.5">
+              <Link href="/courses/system-design/" onClick={() => setMobileOpen(false)} className="flex items-center gap-1.5 py-1">
                 <BookOpen className="h-4 w-4" /> System Design
+              </Link>
+              <Link href="/courses/system-design/practice/" onClick={() => setMobileOpen(false)} className="py-1">
+                Practice & Quizzes
               </Link>
               <a
                 href={withBasePath('/downloads/system-design/index.html')}

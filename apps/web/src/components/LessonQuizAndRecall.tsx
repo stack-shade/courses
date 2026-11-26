@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { CheckCircle2, Clock, Play, Pause, RotateCcw, Sparkles, XCircle } from 'lucide-react';
+import { Button, Card, Heading, Text } from '@astryxdesign/core';
 import type { QuizQuestion } from '@/lib/courses';
 import Link from 'next/link';
 
@@ -67,55 +68,54 @@ export function LessonQuizAndRecall({
   return (
     <div className="max-w-3xl space-y-8">
       {/* Neuroscience Focus & Consolidation Sprint Timer */}
-      <section className="flex flex-wrap items-center justify-between gap-4 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] p-4">
+      <Card variant="muted" padding={4} className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Clock className="h-5 w-5 text-[var(--accent)]" />
           <div>
             <div className="text-xs font-bold uppercase tracking-wider text-[var(--ink-muted)]">
               {phase === 'focus' ? 'Deep Focus Sprint (25m)' : 'Consolidation Rest Break (5m)'}
             </div>
-            <div className="font-mono text-lg font-bold">
+            <div className="font-mono text-lg font-bold tabular-nums">
               {mins}:{secs}
             </div>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            type="button"
+          <Button
+            variant="primary"
+            size="sm"
+            label={running ? 'Pause' : 'Start Sprint'}
+            icon={running ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
             onClick={() => setRunning((r) => !r)}
-            className="inline-flex items-center gap-1.5 rounded-[var(--radius)] bg-[var(--accent)] px-3 py-1.5 text-xs font-semibold text-[var(--accent-ink)]"
-          >
-            {running ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
-            <span>{running ? 'Pause' : 'Start Sprint'}</span>
-          </button>
-          <button
-            type="button"
+          />
+          <Button
+            variant="secondary"
+            size="sm"
+            isIconOnly
+            label="Reset focus timer"
+            icon={<RotateCcw className="h-3.5 w-3.5" />}
             onClick={() => {
               setRunning(false);
               setPhase('focus');
               setSecondsLeft(25 * 60);
             }}
-            className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] p-1.5 text-[var(--ink-muted)] hover:text-[var(--ink)]"
-            aria-label="Reset focus timer"
-          >
-            <RotateCcw className="h-3.5 w-3.5" />
-          </button>
-          <Link
+          />
+          <Button
+            variant="secondary"
+            size="sm"
+            label="Full Practice Arena →"
             href={`/courses/${courseSlug}/practice/`}
-            className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] px-3 py-1.5 text-xs font-semibold hover:border-[var(--accent)]"
-          >
-            Full Practice Arena →
-          </Link>
+          />
         </div>
-      </section>
+      </Card>
 
       {/* Active Recall Diagnostic Quiz */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold">Active Recall Diagnostic Quiz</h2>
-          <span className="text-xs text-[var(--ink-muted)]">
+          <Heading level={2}>Active Recall Diagnostic Quiz</Heading>
+          <Text type="supporting" color="secondary">
             Testing Effect: retrieve before re-reading
-          </span>
+          </Text>
         </div>
 
         {questions.length === 0 ? (
