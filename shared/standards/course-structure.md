@@ -1,8 +1,8 @@
-# Multi-course repository structure
+# Multi-Course Repository Structure
 
-The repository is a course monorepo: common platform files live once, while every course owns its learning content.
+The repository is a course monorepo: shared design docs, authoring guides, and standards live once in `shared/`, while every course owns its learning content under `courses/<slug>/`.
 
-## Canonical layout
+## Canonical Layout
 
 ```text
 courses/
@@ -12,6 +12,8 @@ courses/
     course.json
     roadmap.md
     curriculum.md
+    syllabus.md
+    glossary.md
     lessons/
     modules/
     slides/
@@ -24,53 +26,53 @@ courses/
     templates/
     downloads/
 shared/
+  design-system/
+  guides/
   standards/
   templates/
   resources/
-site/
-  index.html
-  _sidebar.md
-  _coverpage.md
-  assets/
+apps/
+  web/              # Future Next.js static site (loaded dynamically from courses/)
+scripts/
+  new-course.sh
 .github/workflows/
 ```
 
-Not every course needs every folder on day one. Create folders when there is real content to put in them. Prefer meaningful module subfolders only when a course becomes large enough to justify them.
+Not every course needs every subfolder on day one. Create folders when there is real content to put in them, and never create empty placeholder lesson files.
 
-## Ownership rules
+## Ownership Rules
 
-- **`courses/<slug>/`:** course-specific material, progression, exercises, diagrams, assets and references.
-- **`shared/templates/`:** reusable lesson, lab, project, case-study and slide formats.
-- **`shared/standards/`:** editorial rules, accessibility, citation, diagrams and quality standards.
-- **`shared/resources/`:** tools and resources useful across multiple courses.
-- **`site/`:** global website shell, theme and navigation. Do not put lesson content here.
-- **`courses/catalog.json`:** machine-readable list of published and in-progress courses.
+- **`courses/<slug>/`:** course-specific material, syllabus, lessons, labs, case studies, diagrams, slide sources, and references.
+- **`shared/design-system/`:** Udemy-inspired minimal UI tokens, page layouts, Mermaid grammar, and slide/animation rules.
+- **`shared/guides/`:** authoring workflows for articles, visualizations, animations, standalone HTML slide decks, and YouTube integration.
+- **`shared/templates/` & `shared/standards/`:** reusable lesson, lab, project, case-study, assessment, and slide formats plus editorial quality rules.
+- **`apps/web/`:** global website shell, static loader, and presenter mode (reads `courses/catalog.json` and `course.json` dynamically).
+- **`courses/catalog.json`:** machine-readable index of active and planned courses.
 
-## Add a course
+## Add a Course
 
 1. Choose a short lowercase slug, e.g. `backend-engineering`.
-2. Create `courses/<slug>/README.md`, `course.json`, `roadmap.md` and `curriculum.md`.
-3. Create the relevant content directories from the canonical layout.
-4. Add one entry to `courses/catalog.json`.
-5. Add course navigation links to `site/_sidebar.md`.
-6. Add slide sources to `courses/<slug>/slides/*.md`. The workflow discovers decks across all courses.
-7. Use links relative to each course folder for internal content, and root-relative links only for cross-course resources.
-8. Keep statuses honest: `planned`, `in-progress`, `review`, or `published`.
+2. Run `bash scripts/new-course.sh <slug> "Course Title" "One-line description"`.
+3. Fill out `course.json`, `README.md`, `roadmap.md`, `curriculum.md`, and `syllabus.md`.
+4. Add one matching entry to `courses/catalog.json`.
+5. Add slide Markdown sources under `courses/<slug>/slides/*.md` following [Downloadable Animated HTML Slides](../guides/downloadable-html-slides.md).
+6. Use links relative to each course folder for internal content, and relative paths from `courses/<slug>/` to `../../shared/` for platform standards.
+7. Keep statuses honest: `planned`, `in-progress`, `review`, or `published`.
 
-## Naming
+## Naming Conventions
 
-- Lessons: `lessons/NN-topic-name.md` or `modules/NN-topic-name/README.md`.
-- Labs: `labs/NN-topic-name.md`.
-- Projects: `projects/project-name/README.md`.
-- Case studies: `case-studies/NN-system-name.md`.
-- Slides: `slides/NN-topic-name.md` using Marp.
-- Diagrams: `diagrams/topic-name.mmd` or SVG/PNG with an editable source when possible.
-- Assessments: `assessments/checkpoint-NN.md`.
+- Lessons: `lessons/NN-topic-name.md` or `modules/NN-topic-name/README.md`
+- Labs: `labs/NN-topic-name.md`
+- Projects: `projects/project-name/README.md`
+- Case studies: `case-studies/NN-system-name.md`
+- Slides: `slides/NN-topic-name.md` (portable Markdown compiling to standalone `.html` + optional `.pptx`/`.pdf`)
+- Diagrams: `diagrams/topic-name.mmd` or SVG/editable sources alongside exports
+- Assessments: `assessments/checkpoint-NN.md`
 
-## Course metadata
+## Course Metadata
 
-Each `course.json` should include a `slug`, `title`, `description`, `level`, `status`, `prerequisites`, `topics`, and relative `entrypoint`. Keep the global catalogue in sync.
+Each `course.json` should include `slug`, `title`, `subtitle`, `description`, `level`, `status`, `category`, `estimatedHours`, `prerequisites`, `outcomes`, `topics`, `modules`, `youtube`, `downloads`, and relative `entrypoint`. Keep `courses/catalog.json` synchronized.
 
-## Avoid duplication
+## Avoid Duplication
 
-Do not copy the shared templates or common platform policies into each course. Link to them. If a resource is truly specific to one topic or course, keep it local. A shared resource should have clear reuse across at least two courses.
+Do not copy shared templates, design docs, or platform policies into individual courses. Link to them under `shared/`.

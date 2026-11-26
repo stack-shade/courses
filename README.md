@@ -8,16 +8,18 @@ This repository organizes multiple beginner-to-advanced educational courses. Eve
 
 - [Product and multi-course plan](PLAN.md)
 - [Claude website build prompt](CLAUDE_BUILD_PROMPT.md)
+- [Minimal design system doc (Udemy-inspired)](shared/design-system/README.md)
+- [Content authoring, visuals & HTML slides playbook](shared/guides/content-authoring-playbook.md)
 - [Course catalogue](courses/README.md)
 - [Repository structure standard](shared/standards/course-structure.md)
-- [Shared templates](shared/README.md)
+- [Shared templates & guides](shared/README.md)
 - [Contributing guide](CONTRIBUTING.md)
 
 ## Courses
 
-| Course | Level | Status |
-|---|---|---|
-| [System Design: Beginner → Advanced](courses/system-design/README.md) | Beginner to advanced | In progress |
+| Course | Level | Scope | Status |
+|---|---|---|---|
+| [System Design: Beginner → Advanced](courses/system-design/README.md) | Beginner to advanced | 9 Modules · 40 Lessons · 14 Labs · 16 Case Studies | In progress |
 
 More courses will be added independently under `courses/<course-slug>/`.
 
