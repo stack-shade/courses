@@ -60,10 +60,10 @@ See the standalone diagram source: [singleflight-coalescing.mmd](../diagrams/sin
 
 ```mermaid
 sequenceDiagram
-  participant C1 as ([Client 1..100])
-  participant API as [API + Singleflight]
-  participant R as {{Redis Cache}}
-  participant DB as [(Primary DB)]
+  participant C1 as Client 1..100
+  participant API as API + Singleflight
+  participant R as Redis Cache
+  participant DB as Primary DB
 
   Note over R: Hot key "product:42" expires at t=0
   C1->>API: 100 concurrent GET /products/42

@@ -267,9 +267,11 @@ function buildStandaloneDeckHtml({ title, lessonRel, slidesHtml, notesList, defa
     .ss-slide a{color:var(--accent)}
     .ss-step{opacity:0;transform:translateY(10px);transition:opacity 240ms var(--ease-out),transform 240ms var(--ease-out);pointer-events:none}
     .ss-step.revealed{opacity:1;transform:none;pointer-events:auto}
-    .ss-mermaid-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin:10px 0;overflow:auto;text-align:center}
-    .ss-mermaid-box svg path.flowchart-link,.ss-mermaid-box svg .edgePath path{stroke-dasharray:6 4;animation:ssFlow 2.4s linear infinite}
-    @keyframes ssFlow{to{stroke-dashoffset:-20}}
+    .ss-mermaid-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin:12px 0;overflow:auto;display:flex;justify-content:center;align-items:center}
+    .ss-mermaid-box svg{max-width:100%;max-height:46vh;width:auto;height:auto;font-family:var(--font-sans)!important}
+    .ss-mermaid-box svg .node rect,.ss-mermaid-box svg .node polygon,.ss-mermaid-box svg .actor{stroke-width:1.6px}
+    .ss-mermaid-box svg path.flowchart-link,.ss-mermaid-box svg .edgePath path,.ss-mermaid-box svg .transition,.ss-mermaid-box svg .messageLine1{stroke-dasharray:7 5;animation:ssFlow 2.2s linear infinite}
+    @keyframes ssFlow{to{stroke-dashoffset:-24}}
     pre.mermaid{margin:0;border:none;background:transparent;font-family:var(--font-mono);font-size:13px;text-align:left}
     /* Sleek Icon-First Floating Controller */
     .ss-hud{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:4px;background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:999px;padding:5px 8px;z-index:40;box-shadow:0 8px 24px rgba(0,0,0,.14);transition:opacity 240ms ease,transform 240ms ease}
@@ -444,6 +446,7 @@ ${WIDGETS_JS}
         var nextTheme = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
         root.setAttribute('data-theme', nextTheme);
         themeBtn.innerHTML = nextTheme === 'dark' ? sunSvg : moonSvg;
+        if (window.__renderMermaidDecks) window.__renderMermaidDecks();
       };
       camBtn.onclick = toggleCam;
       fsBtn.onclick = function(){
@@ -465,14 +468,104 @@ ${WIDGETS_JS}
         else if (e.key === 'Escape') { gridEl.hidden = true; gridBtn.removeAttribute('data-on'); notesEl.hidden = true; notesBtn.removeAttribute('data-on'); }
       });
 
-      show(idx, false, 'next');
+      requestAnimationFrame(function(){ show(idx, false, 'next'); });
     })();
   </script>
   <script type="module">
+    let mermaidApi = null;
+    let mmdSeq = 0;
+    function getSlideMermaidCfg(isDark) {
+      return {
+        startOnLoad: false,
+        theme: 'base',
+        flowchart: { curve: 'basis', padding: 14, nodeSpacing: 34, rankSpacing: 46, htmlLabels: true },
+        sequence: { mirrorActors: false, actorMargin: 42, messageMargin: 32, noteMargin: 10 },
+        themeVariables: isDark ? {
+          darkMode: true,
+          background: 'transparent',
+          fontFamily: '"Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',
+          fontSize: '14px',
+          primaryColor: '#1d2735',
+          primaryTextColor: '#eef2f6',
+          primaryBorderColor: '#a3e635',
+          secondaryColor: '#161e2b',
+          secondaryTextColor: '#eef2f6',
+          secondaryBorderColor: '#475569',
+          tertiaryColor: '#131a24',
+          tertiaryBorderColor: '#334155',
+          lineColor: '#8fa3b8',
+          textColor: '#eef2f6',
+          edgeLabelBackground: '#18202c',
+          clusterBkg: '#161d28',
+          clusterBorder: '#334155',
+          actorBkg: '#1d2735',
+          actorBorder: '#a3e635',
+          actorTextColor: '#eef2f6',
+          actorLineColor: '#475569',
+          signalColor: '#cbd5e1',
+          signalTextColor: '#eef2f6',
+          noteBkgColor: '#262116',
+          noteBorderColor: '#eab308',
+          noteTextColor: '#fef3c7'
+        } : {
+          darkMode: false,
+          background: 'transparent',
+          fontFamily: '"Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',
+          fontSize: '14px',
+          primaryColor: '#edf5ee',
+          primaryTextColor: '#18202c',
+          primaryBorderColor: '#2d7a47',
+          secondaryColor: '#f6f8f5',
+          secondaryTextColor: '#18202c',
+          secondaryBorderColor: '#9fb4a5',
+          tertiaryColor: '#f1f4f0',
+          tertiaryBorderColor: '#cbd5cd',
+          lineColor: '#3f5a4a',
+          textColor: '#18202c',
+          edgeLabelBackground: '#f7f9f7',
+          clusterBkg: '#f4f7f4',
+          clusterBorder: '#cbd5cd',
+          actorBkg: '#edf5ee',
+          actorBorder: '#2d7a47',
+          actorTextColor: '#18202c',
+          actorLineColor: '#94a3b8',
+          signalColor: '#243040',
+          signalTextColor: '#18202c',
+          noteBkgColor: '#fef9e7',
+          noteBorderColor: '#d97706',
+          noteTextColor: '#18202c'
+        }
+      };
+    }
+    window.__renderMermaidDecks = async function() {
+      if (!mermaidApi) return;
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      mermaidApi.initialize(getSlideMermaidCfg(isDark));
+      const boxes = document.querySelectorAll('.ss-mermaid-box');
+      for (const box of boxes) {
+        if (!box.dataset.mmdSrc) {
+          const pre = box.querySelector('pre.mermaid');
+          if (pre) box.dataset.mmdSrc = pre.textContent || '';
+        }
+        const src = (box.dataset.mmdSrc || '').trim();
+        if (!src) continue;
+        try {
+          const { svg } = await mermaidApi.render('ss-sm-' + (++mmdSeq), src);
+          box.innerHTML = svg;
+          const svgEl = box.querySelector('svg');
+          if (svgEl) {
+            svgEl.removeAttribute('height');
+            svgEl.style.maxWidth = '100%';
+            svgEl.style.maxHeight = '46vh';
+            svgEl.style.height = 'auto';
+          }
+        } catch (_) {}
+      }
+    };
     try {
       const m = await import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs');
-      m.default.initialize({ startOnLoad: false, theme: document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'neutral' });
-      await m.default.run({ querySelector: 'pre.mermaid' });
+      mermaidApi = m.default;
+      await window.__renderMermaidDecks();
     } catch (_) {
       // Offline graceful fallback: crisp monospace Mermaid source stays readable inside .ss-mermaid-box
     }
@@ -551,7 +644,7 @@ function buildCourse(courseDir) {
     const slidesHtml = rawSlides.map((s, idx) => {
       const rendered = renderMarkdownSlide(s, slidesDir);
       notesList.push(rendered.notes);
-      return `    <section class="ss-slide${idx === 0 ? ' active' : ''}">\n${rendered.html}\n    </section>`;
+      return `    <section class="ss-slide">\n${rendered.html}\n    </section>`;
     }).join('\n');
 
     const slug = file.replace(/\.md$/, '');

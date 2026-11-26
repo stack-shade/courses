@@ -69,10 +69,10 @@ Stream engines (Apache Flink, Spark Structured Streaming, Kafka Streams) group u
 
 ```mermaid
 flowchart LR
-  S[/Raw Click Stream: out-of-order/] -->|Extract event_time & emit W(t)| OP[Stateful Window Operator]
-  OP -->|event_time >= W(t): On-time| W1[12:00-12:01 Window State]
-  W1 -->|Watermark passes 12:01 + 30s| OLAP[(Real-Time OLAP: ClickHouse / Pinot)]
-  OP -.->|event_time < W(t): Late arrival| LATE[/Late Data Side Output / Backfill/]
+  S[/"Raw Click Stream: out-of-order"/] -->|"Extract event_time & emit W(t)"| OP[Stateful Window Operator]
+  OP -->|"event_time >= W(t): On-time"| W1[12:00-12:01 Window State]
+  W1 -->|"Watermark passes 12:01 + 30s"| OLAP[(Real-Time OLAP: ClickHouse / Pinot)]
+  OP -.->|"event_time < W(t): Late arrival"| LATE[/"Late Data Side Output / Backfill"/]
   OP <==> CP[(Incremental Checkpoint: S3 / RocksDB)]
 ```
 

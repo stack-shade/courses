@@ -81,7 +81,7 @@ sequenceDiagram
   participant F3 as Follower C (Term 1)
   participant Old as Stale Leader (Term 1)
 
-  Note over F1,F3: Old Leader partitioned; F1 election timer (180 ms) expires first
+  Note over F1,F3: Old Leader partitioned — F1 election timer (180 ms) expires first
   F1->>F1: Increment currentTerm = 2, vote for self (1/3)
   F1->>F2: RequestVote(term=2, candidate=A, lastLogIdx=42, lastLogTerm=1)
   F1->>F3: RequestVote(term=2, candidate=A, lastLogIdx=42, lastLogTerm=1)
@@ -92,7 +92,7 @@ sequenceDiagram
   F1->>F2: AppendEntries heartbeat(term=2, leaderCommit=42)
   F1->>F3: AppendEntries heartbeat(term=2, leaderCommit=42)
 
-  Note over Old,F2: Partition heals; Old sends stale Term 1 AppendEntries
+  Note over Old,F2: Partition heals — Old sends stale Term 1 AppendEntries
   Old->>F2: AppendEntries(term=1)
   F2-->>Old: Reject(term=2) -> Old steps down to Follower (Term 2)
 ```

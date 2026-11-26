@@ -72,7 +72,7 @@ sequenceDiagram
   GW->>S1: POST /orders (traceparent: ...-A-01)
   S1->>Q: Produce event (header traceparent: ...-B-01)
   S1-->>GW: 202 Accepted
-  Q-.->W: Consume event (link parent span=B -> span=C)
+  Q-->>W: Consume event (link parent span=B -> span=C)
 ```
 
 <!-- note: Stress propagating W3C traceparent through BOTH HTTP/gRPC headers and async Kafka/SQS message headers. -->

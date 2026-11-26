@@ -87,10 +87,10 @@ sequenceDiagram
   S1->>Q: Produce OrderCreated (header traceparent: ...-B-01)
   S1-->>GW: 202 Accepted
   GW-->>C: 202 Accepted
-  Q-.->W: Consume event (links parent span=B -> span=C)
-  GW-.->Col: Export Span A (async OTLP batch)
-  S1-.->Col: Export Span B
-  W-.->Col: Export Span C (async child / span link)
+  Q-->>W: Consume event (links parent span=B -> span=C)
+  GW-->>Col: Export Span A (async OTLP batch)
+  S1-->>Col: Export Span B
+  W-->>Col: Export Span C (async child / span link)
 ```
 
 ### Sampling & Exemplars (Keeping Costs Bounded)

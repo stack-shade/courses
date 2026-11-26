@@ -34,10 +34,10 @@ StackShade · System Design · Module 03
 
 ```mermaid
 sequenceDiagram
-  participant C as ([100 Concurrent Clients])
-  participant API as [API + Singleflight]
-  participant R as {{Redis}}
-  participant DB as [(Primary DB)]
+  participant C as 100 Concurrent Clients
+  participant API as API + Singleflight
+  participant R as Redis
+  participant DB as Primary DB
   C->>API: 100 GET /products/42
   API->>R: GET product:42 -> 100 misses
   API->>DB: 1 leader query (99 wait on Future)

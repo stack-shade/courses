@@ -4,6 +4,7 @@ import { ArrowRight, BookOpen, Brain, Download, Layers, PlayCircle, Youtube } fr
 import { Badge, Button, Card, Divider, Heading, Text } from '@astryxdesign/core';
 import { getCatalog, getCourseData } from '@/lib/courses';
 import { withBasePath } from '@/lib/paths';
+import { LiveVisual } from '@/components/LiveVisual';
 
 export default function HomePage() {
   const catalog = getCatalog();
@@ -14,7 +15,7 @@ export default function HomePage() {
     <main>
       {/* Editorial Hero */}
       <section className="border-b border-[var(--border)] bg-[var(--surface)] py-14 sm:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 ss-reveal">
           <div className="max-w-3xl">
             <Badge variant="neutral" label="StackShade Courses · First-Principles Engineering" />
             <Heading level={1} type="display-2" className="mt-4">
@@ -63,9 +64,30 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Live Interactive Visual Preview */}
+      <section className="mx-auto max-w-7xl px-4 pt-12 sm:px-6 ss-reveal ss-reveal-d1">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <Heading level={2}>Live Architecture Simulation</Heading>
+            <Text type="supporting" color="secondary" className="mt-0.5 block">
+              Every lesson &amp; standalone HTML slide deck pairs diagrams with live animated simulations like this.
+            </Text>
+          </div>
+          <a
+            href={withBasePath('/downloads/system-design/index.html')}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-semibold text-[var(--accent)] hover:underline"
+          >
+            Explore all 40 live simulations →
+          </a>
+        </div>
+        <LiveVisual animIds={['anim-request-layers']} />
+      </section>
+
       {/* Featured Course (Clean Flat Astryx Card — Zero Nested Card Clutter) */}
       {featured && courseData && (
-        <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+        <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 ss-reveal ss-reveal-d2">
           <div className="mb-6 flex items-center justify-between">
             <Heading level={2}>Featured Course</Heading>
             <Link href="/courses/" className="text-sm font-semibold text-[var(--accent)] hover:underline">

@@ -1,57 +1,28 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { withBasePath } from '@/lib/paths';
+import { ensureWidgetsLoaded } from '@/lib/visuals';
+import { getMermaidInitConfig } from '@/lib/mermaidTheme';
+import { useStackShadeTheme } from './AstryxProvider';
 
-declare global {
-  interface Window {
-    StackShadeVisuals?: {
-      mountAll: (scope?: HTMLElement | Document) => void;
-    };
-  }
-}
-
-function ensureWidgetsLoaded(cb: () => void) {
-  if (typeof window === 'undefined') return;
-  if (window.StackShadeVisuals) {
-    cb();
-    return;
-  }
-  const existing = document.getElementById('ss-widgets-script');
-  if (existing) {
-    existing.addEventListener('load', cb, { once: true });
-    return;
-  }
-  const s = document.createElement('script');
-  s.id = 'ss-widgets-script';
-  s.src = withBasePath('/visuals/widgets.js');
-  s.onload = cb;
-  document.body.appendChild(s);
-}
+let mmdRenderCounter = 0;
 
 export function MarkdownRenderer({ html }: { html: string }) {
   const ref = useRef<HTMLDivElement>(null);
+  const { mode } = useStackShadeTheme();
 
+  // Mount interactive widgets and copy buttons whenever HTML updates
   useEffect(() => {
     const container = ref.current;
     if (!container) return;
 
-    // 1. Mount interactive visualizations
     ensureWidgetsLoaded(() => {
-      window.StackShadeVisuals?.mountAll(container);
+      const w = window as Window & {
+        StackShadeVisuals?: { mountAll: (scope?: HTMLElement | Document) => void };
+      };
+      w.StackShadeVisuals?.mountAll(container);
     });
 
-    // 2. Render Mermaid diagrams cleanly
-    const mermaidNodes = container.querySelectorAll<HTMLElement>('pre.mermaid');
-    if (mermaidNodes.length > 0) {
-      import('mermaid').then((m) => {
-        const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'neutral';
-        m.default.initialize({ startOnLoad: false, theme });
-        m.default.run({ nodes: Array.from(mermaidNodes) }).catch(() => {});
-      });
-    }
-
-    // 3. Add copy buttons on code blocks
     const codeBlocks = container.querySelectorAll<HTMLElement>('pre[data-code-block="true"]');
     codeBlocks.forEach((pre) => {
       if (pre.querySelector('.ss-copy-btn')) return;
@@ -72,6 +43,78 @@ export function MarkdownRenderer({ html }: { html: string }) {
       pre.appendChild(btn);
     });
   }, [html]);
+
+  // Render & re-render Mermaid diagrams with custom OKLCH palette whenever HTML or Light/Dark mode changes
+  useEffect(() => {
+    const container = ref.current;
+    if (!container) return;
+    let cancelled = false;
+
+    const wraps = container.querySelectorAll<HTMLElement>('.ss-mermaid-wrap');
+    if (wraps.length === 0) return;
+
+    // Cache raw Mermaid text before first SVG replacement so theme toggles re-render cleanly
+    wraps.forEach((wrap) => {
+      if (!wrap.dataset.mermaidSrc) {
+        const pre = wrap.querySelector<HTMLElement>('pre.mermaid');
+        if (pre) {
+          wrap.dataset.mermaidSrc = pre.textContent ?? '';
+        }
+      }
+      if (!wrap.querySelector('.ss-mermaid-toolbar')) {
+        const bar = document.createElement('div');
+        bar.className = 'ss-mermaid-toolbar';
+        bar.innerHTML =
+          '<span class="ss-mermaid-label"><span class="ss-live-dot" aria-hidden="true"></span>Architecture Diagram</span>';
+        const toggleBtn = document.createElement('button');
+        toggleBtn.type = 'button';
+        toggleBtn.className = 'ss-mermaid-expand';
+        toggleBtn.textContent = 'Expand';
+        toggleBtn.onclick = () => {
+          const expanded = wrap.classList.toggle('is-expanded');
+          toggleBtn.textContent = expanded ? 'Close' : 'Expand';
+        };
+        bar.appendChild(toggleBtn);
+        wrap.prepend(bar);
+      }
+      if (!wrap.querySelector('.ss-mermaid-canvas')) {
+        const canvas = document.createElement('div');
+        canvas.className = 'ss-mermaid-canvas';
+        const pre = wrap.querySelector('pre.mermaid');
+        if (pre) canvas.appendChild(pre);
+        wrap.appendChild(canvas);
+      }
+    });
+
+    import('mermaid').then(async (m) => {
+      if (cancelled) return;
+      m.default.initialize(getMermaidInitConfig(mode));
+      for (const wrap of Array.from(wraps)) {
+        if (cancelled) return;
+        const src = wrap.dataset.mermaidSrc?.trim();
+        const canvas = wrap.querySelector<HTMLElement>('.ss-mermaid-canvas');
+        if (!src || !canvas) continue;
+        try {
+          const id = `ss-mmd-${++mmdRenderCounter}`;
+          const { svg } = await m.default.render(id, src);
+          if (cancelled) return;
+          canvas.innerHTML = svg;
+          const svgEl = canvas.querySelector('svg');
+          if (svgEl) {
+            svgEl.removeAttribute('height');
+            svgEl.style.maxWidth = '100%';
+            svgEl.style.height = 'auto';
+          }
+        } catch {
+          // Leave fallback readable text if syntax fails
+        }
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [html, mode]);
 
   return <div ref={ref} className="ss-prose" dangerouslySetInnerHTML={{ __html: html }} />;
 }

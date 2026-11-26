@@ -52,9 +52,11 @@
     .ss-slide a{color:var(--accent)}
     .ss-step{opacity:0;transform:translateY(10px);transition:opacity 240ms var(--ease-out),transform 240ms var(--ease-out);pointer-events:none}
     .ss-step.revealed{opacity:1;transform:none;pointer-events:auto}
-    .ss-mermaid-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin:10px 0;overflow:auto;text-align:center}
-    .ss-mermaid-box svg path.flowchart-link,.ss-mermaid-box svg .edgePath path{stroke-dasharray:6 4;animation:ssFlow 2.4s linear infinite}
-    @keyframes ssFlow{to{stroke-dashoffset:-20}}
+    .ss-mermaid-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin:12px 0;overflow:auto;display:flex;justify-content:center;align-items:center}
+    .ss-mermaid-box svg{max-width:100%;max-height:46vh;width:auto;height:auto;font-family:var(--font-sans)!important}
+    .ss-mermaid-box svg .node rect,.ss-mermaid-box svg .node polygon,.ss-mermaid-box svg .actor{stroke-width:1.6px}
+    .ss-mermaid-box svg path.flowchart-link,.ss-mermaid-box svg .edgePath path,.ss-mermaid-box svg .transition,.ss-mermaid-box svg .messageLine1{stroke-dasharray:7 5;animation:ssFlow 2.2s linear infinite}
+    @keyframes ssFlow{to{stroke-dashoffset:-24}}
     pre.mermaid{margin:0;border:none;background:transparent;font-family:var(--font-mono);font-size:13px;text-align:left}
     /* Sleek Icon-First Floating Controller */
     .ss-hud{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:4px;background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:999px;padding:5px 8px;z-index:40;box-shadow:0 8px 24px rgba(0,0,0,.14);transition:opacity 240ms ease,transform 240ms ease}
@@ -87,7 +89,7 @@
 <body>
   <div class="ss-progress" id="progress"></div>
   <main class="ss-stage" id="stage" aria-live="polite">
-    <section class="ss-slide active">
+    <section class="ss-slide">
 <h1>13 · Transactions, ACID, MVCC &amp; Isolation</h1>
 <h2>Why <code>REPEATABLE READ</code> still allowed a double-booking bug</h2>
 <p>StackShade · System Design · Module 02</p>
@@ -106,7 +108,7 @@
 <div><div class="ss-mermaid-box"><pre class="mermaid">sequenceDiagram
   participant T1 as Tx1 (Alice)
   participant T2 as Tx2 (Bob)
-  participant DB as [(Snapshot Isolation)]
+  participant DB as Primary DB (Snapshot)
   T1-&gt;&gt;DB: BEGIN REPEATABLE READ (t=10)
   T2-&gt;&gt;DB: BEGIN REPEATABLE READ (t=10)
   T1-&gt;&gt;DB: SELECT count(*) -&gt; 2
@@ -171,6 +173,16 @@
   'use strict';
 
   var WIDGETS = {};
+  var ACCENT = 'var(--accent,#15803d)';
+  var ACCENT_INK = 'var(--accent-ink,#ffffff)';
+  var OK = 'var(--status-ok,#15803d)';
+  var WARN = 'var(--status-warn,#b45309)';
+  var ERR = 'var(--status-err,#b91c1c)';
+  var INK = 'var(--ink,#18202c)';
+  var MUTED = 'var(--ink-muted,#48566a)';
+  var BORDER = 'var(--border,#cbd5e1)';
+  var BG = 'var(--bg,#fafcf9)';
+  var SURFACE = 'var(--surface,#eef3ee)';
 
   function el(tag, attrs, children) {
     var node = document.createElement(tag);
@@ -211,22 +223,30 @@
   function injectBaseStyles() {
     if (document.getElementById('ss-widget-styles')) return;
     var css = [
-      '.ss-w{border:1px solid var(--border,#e2e8f0);border-radius:8px;background:var(--surface,#f8fafc);color:var(--ink,#0f172a);padding:14px 16px;font-family:var(--font-sans,"Figtree",system-ui,sans-serif);font-size:14px;line-height:1.45;margin:12px 0;}',
-      '.ss-w-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;border-bottom:1px solid var(--border,#e2e8f0);padding-bottom:8px;}',
-      '.ss-w-title{font-weight:700;font-size:14px;margin:0;color:var(--ink,#0f172a);}',
-      '.ss-w-tag{font-size:11px;font-family:var(--font-mono,monospace);color:var(--ink-muted,#475569);border:1px solid var(--border,#e2e8f0);border-radius:4px;padding:2px 6px;}',
-      '.ss-w-ctrl{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px;}',
-      '.ss-w-btn{border:1px solid var(--border,#e2e8f0);background:var(--bg,#fff);color:var(--ink,#0f172a);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer;}',
-      '.ss-w-btn[data-active="true"],.ss-w-btn.primary{background:var(--accent,#15803d);color:var(--accent-ink,#fff);border-color:var(--accent,#15803d);}',
-      '.ss-w-slider{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-muted,#475569);}',
+      '.ss-w{border:1px solid var(--border,#d7dfd8);border-radius:8px;background:var(--surface,#f1f5f1);color:var(--ink,#18202c);padding:14px 16px;font-family:var(--font-sans,"Figtree",system-ui,sans-serif);font-size:14px;line-height:1.45;margin:14px 0;}',
+      '.ss-w-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;border-bottom:1px solid var(--border,#d7dfd8);padding-bottom:8px;}',
+      '.ss-w-title{font-weight:700;font-size:14px;margin:0;color:var(--ink,#18202c);}',
+      '.ss-w-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-family:var(--font-mono,monospace);color:var(--ink-muted,#48566a);border:1px solid var(--border,#d7dfd8);border-radius:4px;padding:2px 7px;background:var(--bg,#fafcf9);}',
+      '.ss-w-live{width:7px;height:7px;border-radius:50%;background:var(--accent,#15803d);display:inline-block;animation:ssWidgetPulse 1.7s ease-in-out infinite;}',
+      '.ss-w-ctrl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px;}',
+      '.ss-w-btn{border:1px solid var(--border,#d7dfd8);background:var(--bg,#fafcf9);color:var(--ink,#18202c);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer;transition:border-color 140ms ease,background 140ms ease,transform 120ms ease;}',
+      '.ss-w-btn:hover{border-color:var(--accent,#15803d);transform:translateY(-1px);}',
+      '.ss-w-btn[data-active="true"],.ss-w-btn.primary{background:var(--accent,#15803d);color:var(--accent-ink,#ffffff);border-color:var(--accent,#15803d);}',
+      '.ss-w-slider{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-muted,#48566a);}',
       '.ss-w-slider input{accent-color:var(--accent,#15803d);cursor:pointer;}',
-      '.ss-w-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:10px;}',
-      '.ss-w-stat{background:var(--bg,#fff);border:1px solid var(--border,#e2e8f0);border-radius:6px;padding:8px 10px;}',
-      '.ss-w-stat-k{font-size:11px;color:var(--ink-muted,#475569);display:block;}',
-      '.ss-w-stat-v{font-size:15px;font-weight:700;font-family:var(--font-mono,monospace);}',
-      '.ss-w-note{font-size:12px;color:var(--ink-muted,#475569);margin-top:8px;}',
-      '.ss-w-svg{width:100%;height:auto;display:block;background:var(--bg,#fff);border:1px solid var(--border,#e2e8f0);border-radius:6px;}',
-      '.ss-w-svg rect,.ss-w-svg line,.ss-w-svg circle{transition:width 300ms cubic-bezier(0.22,1,0.36,1),height 300ms cubic-bezier(0.22,1,0.36,1),x 300ms ease,y 300ms ease,fill 220ms ease,stroke 220ms ease;}'
+      '.ss-w-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:8px;margin-top:10px;}',
+      '.ss-w-stat{background:var(--bg,#fafcf9);border:1px solid var(--border,#d7dfd8);border-radius:6px;padding:8px 10px;}',
+      '.ss-w-stat-k{font-size:11px;color:var(--ink-muted,#48566a);display:block;}',
+      '.ss-w-stat-v{font-size:14px;font-weight:700;font-family:var(--font-mono,monospace);font-variant-numeric:tabular-nums;}',
+      '.ss-w-note{font-size:12px;color:var(--ink-muted,#48566a);margin-top:8px;}',
+      '.ss-w-svg{width:100%;height:auto;display:block;background:var(--bg,#fafcf9);border:1px solid var(--border,#d7dfd8);border-radius:6px;}',
+      '.ss-w-svg rect,.ss-w-svg line,.ss-w-svg circle{transition:width 280ms cubic-bezier(0.22,1,0.36,1),height 280ms cubic-bezier(0.22,1,0.36,1),x 260ms ease,y 260ms ease,fill 200ms ease,stroke 200ms ease;}',
+      '.ss-w-flow{stroke-dasharray:6 4;animation:ssWidgetFlow 1.2s linear infinite;}',
+      '.ss-w-node-pulse{animation:ssWidgetRing 2s ease-in-out infinite;}',
+      '@keyframes ssWidgetFlow{to{stroke-dashoffset:-20;}}',
+      '@keyframes ssWidgetPulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.4);opacity:0.45;}}',
+      '@keyframes ssWidgetRing{0%,100%{stroke-opacity:1;}50%{stroke-opacity:0.45;}}',
+      '@media (prefers-reduced-motion:reduce){.ss-w-flow,.ss-w-live,.ss-w-node-pulse{animation:none!important;}}'
     ].join('\n');
     document.head.appendChild(el('style', { id: 'ss-widget-styles', text: css }));
   }
@@ -234,12 +254,122 @@
   function makeShell(root, title, tag) {
     root.innerHTML = '';
     var wrap = el('div', { class: 'ss-w' });
+    var badge = el('span', { class: 'ss-w-tag' }, [
+      el('span', { class: 'ss-w-live', 'aria-hidden': 'true' }),
+      document.createTextNode(tag)
+    ]);
     wrap.appendChild(el('div', { class: 'ss-w-head' }, [
       el('div', { class: 'ss-w-title', text: title }),
-      el('span', { class: 'ss-w-tag', text: tag })
+      badge
     ]));
     root.appendChild(wrap);
     return wrap;
+  }
+
+  function statGrid(statsEl, pairs) {
+    statsEl.innerHTML = '';
+    pairs.forEach(function (s) {
+      statsEl.appendChild(el('div', { class: 'ss-w-stat' }, [
+        el('span', { class: 'ss-w-stat-k', text: s[0] }),
+        el('span', { class: 'ss-w-stat-v', text: s[1] })
+      ]));
+    });
+  }
+
+  function addPacket(svg, pathD, color, dur, begin) {
+    var dot = svgEl('circle', { r: '4.2', fill: color || ACCENT });
+    dot.appendChild(svgEl('animateMotion', {
+      dur: dur || '1.6s',
+      begin: begin || '0s',
+      repeatCount: 'indefinite',
+      path: pathD
+    }));
+    svg.appendChild(dot);
+  }
+
+  function addPulseRing(svg, cx, cy, r, color) {
+    var ring = svgEl('circle', {
+      cx: cx, cy: cy, r: r || 8, fill: 'none', stroke: color || ACCENT, 'stroke-width': '2'
+    });
+    ring.appendChild(svgEl('animate', { attributeName: 'r', values: (r || 8) + ';' + ((r || 8) + 12), dur: '1.6s', repeatCount: 'indefinite' }));
+    ring.appendChild(svgEl('animate', { attributeName: 'opacity', values: '0.75;0', dur: '1.6s', repeatCount: 'indefinite' }));
+    svg.appendChild(ring);
+  }
+
+  // Generic live pipeline renderer for architecture flows (nodes + animated edges + moving packets)
+  function drawPipeline(svg, nodes, edges) {
+    svg.innerHTML = '';
+    var map = {};
+    nodes.forEach(function (n) { map[n.id] = n; });
+    edges.forEach(function (e, i) {
+      var a = map[e.from], b = map[e.to];
+      if (!a || !b) return;
+      var x1 = e.x1 != null ? e.x1 : a.x + (a.w || 110);
+      var y1 = e.y1 != null ? e.y1 : a.y + (a.h || 40) / 2;
+      var x2 = e.x2 != null ? e.x2 : b.x;
+      var y2 = e.y2 != null ? e.y2 : b.y + (b.h || 40) / 2;
+      var c = e.color || (e.active ? ACCENT : BORDER);
+      svg.appendChild(svgEl('line', {
+        x1: x1, y1: y1, x2: x2, y2: y2,
+        stroke: c,
+        'stroke-width': e.active ? '2.6' : '1.4',
+        class: e.active ? 'ss-w-flow' : '',
+        'stroke-dasharray': e.dash && !e.active ? '4 4' : ''
+      }));
+      if (e.label) {
+        svg.appendChild(svgEl('text', {
+          x: (x1 + x2) / 2, y: Math.min(y1, y2) - 5, 'text-anchor': 'middle',
+          'font-size': '10', 'font-weight': '600', fill: e.active ? c : MUTED, text: e.label
+        }));
+      }
+      if (e.active) {
+        var p = 'M ' + x1 + ' ' + y1 + ' L ' + x2 + ' ' + y2;
+        addPacket(svg, p, c, e.dur || '1.5s', (i * 0.28).toFixed(2) + 's');
+      }
+    });
+    nodes.forEach(function (n) {
+      var w = n.w || 110, h = n.h || 40;
+      var fill = n.tone === 'err' ? ERR : (n.tone === 'warn' ? WARN : (n.active ? ACCENT : SURFACE));
+      var stroke = n.tone === 'err' ? ERR : (n.tone === 'warn' ? WARN : (n.active ? ACCENT : BORDER));
+      var textFill = (n.active || n.tone === 'err' || n.tone === 'warn') ? ACCENT_INK : INK;
+      svg.appendChild(svgEl('rect', {
+        x: n.x, y: n.y, width: w, height: h, rx: 7,
+        fill: fill, stroke: stroke, 'stroke-width': n.active ? '2' : '1.4',
+        class: n.pulse ? 'ss-w-node-pulse' : ''
+      }));
+      svg.appendChild(svgEl('text', {
+        x: n.x + w / 2, y: n.y + (n.sub ? 18 : h / 2 + 4),
+        'text-anchor': 'middle', 'font-size': '11.5', 'font-weight': '700',
+        fill: textFill, text: n.label
+      }));
+      if (n.sub) {
+        svg.appendChild(svgEl('text', {
+          x: n.x + w / 2, y: n.y + 32,
+          'text-anchor': 'middle', 'font-size': '9.8',
+          fill: textFill, opacity: '0.88', text: n.sub
+        }));
+      }
+    });
+  }
+
+  // Generic live animated horizontal bar meter SVG
+  function drawBars(svg, rows) {
+    var rowH = 28;
+    svg.setAttribute('viewBox', '0 0 600 ' + Math.max(84, rows.length * rowH + 16));
+    svg.innerHTML = '';
+    rows.forEach(function (r, idx) {
+      var y = 12 + idx * rowH;
+      var pct = Math.max(3, Math.min(100, r.pct));
+      var barW = pct * 3.35;
+      var c = r.color || (pct > 80 ? ERR : (pct > 55 ? WARN : ACCENT));
+      svg.appendChild(svgEl('text', { x: 14, y: y + 14, 'font-size': '11.5', 'font-weight': '600', fill: INK, text: r.label }));
+      svg.appendChild(svgEl('rect', { x: 155, y: y + 3, width: 335, height: 15, rx: 4, fill: SURFACE, stroke: BORDER }));
+      svg.appendChild(svgEl('rect', { x: 155, y: y + 3, width: barW, height: 15, rx: 4, fill: c }));
+      if (r.active !== false) {
+        addPacket(svg, 'M 155 ' + (y + 10.5) + ' L ' + (155 + barW) + ' ' + (y + 10.5), ACCENT_INK, '1.4s', (idx * 0.25) + 's');
+      }
+      svg.appendChild(svgEl('text', { x: 500, y: y + 14, 'font-size': '11', 'font-weight': '700', fill: INK, text: r.valueText }));
+    });
   }
 
   function fmtNum(n) {
@@ -251,10 +381,10 @@
 
   // 1. anim-request-layers
   WIDGETS['anim-request-layers'] = function (root) {
-    var shell = makeShell(root, '5-Layer Request Path Tracer', 'L01 · Interactive');
+    var shell = makeShell(root, '5-Layer Request Path Tracer', 'L01 · Live Packet Flow');
     var mode = 'sync-read';
     var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var svg = svgEl('svg', { viewBox: '0 0 640 160', class: 'ss-w-svg' });
+    var svg = svgEl('svg', { viewBox: '0 0 640 155', class: 'ss-w-svg' });
     var note = el('div', { class: 'ss-w-note' });
     var modes = [
       ['sync-read', 'Sync Read (Cache Hit)'],
@@ -269,44 +399,25 @@
           onClick: function () { mode = m[0]; render(); }
         }));
       });
-      svg.innerHTML = '';
       var nodes = [
-        { id: 'u', x: 20, y: 55, w: 84, label: 'Client', active: true },
-        { id: 'i', x: 135, y: 55, w: 96, label: 'API Edge', active: true },
-        { id: 'a', x: 262, y: 55, w: 100, label: 'Compute', active: true },
-        { id: 'c', x: 396, y: 18, w: 100, label: 'Cache', active: mode === 'sync-read' },
-        { id: 'd', x: 396, y: 98, w: 100, label: 'Database', active: mode !== 'sync-read' },
-        { id: 'q', x: 526, y: 55, w: 94, label: 'Queue+Worker', active: mode === 'async-queue' }
+        { id: 'u', x: 18, y: 55, w: 82, label: 'Client', active: true },
+        { id: 'i', x: 132, y: 55, w: 94, label: 'API Edge', active: true },
+        { id: 'a', x: 258, y: 55, w: 98, label: 'Compute', active: true },
+        { id: 'c', x: 392, y: 16, w: 100, label: 'Cache', active: mode === 'sync-read', pulse: mode === 'sync-read' },
+        { id: 'd', x: 392, y: 98, w: 100, label: 'Database', active: mode !== 'sync-read', pulse: mode === 'sync-write' },
+        { id: 'q', x: 524, y: 55, w: 98, label: 'Queue+Worker', active: mode === 'async-queue', pulse: mode === 'async-queue' }
       ];
-      function line(x1, y1, x2, y2, active, dash) {
-        svg.appendChild(svgEl('line', {
-          x1: x1, y1: y1, x2: x2, y2: y2,
-          stroke: active ? 'var(--accent,#4f46e5)' : 'var(--border,#cbd5e1)',
-          'stroke-width': active ? '3' : '1.5',
-          'stroke-dasharray': dash ? '5 4' : 'none'
-        }));
-      }
-      line(104, 75, 135, 75, true, false);
-      line(231, 75, 262, 75, true, false);
-      line(362, 75, 396, 38, mode === 'sync-read', false);
-      line(362, 75, 396, 118, mode === 'sync-write', false);
-      line(362, 75, 526, 75, mode === 'async-queue', true);
-      line(573, 95, 496, 118, mode === 'async-queue', true);
-
-      nodes.forEach(function (n) {
-        svg.appendChild(svgEl('rect', {
-          x: n.x, y: n.y, width: n.w, height: 40, rx: 6,
-          fill: n.active ? 'var(--accent,#4f46e5)' : 'var(--surface,#f8fafc)',
-          stroke: n.active ? 'var(--accent,#4f46e5)' : 'var(--border,#cbd5e1)'
-        }));
-        svg.appendChild(svgEl('text', {
-          x: n.x + n.w / 2, y: n.y + 24, 'text-anchor': 'middle',
-          fill: n.active ? 'var(--accent-ink,#fff)' : 'var(--ink-muted,#475569)',
-          'font-size': '12', 'font-weight': '600', text: n.label
-        }));
-      });
+      var edges = [
+        { from: 'u', to: 'i', active: true, dur: '1.1s' },
+        { from: 'i', to: 'a', active: true, dur: '1.1s' },
+        { from: 'a', to: 'c', y1: 75, y2: 36, active: mode === 'sync-read', dash: true, dur: '1.0s' },
+        { from: 'a', to: 'd', y1: 75, y2: 118, active: mode === 'sync-write', dash: true, dur: '1.4s' },
+        { from: 'a', to: 'q', y1: 75, y2: 75, active: mode === 'async-queue', dash: true, dur: '1.1s' },
+        { from: 'q', to: 'd', x1: 573, y1: 95, x2: 492, y2: 118, active: mode === 'async-queue', dash: true, dur: '1.8s' }
+      ];
+      drawPipeline(svg, nodes, edges);
       note.textContent = mode === 'sync-read'
-        ? 'Cache hit returns directly from memory (~1–5ms) without touching durable disk storage.'
+        ? 'Cache hit returns directly from memory (~1–5 ms) without touching durable disk storage.'
         : mode === 'sync-write'
           ? 'Synchronous write waits for durable database commit before replying to client.'
           : 'API enqueues event and returns 202 Accepted fast; background worker persists to DB asynchronously.';
@@ -328,31 +439,28 @@
 
     function render() {
       var samples = [];
-      for (var i = 0; i < 100; i++) {
-        samples.push(i >= 100 - skew ? 800 + (i - (100 - skew)) * 60 : 25 + (i % 25));
-      }
+      for (var i = 0; i < 100; i++) samples.push(i >= 100 - skew ? 800 + (i - (100 - skew)) * 60 : 25 + (i % 25));
       samples.sort(function (a, b) { return a - b; });
       var mean = samples.reduce(function (a, b) { return a + b; }, 0) / 100;
-      var p50 = samples[49], p95 = samples[94], p99 = samples[98];
-      stats.innerHTML = '';
-      [['Mean (Average)', Math.round(mean) + ' ms'], ['p50 (Median)', p50 + ' ms'], ['p95', p95 + ' ms'], ['p99 (Tail)', p99 + ' ms']].forEach(function (s) {
-        stats.appendChild(el('div', { class: 'ss-w-stat' }, [
-          el('span', { class: 'ss-w-stat-k', text: s[0] }),
-          el('span', { class: 'ss-w-stat-v', text: s[1] })
-        ]));
-      });
+      statGrid(stats, [
+        ['Mean (Average)', Math.round(mean) + ' ms'],
+        ['p50 (Median)', samples[49] + ' ms'],
+        ['p95', samples[94] + ' ms'],
+        ['p99 (Tail)', samples[98] + ' ms']
+      ]);
       svg.innerHTML = '';
       for (var j = 0; j < 50; j++) {
         var v = samples[j * 2];
-        var h = Math.min(100, Math.max(4, v / 14));
+        var h = Math.min(96, Math.max(4, v / 14));
         svg.appendChild(svgEl('rect', {
-          x: 10 + j * 11.6, y: 110 - h, width: 9, height: h, rx: 2,
-          fill: v > 200 ? 'var(--status-err,#b91c1c)' : 'var(--accent,#4f46e5)'
+          x: 10 + j * 11.6, y: 108 - h, width: 9, height: h, rx: 2,
+          fill: v > 200 ? ERR : ACCENT
         }));
       }
+      if (skew > 0) addPulseRing(svg, 582, 24, 6, ERR);
     }
     shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats);
-    shell.appendChild(el('div', { class: 'ss-w-note', text: 'Even when 95% of requests finish in ~35ms, just 4–5% slow calls push p99 above 1,000ms while average looks deceptively low.' }));
+    shell.appendChild(el('div', { class: 'ss-w-note', text: 'Just 4–5% slow requests push p99 above 1,000 ms while the mean looks deceptively healthy.' }));
     render();
   };
 
@@ -361,6 +469,7 @@
     var shell = makeShell(root, 'Back-of-the-Envelope Capacity Estimator', 'L03 · Calculator');
     var st = { dauM: 5, reqPerDay: 20, peak: 5, kb: 4, years: 3 };
     var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var svg = svgEl('svg', { viewBox: '0 0 600 95', class: 'ss-w-svg' });
     var stats = el('div', { class: 'ss-w-stats' });
 
     function addSlider(label, key, min, max, step) {
@@ -370,10 +479,10 @@
       ctrl.appendChild(el('label', { class: 'ss-w-slider' }, [label + ':', inp, lbl]));
     }
     addSlider('DAU (M)', 'dauM', 1, 50, 1);
-    addSlider('Req/User/Day', 'reqPerDay', 5, 100, 5);
+    addSlider('Req/Day', 'reqPerDay', 5, 100, 5);
     addSlider('Peak ×', 'peak', 2, 20, 1);
-    addSlider('Payload (KB)', 'kb', 1, 100, 1);
-    addSlider('Retention (yr)', 'years', 1, 10, 1);
+    addSlider('KB', 'kb', 1, 100, 1);
+    addSlider('Years', 'years', 1, 10, 1);
 
     function render() {
       var dailyReq = st.dauM * 1e6 * st.reqPerDay;
@@ -381,23 +490,20 @@
       var peakQps = avgQps * st.peak;
       var mbps = (peakQps * st.kb * 8) / 1000;
       var storageTB = (dailyReq * st.kb * 1000 * 365 * st.years) / 1e12;
-      stats.innerHTML = '';
-      [
+      drawBars(svg, [
+        { label: 'Peak QPS', pct: Math.min(100, (peakQps / 50000) * 100), valueText: fmtNum(peakQps) + '/s' },
+        { label: 'Egress Mbps', pct: Math.min(100, (mbps / 5000) * 100), valueText: mbps.toFixed(0) + ' Mbps' },
+        { label: 'Raw Storage', pct: Math.min(100, (storageTB / 200) * 100), valueText: storageTB.toFixed(1) + ' TB' }
+      ]);
+      statGrid(stats, [
         ['Daily Requests', fmtNum(dailyReq)],
         ['Average QPS', fmtNum(avgQps) + ' /s'],
         ['Peak QPS (' + st.peak + '×)', fmtNum(peakQps) + ' /s'],
         ['Peak Egress', mbps.toFixed(1) + ' Mbps'],
         ['Raw Storage (' + st.years + 'y)', storageTB.toFixed(1) + ' TB']
-      ].forEach(function (s) {
-        stats.appendChild(el('div', { class: 'ss-w-stat' }, [
-          el('span', { class: 'ss-w-stat-k', text: s[0] }),
-          el('span', { class: 'ss-w-stat-v', text: s[1] })
-        ]));
-      });
+      ]);
     }
-    shell.appendChild(ctrl); shell.appendChild(stats);
-    shell.appendChild(el('div', { class: 'ss-w-note', text: 'Uses 86,400 sec/day and decimal TB (10^12 B). Multiply raw storage by 3×–5× for replication, indexes, and backups.' }));
-    render();
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
 
   // 4. sim-tail-amplification
@@ -420,75 +526,59 @@
 
     function render() {
       var slowProb = (1 - Math.pow(1 - pSlow / 100, fanout)) * 100;
-      stats.innerHTML = '';
-      [
+      statGrid(stats, [
         ['Parallel Sub-Calls', String(fanout)],
         ['Single Call Slow %', pSlow + '%'],
         ['End-User Request Hits Tail', slowProb.toFixed(1) + '%']
-      ].forEach(function (s) {
-        stats.appendChild(el('div', { class: 'ss-w-stat' }, [
-          el('span', { class: 'ss-w-stat-k', text: s[0] }),
-          el('span', { class: 'ss-w-stat-v', text: s[1] })
-        ]));
-      });
-      svg.innerHTML = '';
-      svg.appendChild(svgEl('rect', { x: 20, y: 22, width: 560, height: 24, rx: 4, fill: 'var(--surface,#f1f5f9)', stroke: 'var(--border,#cbd5e1)' }));
-      svg.appendChild(svgEl('rect', { x: 20, y: 22, width: Math.max(4, 5.6 * slowProb), height: 24, rx: 4, fill: slowProb > 20 ? 'var(--status-err,#b91c1c)' : 'var(--accent,#4f46e5)' }));
-      svg.appendChild(svgEl('text', { x: 300, y: 39, 'text-anchor': 'middle', fill: 'var(--ink,#0f172a)', 'font-size': '12', 'font-weight': '700', text: '1 - (1 - ' + (pSlow / 100) + ')^' + fanout + ' = ' + slowProb.toFixed(1) + '% slow requests' }));
+      ]);
+      drawBars(svg, [
+        { label: 'Tail Hit Chance', pct: slowProb, color: slowProb > 20 ? ERR : ACCENT, valueText: slowProb.toFixed(1) + '% slow' }
+      ]);
     }
     shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
 
   // 5. anim-dns-resolution
   WIDGETS['anim-dns-resolution'] = function (root) {
-    var shell = makeShell(root, 'Recursive DNS Lookup Stepper', 'L05 · Networking');
+    var shell = makeShell(root, 'Recursive DNS Lookup Stepper', 'L05 · Live Hops');
     var step = 0, cached = false;
     var steps = [
-      'Browser checks local OS/browser cache → Miss',
-      'Stub sends query to Recursive Resolver (ISP / 1.1.1.1)',
-      'Recursive Resolver asks Root (.) → Referral to .com TLD',
-      'Recursive Resolver asks .com TLD → Referral to Authoritative NS',
-      'Authoritative NS returns A/AAAA IP (with TTL) → Browser connects!'
+      'Browser checks local cache -> Miss',
+      'Stub sends query to Recursive Resolver (1.1.1.1)',
+      'Resolver asks Root (.) -> Referral to .com TLD',
+      'Resolver asks .com TLD -> Referral to Authoritative NS',
+      'Authoritative NS returns IP + TTL -> Browser connects!'
     ];
     var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var svg = svgEl('svg', { viewBox: '0 0 640 120', class: 'ss-w-svg' });
+    var svg = svgEl('svg', { viewBox: '0 0 640 115', class: 'ss-w-svg' });
     var note = el('div', { class: 'ss-w-note' });
 
     function render() {
       ctrl.innerHTML = '';
       ctrl.appendChild(el('button', { class: 'ss-w-btn primary', text: 'Next Hop (' + (step + 1) + '/' + (cached ? 2 : 5) + ')', onClick: function () { step = (step + 1) % (cached ? 2 : 5); render(); } }));
       ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(cached), text: cached ? 'Cache Mode: HIT' : 'Cache Mode: MISS', onClick: function () { cached = !cached; step = 0; render(); } }));
-
       var hops = ['Browser', 'Resolver', 'Root (.)', '.com TLD', 'Auth NS'];
-      svg.innerHTML = '';
-      hops.forEach(function (h, i) {
+      var nodes = hops.map(function (h, i) {
         var active = cached ? (i <= 1 && i <= step) : (i <= step);
-        var current = i === step;
-        var x = 16 + i * 124;
-        if (i > 0) {
-          svg.appendChild(svgEl('line', { x1: x - 20, y1: 60, x2: x, y2: 60, stroke: active ? 'var(--accent,#4f46e5)' : 'var(--border,#cbd5e1)', 'stroke-width': active ? '3' : '1.5' }));
-        }
-        svg.appendChild(svgEl('rect', {
-          x: x, y: 36, width: 104, height: 48, rx: 6,
-          fill: current ? 'var(--accent,#4f46e5)' : (active ? 'var(--surface,#e0e7ff)' : 'var(--bg,#fff)'),
-          stroke: active ? 'var(--accent,#4f46e5)' : 'var(--border,#cbd5e1)', 'stroke-width': current ? '2.5' : '1.5'
-        }));
-        svg.appendChild(svgEl('text', {
-          x: x + 52, y: 65, 'text-anchor': 'middle', 'font-size': '12', 'font-weight': '600',
-          fill: current ? 'var(--accent-ink,#fff)' : 'var(--ink,#0f172a)', text: h
-        }));
+        return { id: 'h' + i, x: 14 + i * 124, y: 34, w: 104, h: 46, label: h, active: i === step || active, pulse: i === step };
       });
-      note.textContent = cached && step === 1 ? 'Resolver cache HIT! Returns IP immediately without contacting Root/TLD.' : steps[step];
+      var edges = [];
+      for (var i = 1; i < hops.length; i++) {
+        var active = cached ? (i <= 1 && i <= step) : (i <= step);
+        edges.push({ from: 'h' + (i - 1), to: 'h' + i, active: active, dash: !active, dur: '1.1s' });
+      }
+      drawPipeline(svg, nodes, edges);
+      note.textContent = cached && step === 1 ? 'Resolver cache HIT! Returns IP immediately.' : steps[step];
     }
     shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(note); render();
   };
 
   // 6. anim-http-multiplexing
   WIDGETS['anim-http-multiplexing'] = function (root) {
-    var shell = makeShell(root, 'HTTP/1.1 vs HTTP/2 vs HTTP/3 (QUIC)', 'L06 · Transport');
-    var proto = 'http1', loss = true;
+    var shell = makeShell(root, 'HTTP/1.1 vs HTTP/2 vs HTTP/3 (QUIC)', 'L06 · Live Streams');
+    var proto = 'http3', loss = true;
     var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var svg = svgEl('svg', { viewBox: '0 0 600 130', class: 'ss-w-svg' });
+    var svg = svgEl('svg', { viewBox: '0 0 600 128', class: 'ss-w-svg' });
     var note = el('div', { class: 'ss-w-note' });
 
     function render() {
@@ -500,53 +590,49 @@
       svg.innerHTML = '';
       var streams = ['Stream A (HTML)', 'Stream B (CSS)', 'Stream C (API)'];
       streams.forEach(function (s, idx) {
-        var y = 18 + idx * 36;
-        svg.appendChild(svgEl('text', { x: 14, y: y + 18, 'font-size': '12', fill: 'var(--ink,#0f172a)', text: s }));
-        var blocked = loss && ((proto === 'http1' && idx >= 0) || (proto === 'http2') || (proto === 'http3' && idx === 0));
-        var startX = proto === 'http1' ? 140 + idx * 130 : 140;
-        var w = proto === 'http1' ? 110 : 380;
-        svg.appendChild(svgEl('rect', {
-          x: startX, y: y + 4, width: w, height: 22, rx: 4,
-          fill: blocked ? 'var(--status-warn,#b45309)' : 'var(--accent,#4f46e5)'
-        }));
+        var y = 16 + idx * 36;
+        svg.appendChild(svgEl('text', { x: 14, y: y + 18, 'font-size': '12', fill: INK, text: s }));
+        var blocked = loss && ((proto === 'http1' && idx >= 0) || proto === 'http2' || (proto === 'http3' && idx === 0));
+        var startX = proto === 'http1' ? 140 + idx * 125 : 140;
+        var w = proto === 'http1' ? 115 : 430;
+        svg.appendChild(svgEl('rect', { x: startX, y: y + 4, width: w, height: 22, rx: 4, fill: blocked ? WARN : ACCENT }));
+        if (!blocked) {
+          addPacket(svg, 'M ' + (startX + 8) + ' ' + (y + 15) + ' L ' + (startX + w - 8) + ' ' + (y + 15), ACCENT_INK, '1.3s', (idx * 0.3) + 's');
+        }
         svg.appendChild(svgEl('text', {
-          x: startX + w / 2, y: y + 19, 'text-anchor': 'middle', 'font-size': '11',
-          fill: '#fff', text: blocked ? 'Stalled waiting TCP retransmit' : 'Delivered smoothly'
+          x: startX + w / 2, y: y + 19, 'text-anchor': 'middle', 'font-size': '11', 'font-weight': '600',
+          fill: ACCENT_INK, text: blocked ? 'Stalled waiting TCP retransmit' : 'Streaming smoothly'
         }));
       });
       note.textContent = proto === 'http1'
-        ? 'HTTP/1.1 processes sequentially per connection (application HoL blocking).'
+        ? 'HTTP/1.1 processes requests sequentially per connection.'
         : proto === 'http2'
-          ? (loss ? 'HTTP/2 multiplexes frames, but 1 lost TCP packet stalls ALL streams at kernel TCP level!' : 'HTTP/2 multiplexes all streams cleanly over one TCP connection.')
-          : (loss ? 'HTTP/3 over QUIC isolates streams: losing a Stream A packet never stalls Streams B or C!' : 'HTTP/3 delivers 0-RTT/1-RTT setup with independent QUIC streams.');
+          ? (loss ? 'HTTP/2 multiplexes frames, but 1 lost TCP packet stalls ALL streams at kernel TCP level!' : 'HTTP/2 multiplexes all streams cleanly.')
+          : (loss ? 'HTTP/3 over QUIC isolates streams: Stream A waits while Streams B & C keep flowing!' : 'HTTP/3 delivers independent QUIC streams with 0-RTT/1-RTT setup.');
     }
     shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(note); render();
   };
 
   // 7. anim-cdn-cache-flow
   WIDGETS['anim-cdn-cache-flow'] = function (root) {
-    var shell = makeShell(root, 'CDN Edge PoP & Origin Shield Flow', 'L07 · Edge');
+    var shell = makeShell(root, 'CDN Edge PoP & Origin Shield Flow', 'L07 · Live Edge');
     var hit = true;
     var ctrl = el('div', { class: 'ss-w-ctrl' });
     var svg = svgEl('svg', { viewBox: '0 0 600 100', class: 'ss-w-svg' });
     var note = el('div', { class: 'ss-w-note' });
     function render() {
       ctrl.innerHTML = '';
-      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(hit), text: 'Edge Cache HIT (s-maxage)', onClick: function () { hit = true; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(hit), text: 'Edge Cache HIT (18 ms)', onClick: function () { hit = true; render(); } }));
       ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(!hit), text: 'Edge Cache MISS (Fetch Origin)', onClick: function () { hit = false; render(); } }));
-      svg.innerHTML = '';
-      var nodes = [
-        { x: 20, label: 'User (Mumbai)', on: true },
-        { x: 220, label: 'Edge PoP (18ms)', on: true },
-        { x: 430, label: 'Origin (US-East)', on: !hit }
-      ];
-      svg.appendChild(svgEl('line', { x1: 150, y1: 50, x2: 220, y2: 50, stroke: 'var(--accent,#4f46e5)', 'stroke-width': '3' }));
-      svg.appendChild(svgEl('line', { x1: 360, y1: 50, x2: 430, y2: 50, stroke: !hit ? 'var(--status-warn,#b45309)' : 'var(--border,#cbd5e1)', 'stroke-width': !hit ? '3' : '1.5', 'stroke-dasharray': hit ? '4 4' : 'none' }));
-      nodes.forEach(function (n) {
-        svg.appendChild(svgEl('rect', { x: n.x, y: 28, width: 140, height: 44, rx: 6, fill: n.on ? 'var(--accent,#4f46e5)' : 'var(--surface,#f8fafc)', stroke: 'var(--border,#cbd5e1)' }));
-        svg.appendChild(svgEl('text', { x: n.x + 70, y: 54, 'text-anchor': 'middle', 'font-size': '12', 'font-weight': '600', fill: n.on ? 'var(--accent-ink,#fff)' : 'var(--ink-muted,#475569)', text: n.label }));
-      });
-      note.textContent = hit ? 'Cache HIT: Served in ~18ms from nearest Edge PoP. Origin receives zero load.' : 'Cache MISS: Edge pulls from Origin (~190ms), caches response according to Cache-Control: s-maxage.';
+      drawPipeline(svg, [
+        { id: 'u', x: 20, y: 28, w: 135, label: 'User (Mumbai)', active: true },
+        { id: 'e', x: 225, y: 28, w: 145, label: 'Edge PoP', sub: hit ? 'Cache HIT' : 'Forward', active: true, pulse: hit },
+        { id: 'o', x: 440, y: 28, w: 140, label: 'Origin US-East', sub: hit ? '0 Load' : 'Origin Pull', active: !hit, tone: !hit ? 'warn' : null }
+      ], [
+        { from: 'u', to: 'e', active: true, dur: '1.0s' },
+        { from: 'e', to: 'o', active: !hit, color: WARN, dash: true, dur: '1.8s' }
+      ]);
+      note.textContent = hit ? 'Cache HIT: Served in ~18 ms from nearest Edge PoP.' : 'Cache MISS: Edge pulls from Origin (~190 ms) and caches per Cache-Control: s-maxage.';
     }
     shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(note); render();
   };
@@ -554,9 +640,9 @@
   // 8. sim-load-balancer
   WIDGETS['sim-load-balancer'] = function (root) {
     var shell = makeShell(root, 'Load Balancer Algorithm & Slow-Node Sim', 'L08 · Traffic');
-    var algo = 'rr', slow3 = true, counts = [0, 0, 0], inflight = [1, 1, 8], next = 0;
+    var algo = 'rr', slow3 = true, counts = [6, 6, 6], inflight = [1, 1, 8], next = 0;
     var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var svg = svgEl('svg', { viewBox: '0 0 600 130', class: 'ss-w-svg' });
+    var svg = svgEl('svg', { viewBox: '0 0 600 120', class: 'ss-w-svg' });
     var note = el('div', { class: 'ss-w-note' });
 
     function sendBatch() {
@@ -578,51 +664,50 @@
     function render() {
       ctrl.innerHTML = '';
       [['rr', 'Round-Robin'], ['lc', 'Least-Connections'], ['w', 'Weighted']].forEach(function (a) {
-        ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(algo === a[0]), text: a[1], onClick: function () { algo = a[0]; counts = [0, 0, 0]; inflight = [1, 1, slow3 ? 8 : 1]; render(); } }));
+        ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(algo === a[0]), text: a[1], onClick: function () { algo = a[0]; counts = [4, 4, 4]; inflight = [1, 1, slow3 ? 8 : 1]; render(); } }));
       });
       ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(slow3), text: slow3 ? 'Node 3 Slow: YES' : 'Node 3 Slow: NO', onClick: function () { slow3 = !slow3; inflight = [1, 1, slow3 ? 8 : 1]; render(); } }));
       ctrl.appendChild(el('button', { class: 'ss-w-btn primary', text: 'Send 12 Requests', onClick: sendBatch }));
-
-      svg.innerHTML = '';
-      [0, 1, 2].forEach(function (i) {
-        var y = 16 + i * 38;
-        var label = 'Backend ' + (i + 1) + (i === 2 && slow3 ? ' (Slow)' : '');
-        svg.appendChild(svgEl('text', { x: 14, y: y + 19, 'font-size': '12', fill: 'var(--ink,#0f172a)', text: label }));
-        var w = Math.min(340, counts[i] * 10 + 16);
-        svg.appendChild(svgEl('rect', { x: 145, y: y + 4, width: w, height: 22, rx: 4, fill: i === 2 && slow3 ? 'var(--status-warn,#b45309)' : 'var(--accent,#4f46e5)' }));
-        svg.appendChild(svgEl('text', { x: 155 + w, y: y + 19, 'font-size': '12', 'font-weight': '600', fill: 'var(--ink,#0f172a)', text: counts[i] + ' reqs · queue: ' + inflight[i] }));
-      });
+      var maxC = Math.max(12, counts[0], counts[1], counts[2]);
+      drawBars(svg, [0, 1, 2].map(function (i) {
+        return {
+          label: 'Backend ' + (i + 1) + (i === 2 && slow3 ? ' (Slow)' : ''),
+          pct: (counts[i] / maxC) * 100,
+          color: i === 2 && slow3 ? WARN : ACCENT,
+          valueText: counts[i] + ' req · q=' + inflight[i]
+        };
+      }));
       note.textContent = algo === 'rr' && slow3
-        ? 'Round-Robin blindly keeps piling requests onto Slow Node 3.'
+        ? 'Round-Robin blindly piles requests onto Slow Node 3.'
         : algo === 'lc'
-          ? 'Least-Connections routes away from Slow Node 3 while its in-flight queue stays elevated.'
-          : 'Weighted routing shifts capacity ratio proactively away from degraded/smaller nodes.';
+          ? 'Least-Connections avoids Slow Node 3 while its in-flight queue stays elevated.'
+          : 'Weighted routing shifts traffic proactively away from slower hosts.';
     }
     shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(note); render();
   };
 
   // 9. anim-idempotency-retry
   WIDGETS['anim-idempotency-retry'] = function (root) {
-    var shell = makeShell(root, 'Idempotency Key on Network Timeout Retry', 'L09 · API Safety');
-    var keyOn = true, step = 0;
+    var shell = makeShell(root, 'Idempotency Key on Network Timeout Retry', 'L09 · Live Retry');
+    var keyOn = true, step = 1;
     var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var svg = svgEl('svg', { viewBox: '0 0 600 110', class: 'ss-w-svg' });
+    var svg = svgEl('svg', { viewBox: '0 0 600 105', class: 'ss-w-svg' });
     var note = el('div', { class: 'ss-w-note' });
-
     function render() {
       ctrl.innerHTML = '';
-      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(keyOn), text: keyOn ? 'Idempotency-Key: ON' : 'Idempotency-Key: OFF', onClick: function () { keyOn = !keyOn; step = 0; render(); } }));
-      ctrl.appendChild(el('button', { class: 'ss-w-btn primary', text: 'Next Step (' + (step + 1) + '/3)', onClick: function () { step = (step + 1) % 3; render(); } }));
-      svg.innerHTML = '';
-      var msgs = [
-        '1. POST /payments ($50) reaches DB, charge #1 succeeds — response drops in transit!',
-        '2. Client times out and safely retries identical POST ' + (keyOn ? 'with same Idempotency-Key' : 'WITHOUT Idempotency-Key'),
-        keyOn ? '3. Server detects key in store → returns cached 201! Total charged: $50' : '3. Server treats retry as new request → DOUBLE CHARGE! Total charged: $100'
-      ];
-      var color = step === 2 ? (keyOn ? 'var(--status-ok,#15803d)' : 'var(--status-err,#b91c1c)') : 'var(--accent,#4f46e5)';
-      svg.appendChild(svgEl('rect', { x: 20, y: 24, width: 560, height: 60, rx: 6, fill: 'var(--surface,#f8fafc)', stroke: color, 'stroke-width': '2' }));
-      svg.appendChild(svgEl('text', { x: 300, y: 59, 'text-anchor': 'middle', 'font-size': '13', 'font-weight': '600', fill: 'var(--ink,#0f172a)', text: msgs[step] }));
-      note.textContent = 'Store idempotency keys atomically alongside the business state update inside the same transaction.';
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(keyOn), text: keyOn ? 'Idempotency-Key: ON' : 'Idempotency-Key: OFF', onClick: function () { keyOn = !keyOn; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn primary', text: 'Step (' + (step + 1) + '/3)', onClick: function () { step = (step + 1) % 3; render(); } }));
+      drawPipeline(svg, [
+        { id: 'c', x: 20, y: 30, w: 120, label: 'Client Retry', active: true },
+        { id: 'api', x: 225, y: 30, w: 150, label: keyOn ? 'Key Store Hit' : 'No Key Check', sub: step === 2 ? (keyOn ? 'Return Cached 201' : 'New Charge!') : 'POST /payments', active: true, tone: !keyOn && step === 2 ? 'err' : null },
+        { id: 'db', x: 455, y: 30, w: 125, label: 'Ledger DB', sub: (!keyOn && step === 2) ? 'Total: $100!' : 'Total: $50', active: step !== 2 || !keyOn, tone: !keyOn && step === 2 ? 'err' : null }
+      ], [
+        { from: 'c', to: 'api', active: true, dur: '1.2s', label: keyOn ? 'key=abc-123' : 'no key' },
+        { from: 'api', to: 'db', active: !keyOn || step !== 2, color: !keyOn && step === 2 ? ERR : ACCENT, dash: true, dur: '1.3s' }
+      ]);
+      note.textContent = step === 2
+        ? (keyOn ? 'Server returns stored 201 response without double-charging ($50).' : 'Server executes charge twice on retry -> $100 double charge!')
+        : 'Initial charge succeeds on server, but HTTP response drops in transit.';
     }
     shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(note); render();
   };
@@ -630,29 +715,32 @@
   // 10. sim-btree-vs-lsm
   WIDGETS['sim-btree-vs-lsm'] = function (root) {
     var shell = makeShell(root, 'B+Tree vs LSM-Tree Write & Read Path', 'L11 · Storage Engines');
-    var writes = 4, sstables = 3;
+    var sstables = 3;
     var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var svg = svgEl('svg', { viewBox: '0 0 600 95', class: 'ss-w-svg' });
     var stats = el('div', { class: 'ss-w-stats' });
     function render() {
       ctrl.innerHTML = '';
-      ctrl.appendChild(el('button', { class: 'ss-w-btn primary', text: 'Append 1K Writes', onClick: function () { writes++; if (writes % 3 === 0) sstables++; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn primary', text: 'Append 1K Writes', onClick: function () { sstables = Math.min(10, sstables + 1); render(); } }));
       ctrl.appendChild(el('button', { class: 'ss-w-btn', text: 'Run LSM Compaction', onClick: function () { sstables = Math.max(1, Math.ceil(sstables / 2)); render(); } }));
-      stats.innerHTML = '';
-      [
+      drawPipeline(svg, [
+        { id: 'w', x: 18, y: 26, w: 105, label: 'Write Batch', active: true },
+        { id: 'mem', x: 175, y: 26, w: 120, label: 'MemTable', sub: 'Seq WAL Append', active: true },
+        { id: 'ss', x: 350, y: 26, w: 115, label: sstables + ' SSTables', sub: 'L0/L1 Files', active: true, tone: sstables >= 6 ? 'warn' : null },
+        { id: 'cp', x: 505, y: 26, w: 78, label: 'Compact', active: sstables <= 3 }
+      ], [
+        { from: 'w', to: 'mem', active: true, dur: '0.9s' },
+        { from: 'mem', to: 'ss', active: true, dash: true, dur: '1.4s' },
+        { from: 'ss', to: 'cp', active: sstables > 2, color: sstables >= 6 ? WARN : ACCENT, dash: true, dur: '1.6s' }
+      ]);
+      statGrid(stats, [
         ['B+Tree Write I/O', 'Random 4–16KB Page Updates'],
         ['LSM Write Path', 'Seq WAL + MemTable (' + sstables + ' SSTables)'],
-        ['LSM Point Lookup', 'Bloom Filter + max ' + sstables + ' SSTable checks'],
+        ['LSM Point Lookup', 'Bloom Filter + max ' + sstables + ' checks'],
         ['B+Tree Point Lookup', 'O(log N) ~3–4 Page Reads']
-      ].forEach(function (s) {
-        stats.appendChild(el('div', { class: 'ss-w-stat' }, [
-          el('span', { class: 'ss-w-stat-k', text: s[0] }),
-          el('span', { class: 'ss-w-stat-v', text: s[1] })
-        ]));
-      });
+      ]);
     }
-    shell.appendChild(ctrl); shell.appendChild(stats);
-    shell.appendChild(el('div', { class: 'ss-w-note', text: 'LSM-Trees turn random writes into sequential appends (high write throughput), trading background compaction work and multi-SSTable read checks.' }));
-    render();
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
 
   // 11. anim-isolation-anomalies
@@ -660,21 +748,25 @@
     var shell = makeShell(root, 'Transaction Isolation & Write Skew Stepper', 'L13 · ACID');
     var iso = 'si';
     var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var svg = svgEl('svg', { viewBox: '0 0 600 90', class: 'ss-w-svg' });
+    var svg = svgEl('svg', { viewBox: '0 0 600 95', class: 'ss-w-svg' });
     var note = el('div', { class: 'ss-w-note' });
     function render() {
       ctrl.innerHTML = '';
-      [['rc', 'Read Committed'], ['si', 'Snapshot / Repeatable Read'], ['ssi', 'Serializable (SSI)']].forEach(function (m) {
+      [['rc', 'Read Committed'], ['si', 'Snapshot Read'], ['ssi', 'Serializable (SSI)']].forEach(function (m) {
         ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(iso === m[0]), text: m[1], onClick: function () { iso = m[0]; render(); } }));
       });
       var ok = iso === 'ssi';
-      svg.innerHTML = '';
-      svg.appendChild(svgEl('rect', { x: 16, y: 18, width: 568, height: 54, rx: 6, fill: 'var(--surface,#f8fafc)', stroke: ok ? 'var(--status-ok,#15803d)' : 'var(--status-err,#b91c1c)', 'stroke-width': '2' }));
-      svg.appendChild(svgEl('text', {
-        x: 300, y: 50, 'text-anchor': 'middle', 'font-size': '13', 'font-weight': '600', fill: 'var(--ink,#0f172a)',
-        text: ok ? 'Serializable detects read-set conflict → aborts Tx2! At least 1 doctor stays on call.' : 'Both Tx1 and Tx2 read count=2 simultaneously and both sign off → 0 doctors on call (Write Skew)!'
-      }));
-      note.textContent = 'To prevent write skew under Read Committed/Snapshot Isolation, use Serializable OR explicit SELECT ... FOR UPDATE.';
+      drawPipeline(svg, [
+        { id: 't1', x: 20, y: 12, w: 135, h: 32, label: 'Tx1 reads cnt=2', active: true },
+        { id: 't2', x: 20, y: 52, w: 135, h: 32, label: 'Tx2 reads cnt=2', active: true },
+        { id: 'db', x: 250, y: 26, w: 150, h: 42, label: 'MVCC Engine', sub: ok ? 'SIREAD Lock Conflict' : 'Disjoint Row OK', active: true, tone: ok ? null : 'err' },
+        { id: 'res', x: 455, y: 26, w: 125, h: 42, label: ok ? 'Tx2 Aborted' : '0 Doctors!', sub: ok ? '1 On Call Safe' : 'Write Skew!', active: true, tone: ok ? null : 'err' }
+      ], [
+        { from: 't1', to: 'db', y1: 28, y2: 42, active: true, dur: '1.2s' },
+        { from: 't2', to: 'db', y1: 68, y2: 52, active: true, dur: '1.4s', color: ok ? WARN : ERR },
+        { from: 'db', to: 'res', active: true, dur: '1.1s', color: ok ? OK : ERR }
+      ]);
+      note.textContent = 'Prevent write skew with Serializable (SSI) OR explicit SELECT ... FOR UPDATE.';
     }
     shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(note); render();
   };
@@ -685,6 +777,7 @@
     var policy = 'lru', cap = 3;
     var stream = ['A', 'B', 'A', 'C', 'A', 'D', 'A', 'E', 'A', 'B'];
     var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var svg = svgEl('svg', { viewBox: '0 0 600 72', class: 'ss-w-svg' });
     var stats = el('div', { class: 'ss-w-stats' });
 
     function sim(p) {
@@ -692,14 +785,10 @@
       stream.forEach(function (k) {
         freq[k] = (freq[k] || 0) + 1;
         var idx = cache.indexOf(k);
-        if (idx !== -1) {
-          hits++;
-          if (p === 'lru') { cache.splice(idx, 1); cache.push(k); }
-        } else {
+        if (idx !== -1) { hits++; if (p === 'lru') { cache.splice(idx, 1); cache.push(k); } }
+        else {
           if (cache.length >= cap) {
-            if (p === 'lfu') {
-              cache.sort(function (x, y) { return freq[x] - freq[y]; });
-            }
+            if (p === 'lfu') cache.sort(function (x, y) { return freq[x] - freq[y]; });
             cache.shift();
           }
           cache.push(k);
@@ -714,48 +803,42 @@
         ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(policy === m[0]), text: m[1], onClick: function () { policy = m[0]; render(); } }));
       });
       var res = sim(policy);
-      stats.innerHTML = '';
-      [['Trace', stream.join(' ')], ['Hits / Total', res.hits + ' / ' + stream.length], ['Hit Ratio', res.pct + '%'], ['Final Cache (cap=3)', res.finalKeys]].forEach(function (s) {
-        stats.appendChild(el('div', { class: 'ss-w-stat' }, [
-          el('span', { class: 'ss-w-stat-k', text: s[0] }),
-          el('span', { class: 'ss-w-stat-v', text: s[1] })
-        ]));
-      });
+      drawBars(svg, [{ label: 'Hit Ratio', pct: res.pct, valueText: res.pct + '% (' + res.hits + '/' + stream.length + ' hits)' }]);
+      statGrid(stats, [['Trace', stream.join(' ')], ['Hits / Total', res.hits + ' / ' + stream.length], ['Final Cache (cap=3)', res.finalKeys]]);
     }
-    shell.appendChild(ctrl); shell.appendChild(stats); render();
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
 
   // 13. sim-cache-stampede
   WIDGETS['sim-cache-stampede'] = function (root) {
-    var shell = makeShell(root, 'Cache Stampede & Singleflight Defense', 'L17 · Resilience');
+    var shell = makeShell(root, 'Cache Stampede & Singleflight Defense', 'L17 · Live Coalescing');
     var singleflight = true, jitter = true;
     var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var svg = svgEl('svg', { viewBox: '0 0 600 95', class: 'ss-w-svg' });
     var stats = el('div', { class: 'ss-w-stats' });
     function render() {
       ctrl.innerHTML = '';
       ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(singleflight), text: 'Singleflight: ' + (singleflight ? 'ON' : 'OFF'), onClick: function () { singleflight = !singleflight; render(); } }));
       ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(jitter), text: 'TTL Jitter: ' + (jitter ? 'ON' : 'OFF'), onClick: function () { jitter = !jitter; render(); } }));
-      var dbHits = singleflight ? 1 : 250;
-      var avalancheRisk = jitter ? 'Low (spread expiry)' : 'High (synchronized expiry)';
-      stats.innerHTML = '';
-      [['Concurrent Misses', '250 reqs'], ['Origin DB Queries', String(dbHits)], ['Cache Avalanche Risk', avalancheRisk]].forEach(function (s) {
-        stats.appendChild(el('div', { class: 'ss-w-stat' }, [
-          el('span', { class: 'ss-w-stat-k', text: s[0] }),
-          el('span', { class: 'ss-w-stat-v', text: s[1] })
-        ]));
-      });
+      drawPipeline(svg, [
+        { id: 'c', x: 20, y: 26, w: 135, label: '250 Cache Misses', active: true },
+        { id: 'sf', x: 225, y: 26, w: 145, label: singleflight ? 'Singleflight Gate' : 'No Coalescing', sub: singleflight ? 'Deduplicates to 1' : 'Passes All 250!', active: true, tone: singleflight ? null : 'err' },
+        { id: 'db', x: 435, y: 26, w: 145, label: singleflight ? '1 DB Query' : '250 DB Queries!', active: true, tone: singleflight ? null : 'err', pulse: true }
+      ], [
+        { from: 'c', to: 'sf', active: true, dur: '0.9s' },
+        { from: 'sf', to: 'db', active: true, color: singleflight ? OK : ERR, dur: singleflight ? '1.8s' : '0.45s' }
+      ]);
+      statGrid(stats, [['Concurrent Misses', '250 reqs'], ['Origin DB Queries', singleflight ? '1' : '250'], ['Avalanche Risk', jitter ? 'Low (jitter spread)' : 'High (sync expiry)']]);
     }
-    shell.appendChild(ctrl); shell.appendChild(stats); render();
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
 
   // 14. sim-consistent-hashing
   WIDGETS['sim-consistent-hashing'] = function (root) {
-    var shell = makeShell(root, 'Consistent Hashing Ring + Virtual Nodes', 'L20 · Sharding');
+    var shell = makeShell(root, 'Consistent Hashing Ring + Virtual Nodes', 'L20 · Live Ring');
     var nodes = 3, vnodes = 8;
     var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var svg = svgEl('svg', { viewBox: '0 0 600 180', class: 'ss-w-svg' });
-    var stats = el('div', { class: 'ss-w-stats' });
-
+    var svg = svgEl('svg', { viewBox: '0 0 600 175', class: 'ss-w-svg' });
     function render() {
       ctrl.innerHTML = '';
       ctrl.appendChild(el('button', { class: 'ss-w-btn primary', text: '+ Add Shard (' + nodes + ')', onClick: function () { nodes = Math.min(8, nodes + 1); render(); } }));
@@ -766,24 +849,25 @@
       ctrl.appendChild(el('label', { class: 'ss-w-slider' }, ['VNodes/Shard:', inp, lbl]));
 
       svg.innerHTML = '';
-      svg.appendChild(svgEl('circle', { cx: 140, cy: 90, r: 66, fill: 'none', stroke: 'var(--border,#cbd5e1)', 'stroke-width': '3' }));
-      var colors = ['#4f46e5', '#15803d', '#b45309', '#0284c7', '#7c3aed', '#be123c', '#0f766e', '#a16207'];
+      svg.appendChild(svgEl('circle', { cx: 140, cy: 88, r: 64, fill: 'none', stroke: BORDER, 'stroke-width': '3' }));
+      svg.appendChild(svgEl('circle', { cx: 140, cy: 88, r: 64, fill: 'none', stroke: ACCENT, 'stroke-width': '1.5', class: 'ss-w-flow' }));
+      var colors = ['#15803d', '#0284c7', '#b45309', '#be123c', '#0f766e', '#65a30d', '#9333ea', '#c2410c'];
       for (var n = 0; n < nodes; n++) {
         for (var v = 0; v < vnodes; v++) {
           var ang = (((n * 137 + v * 53) % 360) * Math.PI) / 180;
-          var x = 140 + Math.cos(ang) * 66;
-          var y = 90 + Math.sin(ang) * 66;
-          svg.appendChild(svgEl('circle', { cx: x, cy: y, r: v === 0 ? 6 : 3.5, fill: colors[n % colors.length] }));
+          svg.appendChild(svgEl('circle', {
+            cx: 140 + Math.cos(ang) * 64, cy: 88 + Math.sin(ang) * 64,
+            r: v === 0 ? 6 : 3.5, fill: colors[n % colors.length]
+          }));
         }
       }
-      svg.appendChild(svgEl('text', { x: 140, y: 94, 'text-anchor': 'middle', 'font-size': '12', 'font-weight': '700', fill: 'var(--ink,#0f172a)', text: nodes + ' Shards' }));
-      svg.appendChild(svgEl('text', { x: 255, y: 65, 'font-size': '13', 'font-weight': '600', fill: 'var(--ink,#0f172a)', text: 'Keys remapped on +1 shard ≈ ' + Math.round(100 / (nodes + 1)) + '%' }));
-      svg.appendChild(svgEl('text', { x: 255, y: 92, 'font-size': '12', fill: 'var(--ink-muted,#475569)', text: 'Total ring points: ' + (nodes * vnodes) + ' (higher vnodes = lower variance)' }));
-      svg.appendChild(svgEl('text', { x: 255, y: 116, 'font-size': '12', fill: 'var(--ink-muted,#475569)', text: 'Modulo hash(key) % N would remap ~' + Math.round((nodes / (nodes + 1)) * 100) + '% of keys!' }));
-
-      stats.innerHTML = '';
+      addPacket(svg, 'M 204 88 A 64 64 0 1 1 203.9 87', ACCENT, '4s', '0s');
+      svg.appendChild(svgEl('text', { x: 140, y: 92, 'text-anchor': 'middle', 'font-size': '12', 'font-weight': '700', fill: INK, text: nodes + ' Shards' }));
+      svg.appendChild(svgEl('text', { x: 255, y: 65, 'font-size': '13', 'font-weight': '700', fill: INK, text: 'Keys moved on +1 shard ≈ ' + Math.round(100 / (nodes + 1)) + '%' }));
+      svg.appendChild(svgEl('text', { x: 255, y: 90, 'font-size': '12', fill: MUTED, text: 'Total ring points: ' + (nodes * vnodes) + ' (higher vnodes = balanced shards)' }));
+      svg.appendChild(svgEl('text', { x: 255, y: 114, 'font-size': '12', fill: MUTED, text: 'Naive hash(key) % N moves ~' + Math.round((nodes / (nodes + 1)) * 100) + '% of keys!' }));
     }
-    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
+    shell.appendChild(ctrl); shell.appendChild(svg); render();
   };
 
   // 15. anim-saga-compensation
@@ -795,16 +879,20 @@
     function render() {
       ctrl.innerHTML = '';
       ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(!fail), text: 'Happy Path', onClick: function () { fail = false; render(); } }));
-      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(fail), text: 'Step 3 Inventory Fails → Compensate', onClick: function () { fail = true; render(); } }));
-      svg.innerHTML = '';
-      var labels = fail ? ['1. Order Pending', '2. Payment Charged', '3. Inventory FAIL', '4. Refund Payment', '5. Order Cancelled'] : ['1. Create Order', '2. Charge Card', '3. Reserve Stock', '4. Confirm Order'];
-      var w = fail ? 106 : 132;
-      labels.forEach(function (l, i) {
-        var x = 14 + i * (w + 10);
-        var c = fail && i === 2 ? 'var(--status-err,#b91c1c)' : (fail && i > 2 ? 'var(--status-warn,#b45309)' : 'var(--accent,#4f46e5)');
-        svg.appendChild(svgEl('rect', { x: x, y: 26, width: w, height: 42, rx: 6, fill: c }));
-        svg.appendChild(svgEl('text', { x: x + w / 2, y: 51, 'text-anchor': 'middle', 'font-size': '11', 'font-weight': '600', fill: '#fff', text: l }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(fail), text: 'Step 3 Fails -> Compensate', onClick: function () { fail = true; render(); } }));
+      var labels = fail
+        ? ['Order Pending', 'Card Charged', 'Inventory FAIL', 'Refund Card', 'Order Cancelled']
+        : ['Create Order', 'Charge Card', 'Reserve Stock', 'Confirm Order'];
+      var w = fail ? 98 : 124;
+      var nodes = labels.map(function (l, i) {
+        return {
+          id: 's' + i, x: 14 + i * (w + 18), y: 26, w: w, h: 42, label: l,
+          active: true, tone: fail && i === 2 ? 'err' : (fail && i > 2 ? 'warn' : null)
+        };
       });
+      var edges = [];
+      for (var i = 1; i < nodes.length; i++) edges.push({ from: 's' + (i - 1), to: 's' + i, active: true, color: fail && i >= 2 ? WARN : ACCENT, dur: '1.2s' });
+      drawPipeline(svg, nodes, edges);
     }
     shell.appendChild(ctrl); shell.appendChild(svg); render();
   };
@@ -814,6 +902,7 @@
     var shell = makeShell(root, 'Retry Storm vs Full Jitter + Circuit Breaker', 'L28 · Partial Failure');
     var mode = 'jitter', cb = true;
     var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var svg = svgEl('svg', { viewBox: '0 0 600 72', class: 'ss-w-svg' });
     var stats = el('div', { class: 'ss-w-stats' });
     function render() {
       ctrl.innerHTML = '';
@@ -821,17 +910,17 @@
         ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(mode === m[0]), text: m[1], onClick: function () { mode = m[0]; render(); } }));
       });
       ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(cb), text: 'Circuit Breaker: ' + (cb ? 'ON' : 'OFF'), onClick: function () { cb = !cb; render(); } }));
-      var spike = mode === 'none' ? '4.0× Retry Storm' : (mode === 'exp' ? '2.4× Synchronized Waves' : '1.15× Smooth Recovery');
-      var state = cb ? 'OPEN → Fail Fast (0ms)' : 'Blocking on 5s Timeouts';
-      stats.innerHTML = '';
-      [['Traffic Multiplier', spike], ['Dependency Outage Behavior', state]].forEach(function (s) {
-        stats.appendChild(el('div', { class: 'ss-w-stat' }, [
-          el('span', { class: 'ss-w-stat-k', text: s[0] }),
-          el('span', { class: 'ss-w-stat-v', text: s[1] })
-        ]));
-      });
+      var pct = mode === 'none' ? 98 : (mode === 'exp' ? 62 : 28);
+      drawBars(svg, [
+        { label: 'Retry Amplification', pct: pct, color: pct > 75 ? ERR : (pct > 45 ? WARN : OK), valueText: mode === 'none' ? '4.0× Storm' : (mode === 'exp' ? '2.4× Waves' : '1.15× Smooth') },
+        { label: 'Outage Behavior', pct: cb ? 8 : 95, color: cb ? OK : ERR, valueText: cb ? 'OPEN Fail-Fast (0 ms)' : 'Blocked Threads!' }
+      ]);
+      statGrid(stats, [
+        ['Traffic Multiplier', mode === 'none' ? '4.0× Retry Storm' : (mode === 'exp' ? '2.4× Synced Waves' : '1.15× Smooth')],
+        ['Circuit State', cb ? 'OPEN -> Fail Fast (0 ms)' : 'Blocking on 5s Timeouts']
+      ]);
     }
-    shell.appendChild(ctrl); shell.appendChild(stats); render();
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
 
   // 17. anim-fencing-tokens
@@ -843,16 +932,16 @@
     function render() {
       ctrl.innerHTML = '';
       ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(enforce), text: 'Storage Fencing Check: ' + (enforce ? 'ON' : 'OFF'), onClick: function () { enforce = !enforce; render(); } }));
-      svg.innerHTML = '';
-      svg.appendChild(svgEl('rect', { x: 16, y: 18, width: 568, height: 56, rx: 6, fill: 'var(--surface,#f8fafc)', stroke: enforce ? 'var(--status-ok,#15803d)' : 'var(--status-err,#b91c1c)', 'stroke-width': '2' }));
-      svg.appendChild(svgEl('text', {
-        x: 300, y: 42, 'text-anchor': 'middle', 'font-size': '12', 'font-weight': '600', fill: 'var(--ink,#0f172a)',
-        text: 'Client A wakes from GC pause with Token #33 (Client B already wrote with Token #34)'
-      }));
-      svg.appendChild(svgEl('text', {
-        x: 300, y: 62, 'text-anchor': 'middle', 'font-size': '12', 'font-weight': '700', fill: enforce ? 'var(--status-ok,#15803d)' : 'var(--status-err,#b91c1c)',
-        text: enforce ? 'REJECTED (33 < 34): Data integrity preserved!' : 'ACCEPTED WITHOUT CHECK: Silent data corruption!'
-      }));
+      drawPipeline(svg, [
+        { id: 'a', x: 20, y: 12, w: 155, h: 32, label: 'Stale Client A (GC)', sub: 'Token #33', active: true, tone: 'warn' },
+        { id: 'b', x: 20, y: 52, w: 155, h: 32, label: 'New Leader B', sub: 'Token #34', active: true },
+        { id: 's', x: 255, y: 26, w: 165, h: 42, label: 'Storage Fence Check', sub: enforce ? 'max_token = 34' : 'NO CHECK!', active: true, tone: enforce ? null : 'err' },
+        { id: 'r', x: 470, y: 26, w: 112, h: 42, label: enforce ? '#33 REJECTED' : 'CORRUPTED!', active: true, tone: enforce ? null : 'err', pulse: true }
+      ], [
+        { from: 'a', to: 's', y1: 28, y2: 42, active: true, color: enforce ? WARN : ERR, dur: '1.7s' },
+        { from: 'b', to: 's', y1: 68, y2: 52, active: true, color: OK, dur: '1.1s' },
+        { from: 's', to: 'r', active: true, color: enforce ? OK : ERR, dur: '1.1s' }
+      ]);
     }
     shell.appendChild(ctrl); shell.appendChild(svg); render();
   };
@@ -865,46 +954,38 @@
     var svg = svgEl('svg', { viewBox: '0 0 600 85', class: 'ss-w-svg' });
     var stats = el('div', { class: 'ss-w-stats' });
 
-    function slider(lbl, getter, setter, min, max) {
+    function slider(lbl, getter, setter) {
       var v = el('span', { text: String(getter()) });
-      var i = el('input', { type: 'range', min: min, max: max, value: String(getter()) });
+      var i = el('input', { type: 'range', min: 1, max: 7, value: String(getter()) });
       i.addEventListener('input', function () { setter(Number(i.value)); v.textContent = String(getter()); render(); });
       ctrl.appendChild(el('label', { class: 'ss-w-slider' }, [lbl + ':', i, v]));
     }
-    slider('N Replicas', function () { return N; }, function (x) { N = x; W = Math.min(W, N); R = Math.min(R, N); }, 3, 7);
-    slider('W Write Quorum', function () { return W; }, function (x) { W = Math.min(x, N); }, 1, 7);
-    slider('R Read Quorum', function () { return R; }, function (x) { R = Math.min(x, N); }, 1, 7);
+    slider('N', function () { return N; }, function (x) { N = Math.max(3, x); W = Math.min(W, N); R = Math.min(R, N); });
+    slider('W', function () { return W; }, function (x) { W = Math.min(x, N); });
+    slider('R', function () { return R; }, function (x) { R = Math.min(x, N); });
 
     function render() {
       var strong = (R + W) > N;
       svg.innerHTML = '';
       for (var i = 0; i < N; i++) {
-        var isW = i < W;
-        var isR = i >= N - R;
-        var overlap = isW && isR;
-        var x = 25 + i * 80;
+        var isW = i < W, isR = i >= N - R, overlap = isW && isR, x = 25 + i * 80;
         svg.appendChild(svgEl('rect', {
           x: x, y: 18, width: 64, height: 48, rx: 6,
-          fill: overlap ? 'var(--accent,#4f46e5)' : (isW || isR ? 'var(--surface,#f1f5f9)' : 'var(--bg,#fff)'),
-          stroke: overlap ? 'var(--accent,#4f46e5)' : 'var(--border,#cbd5e1)', 'stroke-width': overlap ? '2.5' : '1.5'
+          fill: overlap ? ACCENT : (isW || isR ? SURFACE : BG),
+          stroke: overlap ? ACCENT : BORDER, 'stroke-width': overlap ? '2.5' : '1.5',
+          class: overlap ? 'ss-w-node-pulse' : ''
         }));
         svg.appendChild(svgEl('text', {
           x: x + 32, y: 46, 'text-anchor': 'middle', 'font-size': '12', 'font-weight': '700',
-          fill: overlap ? '#fff' : 'var(--ink,#0f172a)',
+          fill: overlap ? ACCENT_INK : INK,
           text: overlap ? 'W∩R' : (isW ? 'W' : (isR ? 'R' : 'N' + (i + 1)))
         }));
       }
-      stats.innerHTML = '';
-      [
-        ['R + W vs N', R + ' + ' + W + ' = ' + (R + W) + (strong ? ' > ' : ' ≤ ') + N],
+      statGrid(stats, [
+        ['R + W vs N', R + ' + ' + W + ' = ' + (R + W) + (strong ? ' > ' : ' <= ') + N],
         ['Guarantee', strong ? 'Overlap Guaranteed' : 'Stale Reads Possible'],
-        ['Fault Tolerance', 'Write tolerates ' + (N - W) + ' down · Read tolerates ' + (N - R) + ' down']
-      ].forEach(function (s) {
-        stats.appendChild(el('div', { class: 'ss-w-stat' }, [
-          el('span', { class: 'ss-w-stat-k', text: s[0] }),
-          el('span', { class: 'ss-w-stat-v', text: s[1] })
-        ]));
-      });
+        ['Fault Tolerance', 'W tolerates ' + (N - W) + ' down · R tolerates ' + (N - R) + ' down']
+      ]);
     }
     shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
@@ -914,27 +995,36 @@
     var shell = makeShell(root, 'Raft Leader Election & Split-Brain Prevention', 'L31 · Consensus');
     var term = 1, alive = 5;
     var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var svg = svgEl('svg', { viewBox: '0 0 600 90', class: 'ss-w-svg' });
     var stats = el('div', { class: 'ss-w-stats' });
     function render() {
       ctrl.innerHTML = '';
-      ctrl.appendChild(el('button', { class: 'ss-w-btn primary', text: 'Kill Leader & Elect New', onClick: function () { term++; render(); } }));
-      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(alive === 5), text: '5/5 Nodes Up', onClick: function () { alive = 5; render(); } }));
-      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(alive === 3), text: 'Partition: 3 vs 2', onClick: function () { alive = 3; render(); } }));
-      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(alive === 2), text: 'Minority Side (2/5)', onClick: function () { alive = 2; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn primary', text: 'Elect New Term (' + term + ')', onClick: function () { term++; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(alive === 5), text: '5/5 Up', onClick: function () { alive = 5; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(alive === 3), text: 'Majority 3/5', onClick: function () { alive = 3; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(alive === 2), text: 'Minority 2/5', onClick: function () { alive = 2; render(); } }));
       var canElect = alive >= 3;
-      stats.innerHTML = '';
-      [
+      var nodes = [0, 1, 2, 3, 4].map(function (i) {
+        var up = i < alive;
+        return {
+          id: 'n' + i, x: 20 + i * 116, y: 24, w: 96, h: 42,
+          label: i === 0 && canElect ? 'Leader T' + term : (up ? 'Follower' : 'Down'),
+          active: up && (i === 0 ? canElect : true),
+          tone: !up ? 'err' : (!canElect ? 'warn' : null),
+          pulse: i === 0 && canElect
+        };
+      });
+      var edges = [1, 2, 3, 4].map(function (i) {
+        return { from: 'n0', to: 'n' + i, y1: 16, y2: 16, active: canElect && i < alive, dash: true, dur: '1.4s' };
+      });
+      drawPipeline(svg, nodes, edges);
+      statGrid(stats, [
         ['Raft Term', 'Term #' + term],
         ['Reachable Nodes', alive + ' / 5 (Quorum = 3)'],
-        ['Cluster State', canElect ? 'Leader Active (Commits Allowed)' : 'No Majority Quorum (Read/Write Halted Safely)']
-      ].forEach(function (s) {
-        stats.appendChild(el('div', { class: 'ss-w-stat' }, [
-          el('span', { class: 'ss-w-stat-k', text: s[0] }),
-          el('span', { class: 'ss-w-stat-v', text: s[1] })
-        ]));
-      });
+        ['Cluster State', canElect ? 'Leader Active (Commits OK)' : 'Halted Safely (No Majority)']
+      ]);
     }
-    shell.appendChild(ctrl); shell.appendChild(stats); render();
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
 
   // 20. sim-rate-limiter-algorithms
@@ -942,455 +1032,484 @@
     var shell = makeShell(root, 'Rate Limiter Burst Comparison (Limit: 5 req/min)', 'L35 · Security');
     var algo = 'tb', tokens = 5, accepted = 0, rejected = 0;
     var ctrl = el('div', { class: 'ss-w-ctrl' });
+    var svg = svgEl('svg', { viewBox: '0 0 600 72', class: 'ss-w-svg' });
     var stats = el('div', { class: 'ss-w-stats' });
     function burst() {
       for (var i = 0; i < 4; i++) {
-        if (algo === 'fw') { accepted++; } // simulates boundary double burst
+        if (algo === 'fw') accepted++;
         else if (tokens > 0) { tokens--; accepted++; }
-        else { rejected++; }
+        else rejected++;
       }
       render();
     }
     function render() {
       ctrl.innerHTML = '';
-      [['tb', 'Token Bucket'], ['sw', 'Sliding Window'], ['fw', 'Fixed Window (Boundary Bug)']].forEach(function (a) {
+      [['tb', 'Token Bucket'], ['sw', 'Sliding Window'], ['fw', 'Fixed Window']].forEach(function (a) {
         ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(algo === a[0]), text: a[1], onClick: function () { algo = a[0]; tokens = 5; accepted = 0; rejected = 0; render(); } }));
       });
       ctrl.appendChild(el('button', { class: 'ss-w-btn primary', text: 'Send 4-Req Burst', onClick: burst }));
       ctrl.appendChild(el('button', { class: 'ss-w-btn', text: 'Refill (+2 Tokens)', onClick: function () { tokens = Math.min(5, tokens + 2); render(); } }));
-      stats.innerHTML = '';
-      [
-        ['Tokens Remaining', algo === 'fw' ? 'Window Counter' : tokens + ' / 5'],
+      drawBars(svg, [
+        { label: 'Tokens Left', pct: (tokens / 5) * 100, valueText: algo === 'fw' ? 'Unbounded' : tokens + ' / 5' },
+        { label: '429 Rejected', pct: Math.min(100, rejected * 12), color: ERR, valueText: rejected + ' rejected' }
+      ]);
+      statGrid(stats, [
         ['Accepted', String(accepted)],
         ['429 Rejected', String(rejected)],
-        ['Boundary Burst Risk', algo === 'fw' ? 'Up to 2× Limit at 00:59–01:01' : 'Bounded Safely']
-      ].forEach(function (s) {
-        stats.appendChild(el('div', { class: 'ss-w-stat' }, [
-          el('span', { class: 'ss-w-stat-k', text: s[0] }),
-          el('span', { class: 'ss-w-stat-v', text: s[1] })
-        ]));
-      });
+        ['Boundary Burst Risk', algo === 'fw' ? 'Up to 2× Limit at Boundary' : 'Bounded Safely']
+      ]);
     }
-    shell.appendChild(ctrl); shell.appendChild(stats); render();
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
 
-  function statGrid(statsEl, pairs) {
-    statsEl.innerHTML = '';
-    pairs.forEach(function (s) {
-      statsEl.appendChild(el('div', { class: 'ss-w-stat' }, [
-        el('span', { class: 'ss-w-stat-k', text: s[0] }),
-        el('span', { class: 'ss-w-stat-v', text: s[1] })
-      ]));
-    });
-  }
-
-  // 21. anim-schema-access-patterns
+  // Remaining L10–L40 widgets upgraded cleanly to include live animated SVG flows/bars!
   WIDGETS['anim-schema-access-patterns'] = function (root) {
     var shell = makeShell(root, 'Schema Access Patterns: SQL Join vs Document vs Wide-Column', 'L10 · Data Models');
-    var mode = 'sql';
-    var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var stats = el('div', { class: 'ss-w-stats' });
+    var mode = 'sql', ctrl = el('div', { class: 'ss-w-ctrl' }), svg = svgEl('svg', { viewBox: '0 0 600 95', class: 'ss-w-svg' }), stats = el('div', { class: 'ss-w-stats' });
     function render() {
       ctrl.innerHTML = '';
       [['sql', 'Normalized SQL (3NF)'], ['doc', 'Document Embed'], ['wide', 'Wide-Column Partition']].forEach(function (m) {
         ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(mode === m[0]), text: m[1], onClick: function () { mode = m[0]; render(); } }));
       });
-      var info = mode === 'sql'
+      drawPipeline(svg, [
+        { id: 'q', x: 20, y: 28, w: 120, label: 'Query Request', active: true },
+        { id: 'idx', x: 215, y: 28, w: 155, label: mode === 'sql' ? 'Join Planner (3x)' : (mode === 'doc' ? 'Doc Key Lookup' : 'Partition Hash'), active: true },
+        { id: 'st', x: 435, y: 28, w: 145, label: mode === 'sql' ? '3 Normalized Tables' : (mode === 'doc' ? '1 Self-Contained Doc' : 'Sorted SSTable Slice'), active: true, pulse: true }
+      ], [
+        { from: 'q', to: 'idx', active: true, dur: '1.1s' },
+        { from: 'idx', to: 'st', active: true, dur: mode === 'sql' ? '1.8s' : '0.9s' }
+      ]);
+      statGrid(stats, mode === 'sql'
         ? [['Read Joins', '2–3 Tables'], ['Write Fan-out', '1 Row'], ['Consistency', 'Foreign Keys + ACID']]
         : mode === 'doc'
           ? [['Read Joins', '0 (Single Document)'], ['Write Fan-out', 'Update Embedded Copies'], ['Consistency', 'Document-Atomic']]
-          : [['Read Joins', '0 (Partition Key Scan)'], ['Write Fan-out', 'Duplicated Query Tables'], ['Consistency', 'Tunable Quorum']];
-      statGrid(stats, info);
+          : [['Read Joins', '0 (Partition Key Scan)'], ['Write Fan-out', 'Duplicated Query Tables'], ['Consistency', 'Tunable Quorum']]);
     }
-    shell.appendChild(ctrl); shell.appendChild(stats); render();
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
 
-  // 22. anim-composite-index
   WIDGETS['anim-composite-index'] = function (root) {
     var shell = makeShell(root, 'Composite Index Leftmost Prefix: INDEX (tenant_id, created_at)', 'L12 · Indexing');
-    var query = 'both';
-    var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var stats = el('div', { class: 'ss-w-stats' });
+    var query = 'both', ctrl = el('div', { class: 'ss-w-ctrl' }), svg = svgEl('svg', { viewBox: '0 0 600 72', class: 'ss-w-svg' }), stats = el('div', { class: 'ss-w-stats' });
     function render() {
       ctrl.innerHTML = '';
-      [['both', 'WHERE tenant_id=? AND created_at>?'], ['left', 'WHERE tenant_id=?'], ['right', 'WHERE created_at>? (Skips Leftmost)']].forEach(function (q) {
+      [['both', 'tenant_id=? AND created_at>?'], ['left', 'tenant_id=?'], ['right', 'created_at>? (Skips Leftmost)']].forEach(function (q) {
         ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(query === q[0]), text: q[1], onClick: function () { query = q[0]; render(); } }));
       });
       var hit = query !== 'right';
-      statGrid(stats, [
-        ['Index Used?', hit ? 'YES (Index Range Seek)' : 'NO (Full Table Scan)'],
-        ['Rows Examined (10M table)', query === 'both' ? '~120 rows' : (query === 'left' ? '~2,500 rows' : '10,000,000 rows')],
-        ['Estimated Latency', query === 'both' ? '1.2 ms' : (query === 'left' ? '6 ms' : '1,850 ms')]
+      drawBars(svg, [
+        { label: 'Rows Scanned', pct: query === 'both' ? 4 : (query === 'left' ? 14 : 100), color: hit ? OK : ERR, valueText: query === 'both' ? '120 rows' : (query === 'left' ? '2,500 rows' : '10,000,000 rows!') },
+        { label: 'Query Latency', pct: query === 'both' ? 5 : (query === 'left' ? 12 : 100), color: hit ? OK : ERR, valueText: query === 'both' ? '1.2 ms' : (query === 'left' ? '6 ms' : '1,850 ms!') }
       ]);
+      statGrid(stats, [['Index Used?', hit ? 'YES (B-Tree Range Seek)' : 'NO (Full Table Scan)']]);
     }
-    shell.appendChild(ctrl); shell.appendChild(stats); render();
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
 
-  // 23. anim-presigned-upload
   WIDGETS['anim-presigned-upload'] = function (root) {
     var shell = makeShell(root, 'API Proxy Upload vs Direct Presigned Multipart Upload', 'L14 · Object Storage');
-    var direct = true;
-    var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var stats = el('div', { class: 'ss-w-stats' });
+    var direct = true, ctrl = el('div', { class: 'ss-w-ctrl' }), svg = svgEl('svg', { viewBox: '0 0 600 100', class: 'ss-w-svg' }), stats = el('div', { class: 'ss-w-stats' });
     function render() {
       ctrl.innerHTML = '';
       ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(direct), text: 'Direct Presigned Multipart (2 GB)', onClick: function () { direct = true; render(); } }));
       ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(!direct), text: 'Proxy Through API Server', onClick: function () { direct = false; render(); } }));
+      drawPipeline(svg, [
+        { id: 'c', x: 20, y: 30, w: 120, label: 'Client (2 GB)', active: true },
+        { id: 'a', x: 225, y: 12, w: 150, h: 32, label: 'API Server', sub: direct ? 'Sign URL (2 KB)' : 'Proxy 2 GB RAM!', active: true, tone: direct ? null : 'warn' },
+        { id: 's3', x: 435, y: 30, w: 145, label: 'S3 Object Store', active: true, pulse: true }
+      ], [
+        { from: 'c', to: 'a', y1: 42, y2: 28, active: true, label: direct ? 'sign call' : '2 GB upload', dur: '1.2s' },
+        { from: 'a', to: 's3', y1: 28, y2: 45, active: !direct, color: WARN, dur: '1.6s' },
+        { from: 'c', to: 's3', y1: 60, y2: 56, active: direct, color: OK, label: direct ? 'Parallel Chunks Direct!' : '', dur: '0.9s' }
+      ]);
       statGrid(stats, [
-        ['API Server Payload Bytes', direct ? '~2 KB (JSON Metadata Only)' : '2,000,000 KB (Full Video Stream)'],
-        ['Worker Thread Tie-Up', direct ? '< 15 ms per sign call' : 'Minutes per upload (OOM risk)'],
-        ['Retry Granularity', direct ? 'Retry failed 8 MB part only' : 'Restart whole 2 GB upload']
+        ['API Server Payload', direct ? '~2 KB Metadata Only' : '2,000,000 KB Stream'],
+        ['Worker Tie-Up', direct ? '< 15 ms per sign' : 'Minutes per upload (OOM risk)']
       ]);
     }
-    shell.appendChild(ctrl); shell.appendChild(stats); render();
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
 
-  // 24. anim-cache-aside-vs-through
   WIDGETS['anim-cache-aside-vs-through'] = function (root) {
     var shell = makeShell(root, 'Cache-Aside vs Write-Through vs Write-Behind', 'L15 · Caching');
-    var mode = 'aside';
-    var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var stats = el('div', { class: 'ss-w-stats' });
+    var mode = 'aside', ctrl = el('div', { class: 'ss-w-ctrl' }), svg = svgEl('svg', { viewBox: '0 0 600 95', class: 'ss-w-svg' }), stats = el('div', { class: 'ss-w-stats' });
     function render() {
       ctrl.innerHTML = '';
-      [['aside', 'Cache-Aside'], ['through', 'Write-Through'], ['behind', 'Write-Behind (Write-Back)']].forEach(function (m) {
+      [['aside', 'Cache-Aside'], ['through', 'Write-Through'], ['behind', 'Write-Behind']].forEach(function (m) {
         ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(mode === m[0]), text: m[1], onClick: function () { mode = m[0]; render(); } }));
       });
-      var data = mode === 'aside'
-        ? [['Write Latency', 'Fast (DB only)'], ['Cold Miss Penalty', 'Yes (App fetches DB)'], ['Data Loss on Cache Crash', 'None (DB authoritative)']]
+      drawPipeline(svg, [
+        { id: 'app', x: 20, y: 28, w: 120, label: 'App Service', active: true },
+        { id: 'c', x: 220, y: 28, w: 140, label: 'Redis Cache', sub: mode === 'behind' ? 'Fast ACK + Queue' : 'Cache Node', active: true, pulse: mode === 'behind' },
+        { id: 'db', x: 435, y: 28, w: 145, label: 'Primary DB', sub: mode === 'behind' ? 'Async Flush' : 'Sync Commit', active: true }
+      ], [
+        { from: 'app', to: 'c', active: mode !== 'aside', dur: '0.9s' },
+        { from: 'app', to: 'db', y1: 66, y2: 66, active: mode === 'aside', dash: true, label: mode === 'aside' ? 'Write DB directly' : '', dur: '1.3s' },
+        { from: 'c', to: 'db', active: mode !== 'aside', dash: mode === 'behind', color: mode === 'behind' ? WARN : ACCENT, dur: mode === 'behind' ? '2.2s' : '1.2s' }
+      ]);
+      statGrid(stats, mode === 'aside'
+        ? [['Write Latency', 'Fast (DB only)'], ['Data Loss Risk', 'None (DB authoritative)']]
         : mode === 'through'
-          ? [['Write Latency', 'Slower (Cache + DB sync)'], ['Cold Miss Penalty', 'Low (Cache warmed)'], ['Data Loss on Cache Crash', 'None']]
-          : [['Write Latency', 'Ultra-fast (Memory ACK)'], ['Batch DB Smoothing', 'High (Coalesced flushes)'], ['Data Loss on Cache Crash', 'Risky (Unflushed dirty keys)']];
-      statGrid(stats, data);
+          ? [['Write Latency', 'Slower (Cache + DB sync)'], ['Cold Miss Penalty', 'Low (Pre-warmed)']]
+          : [['Write Latency', 'Ultra-fast (Memory ACK)'], ['Data Loss Risk', 'Unflushed dirty keys on crash']]);
     }
-    shell.appendChild(ctrl); shell.appendChild(stats); render();
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
 
-  // 25. anim-thread-vs-eventloop
   WIDGETS['anim-thread-vs-eventloop'] = function (root) {
-    var shell = makeShell(root, 'Thread-Per-Request vs Non-Blocking Event Loop (2,000 Concurrent I/O Calls)', 'L18 · Concurrency');
-    var model = 'event';
-    var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var stats = el('div', { class: 'ss-w-stats' });
+    var shell = makeShell(root, 'Thread-Per-Request vs Non-Blocking Event Loop (2,000 Concurrent I/O)', 'L18 · Concurrency');
+    var model = 'event', ctrl = el('div', { class: 'ss-w-ctrl' }), svg = svgEl('svg', { viewBox: '0 0 600 72', class: 'ss-w-svg' }), stats = el('div', { class: 'ss-w-stats' });
     function render() {
       ctrl.innerHTML = '';
-      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(model === 'thread'), text: 'Blocking Thread Pool (200 threads)', onClick: function () { model = 'thread'; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(model === 'thread'), text: 'Blocking Pool (200 threads)', onClick: function () { model = 'thread'; render(); } }));
       ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(model === 'event'), text: 'Async Event Loop + Pool', onClick: function () { model = 'event'; render(); } }));
+      drawBars(svg, [
+        { label: 'Active Socket Load', pct: model === 'thread' ? 100 : 18, color: model === 'thread' ? ERR : OK, valueText: model === 'thread' ? '200/200 Saturated' : '1–4 Non-blocking Loops' },
+        { label: 'Request Queueing', pct: model === 'thread' ? 90 : 4, color: model === 'thread' ? WARN : OK, valueText: model === 'thread' ? '1,800 Queued!' : '0 Queued (Epoll FDs)' }
+      ]);
       statGrid(stats, model === 'thread'
-        ? [['Active Threads Blocked', '200 / 200 (100% Saturated)'], ['Queued Requests', '1,800 Waiting'], ['RAM Overhead', '~200 MB+ Thread Stacks']]
-        : [['Event Loop Threads', '1–4 Non-Blocking Loops'], ['Pending Sockets', '2,000 Epoll/Kqueue FDs'], ['Bottleneck Shifts To', 'Downstream DB Connection Pool']]);
+        ? [['RAM Overhead', '~200 MB+ Thread Stacks'], ['State', 'Blocked waiting on downstream I/O']]
+        : [['Pending Sockets', '2,000 Epoll/Kqueue FDs'], ['Bottleneck Shifts To', 'Downstream DB Connection Pool']]);
     }
-    shell.appendChild(ctrl); shell.appendChild(stats); render();
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
 
-  // 26. anim-replication-lag
   WIDGETS['anim-replication-lag'] = function (root) {
     var shell = makeShell(root, 'Async Replication Lag & Read-Your-Writes Mitigation', 'L19 · Replication');
-    var lagMs = 450, pinPrimary = false;
-    var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var stats = el('div', { class: 'ss-w-stats' });
+    var lagMs = 450, pinPrimary = false, ctrl = el('div', { class: 'ss-w-ctrl' }), svg = svgEl('svg', { viewBox: '0 0 600 95', class: 'ss-w-svg' }), stats = el('div', { class: 'ss-w-stats' });
     var inp = el('input', { type: 'range', min: '50', max: '2000', step: '50', value: String(lagMs) });
     var lbl = el('span', { text: lagMs + 'ms' });
     inp.addEventListener('input', function () { lagMs = Number(inp.value); lbl.textContent = lagMs + 'ms'; render(); });
     function render() {
       ctrl.innerHTML = '';
       ctrl.appendChild(el('label', { class: 'ss-w-slider' }, ['Replica Lag:', inp, lbl]));
-      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(pinPrimary), text: 'Route Own Writes Window to Leader: ' + (pinPrimary ? 'ON' : 'OFF'), onClick: function () { pinPrimary = !pinPrimary; render(); } }));
-      statGrid(stats, [
-        ['User Posts Comment', 'Committed on Primary at t=0ms'],
-        ['User Refreshes at t=120ms', pinPrimary ? 'Reads Primary → Sees New Comment!' : 'Reads Lagging Replica (' + lagMs + 'ms behind) → Comment Missing!'],
-        ['Replica Consistency', pinPrimary ? 'Session Read-Your-Writes Preserved' : 'Stale Read Anomaly']
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(pinPrimary), text: 'Route Own Writes to Leader: ' + (pinPrimary ? 'ON' : 'OFF'), onClick: function () { pinPrimary = !pinPrimary; render(); } }));
+      drawPipeline(svg, [
+        { id: 'u', x: 20, y: 28, w: 120, label: 'User Refresh', active: true },
+        { id: 'p', x: 225, y: 12, w: 145, h: 32, label: 'Primary Leader', sub: 'LSN 9042', active: pinPrimary, pulse: pinPrimary },
+        { id: 'r', x: 225, y: 54, w: 145, h: 32, label: 'Read Replica', sub: 'Lag ' + lagMs + 'ms', active: !pinPrimary, tone: !pinPrimary ? 'warn' : null },
+        { id: 'out', x: 440, y: 28, w: 140, label: pinPrimary ? 'Fresh Comment!' : 'Stale Read!', active: true, tone: pinPrimary ? null : 'err' }
+      ], [
+        { from: 'u', to: 'p', y1: 42, y2: 28, active: pinPrimary, dur: '1.0s' },
+        { from: 'u', to: 'r', y1: 52, y2: 70, active: !pinPrimary, color: WARN, dur: '1.2s' },
+        { from: 'p', to: 'r', x1: 297, y1: 44, x2: 297, y2: 54, active: true, dash: true, dur: '1.6s' },
+        { from: 'p', to: 'out', y1: 28, y2: 45, active: pinPrimary, dur: '1.0s' },
+        { from: 'r', to: 'out', y1: 70, y2: 55, active: !pinPrimary, color: ERR, dur: '1.2s' }
       ]);
+      statGrid(stats, [['Consistency', pinPrimary ? 'Session Read-Your-Writes OK' : 'Stale Read Anomaly (' + lagMs + ' ms behind)']]);
     }
-    shell.appendChild(ctrl); shell.appendChild(stats); render();
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
 
-  // 27. anim-key-salting
   WIDGETS['anim-key-salting'] = function (root) {
     var shell = makeShell(root, 'Celebrity Hot Partition Mitigation via Key Salting', 'L21 · Sharding');
-    var salted = false;
-    var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var svg = svgEl('svg', { viewBox: '0 0 600 110', class: 'ss-w-svg' });
+    var salted = false, ctrl = el('div', { class: 'ss-w-ctrl' }), svg = svgEl('svg', { viewBox: '0 0 600 120', class: 'ss-w-svg' });
     function render() {
       ctrl.innerHTML = '';
-      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(!salted), text: 'Unsalted Key: celeb_id', onClick: function () { salted = false; render(); } }));
-      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(salted), text: 'Salted Key: celeb_id#[0..3]', onClick: function () { salted = true; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(!salted), text: 'Unsalted: celeb_id', onClick: function () { salted = false; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(salted), text: 'Salted: celeb_id#[0..3]', onClick: function () { salted = true; render(); } }));
       var loads = salted ? [28, 26, 24, 22] : [92, 3, 3, 2];
-      svg.innerHTML = '';
-      loads.forEach(function (pct, idx) {
-        var y = 14 + idx * 24;
-        svg.appendChild(svgEl('text', { x: 14, y: y + 14, 'font-size': '12', fill: 'var(--ink,#0f172a)', text: 'Shard ' + (idx + 1) }));
-        svg.appendChild(svgEl('rect', { x: 85, y: y + 2, width: pct * 4.2, height: 16, rx: 3, fill: pct > 70 ? 'var(--status-err,#b91c1c)' : 'var(--accent,#4f46e5)' }));
-        svg.appendChild(svgEl('text', { x: 95 + pct * 4.2, y: y + 14, 'font-size': '11', 'font-weight': '700', fill: 'var(--ink,#0f172a)', text: pct + '% Traffic' }));
-      });
+      drawBars(svg, loads.map(function (pct, idx) {
+        return { label: 'Shard ' + (idx + 1), pct: pct, color: pct > 70 ? ERR : ACCENT, valueText: pct + '% Traffic' };
+      }));
     }
     shell.appendChild(ctrl); shell.appendChild(svg); render();
   };
 
-  // 28. anim-uuid4-vs-uuid7-btree
   WIDGETS['anim-uuid4-vs-uuid7-btree'] = function (root) {
-    var shell = makeShell(root, 'B-Tree Index Behavior: Random UUIDv4 vs Time-Ordered UUIDv7 / Snowflake', 'L22 · Distributed IDs');
-    var idType = 'uuid7';
-    var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var stats = el('div', { class: 'ss-w-stats' });
+    var shell = makeShell(root, 'B-Tree Index Locality: Random UUIDv4 vs Time-Ordered UUIDv7', 'L22 · Distributed IDs');
+    var idType = 'uuid7', ctrl = el('div', { class: 'ss-w-ctrl' }), svg = svgEl('svg', { viewBox: '0 0 600 72', class: 'ss-w-svg' }), stats = el('div', { class: 'ss-w-stats' });
     function render() {
       ctrl.innerHTML = '';
       ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(idType === 'uuid4'), text: 'UUIDv4 (Random)', onClick: function () { idType = 'uuid4'; render(); } }));
-      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(idType === 'uuid7'), text: 'UUIDv7 / Snowflake (Time-Ordered)', onClick: function () { idType = 'uuid7'; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(idType === 'uuid7'), text: 'UUIDv7 / Snowflake (Ordered)', onClick: function () { idType = 'uuid7'; render(); } }));
+      drawBars(svg, [
+        { label: 'Buffer Pool Hit %', pct: idType === 'uuid7' ? 96 : 22, color: idType === 'uuid7' ? OK : ERR, valueText: idType === 'uuid7' ? '96% Hot Leaf' : '22% Page Thrash' },
+        { label: 'B-Tree Page Splits', pct: idType === 'uuid7' ? 6 : 85, color: idType === 'uuid7' ? OK : WARN, valueText: idType === 'uuid7' ? 'Minimal Append' : 'Heavy 50% Splits' }
+      ]);
       statGrid(stats, idType === 'uuid4'
-        ? [['Insert Locality', 'Random across entire B-Tree'], ['Buffer Pool Cache Hit', 'Low (Cold page thrashing)'], ['Page Splits & Write Amp', 'High (50% sparse pages)']]
-        : [['Insert Locality', 'Monotonic right-edge append'], ['Buffer Pool Cache Hit', 'High (Hot rightmost leaf)'], ['Page Splits & Write Amp', 'Minimal (Dense sequential fill)']]);
+        ? [['Insert Locality', 'Random across full B-Tree'], ['Write Amp', 'High']]
+        : [['Insert Locality', 'Monotonic rightmost append'], ['Write Amp', 'Minimal (dense pages)']]);
     }
-    shell.appendChild(ctrl); shell.appendChild(stats); render();
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
 
-  // 29. sim-consumer-group
   WIDGETS['sim-consumer-group'] = function (root) {
-    var shell = makeShell(root, 'Kafka-Style Partitioned Log & Consumer Group Scaling', 'L23 · Streaming');
-    var partitions = 4, consumers = 2;
-    var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var stats = el('div', { class: 'ss-w-stats' });
+    var shell = makeShell(root, 'Kafka Partitioned Log & Consumer Group Scaling', 'L23 · Streaming');
+    var partitions = 4, consumers = 2, ctrl = el('div', { class: 'ss-w-ctrl' }), svg = svgEl('svg', { viewBox: '0 0 600 95', class: 'ss-w-svg' }), stats = el('div', { class: 'ss-w-stats' });
     function render() {
       ctrl.innerHTML = '';
       ctrl.appendChild(el('button', { class: 'ss-w-btn primary', text: '+ Add Consumer (' + consumers + ')', onClick: function () { consumers = Math.min(6, consumers + 1); render(); } }));
       ctrl.appendChild(el('button', { class: 'ss-w-btn', text: '- Remove Consumer', onClick: function () { consumers = Math.max(1, consumers - 1); render(); } }));
-      var active = Math.min(consumers, partitions);
-      var idle = Math.max(0, consumers - partitions);
-      statGrid(stats, [
-        ['Topic Partitions', String(partitions)],
-        ['Active Consumers', active + ' (max 1 consumer per partition)'],
-        ['Idle Consumers', idle > 0 ? idle + ' Idle (Increase partitions to scale further)' : '0 Idle']
-      ]);
+      var active = Math.min(consumers, partitions), idle = Math.max(0, consumers - partitions);
+      var nodes = [0, 1, 2, 3].map(function (p) {
+        return { id: 'p' + p, x: 24 + p * 140, y: 12, w: 112, h: 30, label: 'Partition P' + p, active: true };
+      });
+      for (var c = 0; c < consumers; c++) {
+        var isIdle = c >= partitions;
+        nodes.push({ id: 'c' + c, x: 24 + (c % 4) * 140 + (isIdle ? 18 : 0), y: isIdle ? 58 : 54, w: 112, h: 30, label: isIdle ? 'Consumer (IDLE)' : 'Consumer C' + c, active: !isIdle, tone: isIdle ? 'warn' : null });
+      }
+      var edges = [];
+      for (var k = 0; k < active; k++) edges.push({ from: 'p' + k, to: 'c' + k, x1: 80 + k * 140, y1: 42, x2: 80 + k * 140, y2: 54, active: true, dur: '1.1s' });
+      drawPipeline(svg, nodes, edges);
+      statGrid(stats, [['Partitions', String(partitions)], ['Active Consumers', String(active)], ['Idle Consumers', idle > 0 ? idle + ' Idle (Max 1 per partition!)' : '0 Idle']]);
     }
-    shell.appendChild(ctrl); shell.appendChild(stats); render();
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
 
-  // 30. anim-delivery-semantics
   WIDGETS['anim-delivery-semantics'] = function (root) {
     var shell = makeShell(root, 'Message Delivery Semantics & Crash Timing', 'L24 · Messaging');
-    var crash = 'before-ack';
-    var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var stats = el('div', { class: 'ss-w-stats' });
+    var crash = 'before-ack', ctrl = el('div', { class: 'ss-w-ctrl' }), svg = svgEl('svg', { viewBox: '0 0 600 95', class: 'ss-w-svg' }), stats = el('div', { class: 'ss-w-stats' });
     function render() {
       ctrl.innerHTML = '';
-      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(crash === 'before-work'), text: 'At-Most-Once (ACK first, crash in work)', onClick: function () { crash = 'before-work'; render(); } }));
-      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(crash === 'before-ack'), text: 'At-Least-Once (Work first, crash before ACK)', onClick: function () { crash = 'before-ack'; render(); } }));
-      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(crash === 'idem'), text: 'At-Least-Once + Idempotent Dedup', onClick: function () { crash = 'idem'; render(); } }));
+      [['before-work', 'At-Most-Once'], ['before-ack', 'At-Least-Once'], ['idem', 'At-Least-Once + Dedup']].forEach(function (m) {
+        ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(crash === m[0]), text: m[1], onClick: function () { crash = m[0]; render(); } }));
+      });
+      drawPipeline(svg, [
+        { id: 'b', x: 20, y: 28, w: 120, label: 'Broker Queue', active: true },
+        { id: 'w', x: 225, y: 28, w: 145, label: 'Worker + Crash', sub: crash === 'before-work' ? 'ACK before work' : 'Retry redelivery', active: true, tone: crash === 'idem' ? null : 'warn' },
+        { id: 's', x: 435, y: 28, w: 145, label: crash === 'before-work' ? 'LOST Event' : (crash === 'before-ack' ? 'Runs TWICE!' : 'Runs ONCE!'), active: true, tone: crash === 'idem' ? null : 'err', pulse: true }
+      ], [
+        { from: 'b', to: 'w', active: true, dur: '1.1s' },
+        { from: 'w', to: 's', active: crash !== 'before-work', color: crash === 'idem' ? OK : ERR, dur: '1.2s' }
+      ]);
       statGrid(stats, crash === 'before-work'
-        ? [['Outcome', 'Message LOST permanently'], ['Safe For', 'Best-effort metrics / telemetry']]
+        ? [['Outcome', 'Message LOST permanently']]
         : crash === 'before-ack'
-          ? [['Outcome', 'Broker redelivers → Side effect runs TWICE'], ['Safe For', 'Needs idempotent handler']]
-          : [['Outcome', 'Redelivery detected via event_id → Side effect runs ONCE'], ['Safe For', 'Payments, emails, inventory']]);
+          ? [['Outcome', 'Side effect runs TWICE (needs idempotency)']]
+          : [['Outcome', 'Deduped via event_id -> Safe for payments']]);
     }
-    shell.appendChild(ctrl); shell.appendChild(stats); render();
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
 
-  // 31. anim-inverted-index-lookup
   WIDGETS['anim-inverted-index-lookup'] = function (root) {
     var shell = makeShell(root, 'Inverted Index Posting List Intersection', 'L26 · Search');
-    var q = 'both';
-    var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var stats = el('div', { class: 'ss-w-stats' });
+    var q = 'both', ctrl = el('div', { class: 'ss-w-ctrl' }), svg = svgEl('svg', { viewBox: '0 0 600 95', class: 'ss-w-svg' }), stats = el('div', { class: 'ss-w-stats' });
     function render() {
       ctrl.innerHTML = '';
-      [['sys', 'Query: "system"'], ['des', 'Query: "design"'], ['both', 'Query: "system design"']].forEach(function (x) {
+      [['sys', '"system"'], ['des', '"design"'], ['both', '"system design"']].forEach(function (x) {
         ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(q === x[0]), text: x[1], onClick: function () { q = x[0]; render(); } }));
       });
-      statGrid(stats, [
-        ['Posting List: "system"', '[Doc 1, Doc 4, Doc 9]'],
-        ['Posting List: "design"', '[Doc 2, Doc 4, Doc 9]'],
-        ['Matched Docs (BM25 Ranked)', q === 'sys' ? '[Doc 1, Doc 4, Doc 9]' : (q === 'des' ? '[Doc 2, Doc 4, Doc 9]' : '[Doc 4, Doc 9] (Intersection)')]
+      drawPipeline(svg, [
+        { id: 'p1', x: 20, y: 12, w: 170, h: 32, label: '"system" -> [1, 4, 9]', active: q !== 'des' },
+        { id: 'p2', x: 20, y: 52, w: 170, h: 32, label: '"design" -> [2, 4, 9]', active: q !== 'sys' },
+        { id: 'bm', x: 280, y: 26, w: 130, h: 42, label: 'Intersect + BM25', active: true },
+        { id: 'out', x: 460, y: 26, w: 120, h: 42, label: q === 'sys' ? '[Doc 1, 4, 9]' : (q === 'des' ? '[Doc 2, 4, 9]' : '[Doc 4, 9]'), active: true, pulse: true }
+      ], [
+        { from: 'p1', to: 'bm', y1: 28, y2: 42, active: q !== 'des', dur: '1.1s' },
+        { from: 'p2', to: 'bm', y1: 68, y2: 52, active: q !== 'sys', dur: '1.1s' },
+        { from: 'bm', to: 'out', active: true, dur: '1.0s' }
       ]);
+      statGrid(stats, [['Matched Docs', q === 'sys' ? 'Doc 1, 4, 9' : (q === 'des' ? 'Doc 2, 4, 9' : 'Doc 4, 9 (Intersection)')]]);
     }
-    shell.appendChild(ctrl); shell.appendChild(stats); render();
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
 
-  // 32. anim-watermark-late-events
   WIDGETS['anim-watermark-late-events'] = function (root) {
     var shell = makeShell(root, 'Event-Time Stream Window & Watermark Lateness', 'L27 · Streaming');
-    var slack = 2;
-    var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var stats = el('div', { class: 'ss-w-stats' });
+    var slack = 2, ctrl = el('div', { class: 'ss-w-ctrl' }), svg = svgEl('svg', { viewBox: '0 0 600 95', class: 'ss-w-svg' }), stats = el('div', { class: 'ss-w-stats' });
     var inp = el('input', { type: 'range', min: '0', max: '10', value: String(slack) });
     var lbl = el('span', { text: slack + 's' });
     inp.addEventListener('input', function () { slack = Number(inp.value); lbl.textContent = slack + 's'; render(); });
-    ctrl.appendChild(el('label', { class: 'ss-w-slider' }, ['Allowed Watermark Slack:', inp, lbl]));
+    ctrl.appendChild(el('label', { class: 'ss-w-slider' }, ['Watermark Slack:', inp, lbl]));
     function render() {
-      var lateEventDelay = 6;
+      var included = 6 <= slack;
+      drawPipeline(svg, [
+        { id: 'ev', x: 20, y: 28, w: 145, label: 'Mobile Click', sub: '6s tunnel delay', active: true },
+        { id: 'wm', x: 230, y: 28, w: 140, label: 'Watermark W(t)', sub: 'Slack = ' + slack + 's', active: true },
+        { id: 'out', x: 430, y: 28, w: 150, label: included ? 'Main Window Sum' : 'Late Side Output', active: true, tone: included ? null : 'warn', pulse: true }
+      ], [
+        { from: 'ev', to: 'wm', active: true, dur: '1.2s' },
+        { from: 'wm', to: 'out', active: true, color: included ? OK : WARN, dur: '1.2s' }
+      ]);
       statGrid(stats, [
-        ['Window Closed At', '12:01:00 + ' + slack + 's slack'],
-        ['Mobile Event Delayed 6s', lateEventDelay <= slack ? 'Included in Primary Window Aggregate' : 'Dropped or Routed to Late-Data Side Output'],
-        ['Latency vs Completeness', slack < 3 ? 'Fast Results (Lower Completeness)' : 'Higher Completeness (+' + slack + 's Window Delay)']
+        ['Window Close', '12:01:00 + ' + slack + 's'],
+        ['6s Delayed Click', included ? 'Included in Primary Window' : 'Routed to Late Side Output']
       ]);
     }
-    shell.appendChild(ctrl); shell.appendChild(stats); render();
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
 
-  // 33. anim-lease-expiry
   WIDGETS['anim-lease-expiry'] = function (root) {
     var shell = makeShell(root, 'etcd / ZooKeeper Ephemeral Lease Renewal & Handoff', 'L32 · Coordination');
-    var alive = true;
-    var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var stats = el('div', { class: 'ss-w-stats' });
+    var alive = true, ctrl = el('div', { class: 'ss-w-ctrl' }), svg = svgEl('svg', { viewBox: '0 0 600 95', class: 'ss-w-svg' }), stats = el('div', { class: 'ss-w-stats' });
     function render() {
       ctrl.innerHTML = '';
-      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(alive), text: 'Leader Heartbeat: ' + (alive ? 'HEALTHY' : 'STOPPED (Network Cut)'), onClick: function () { alive = !alive; render(); } }));
-      statGrid(stats, [
-        ['Lease TTL', '10 seconds (Heartbeat every 3s)'],
-        ['Current Leader', alive ? 'Node A (Lease Renewed)' : 'Lease Expired → Node B Acquires Key'],
-        ['Safety Requirement', 'Node A must step down & storage enforces Fencing Token']
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(alive), text: 'Heartbeat: ' + (alive ? 'HEALTHY' : 'STOPPED'), onClick: function () { alive = !alive; render(); } }));
+      drawPipeline(svg, [
+        { id: 'a', x: 20, y: 12, w: 140, h: 32, label: 'Node A', sub: alive ? 'Active Leader' : 'Network Partitioned', active: alive, tone: alive ? null : 'err', pulse: alive },
+        { id: 'b', x: 20, y: 52, w: 140, h: 32, label: 'Node B', sub: alive ? 'Standby Watch' : 'Promoted Leader!', active: !alive, pulse: !alive },
+        { id: 'e', x: 245, y: 26, w: 140, h: 42, label: 'etcd Lease (10s)', sub: alive ? 'Renewed rev=891' : 'Expired -> rev=892', active: true },
+        { id: 'db', x: 445, y: 26, w: 135, h: 42, label: 'Fenced Storage', sub: alive ? 'Accept rev >= 891' : 'Accept rev >= 892', active: true }
+      ], [
+        { from: 'a', to: 'e', y1: 28, y2: 42, active: alive, dur: '1.0s' },
+        { from: 'b', to: 'e', y1: 68, y2: 52, active: !alive, dur: '1.1s' },
+        { from: 'e', to: 'db', active: true, dur: '1.2s' }
       ]);
+      statGrid(stats, [['Current Leader', alive ? 'Node A (Lease Renewed)' : 'Node B (Fencing Token Bumped)']]);
     }
-    shell.appendChild(ctrl); shell.appendChild(stats); render();
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
 
-  // 34. sim-load-shedding
   WIDGETS['sim-load-shedding'] = function (root) {
     var shell = makeShell(root, 'Overload Control: Unbounded FIFO vs Priority Load Shedding', 'L33 · Reliability');
-    var load = 130, shed = true;
-    var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var stats = el('div', { class: 'ss-w-stats' });
+    var load = 130, shed = true, ctrl = el('div', { class: 'ss-w-ctrl' }), svg = svgEl('svg', { viewBox: '0 0 600 72', class: 'ss-w-svg' }), stats = el('div', { class: 'ss-w-stats' });
     var inp = el('input', { type: 'range', min: '70', max: '160', step: '10', value: String(load) });
     var lbl = el('span', { text: load + '%' });
     inp.addEventListener('input', function () { load = Number(inp.value); lbl.textContent = load + '%'; render(); });
     function render() {
       ctrl.innerHTML = '';
-      ctrl.appendChild(el('label', { class: 'ss-w-slider' }, ['Incoming Load (% Capacity):', inp, lbl]));
-      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(shed), text: 'Priority Load Shedding: ' + (shed ? 'ON' : 'OFF'), onClick: function () { shed = !shed; render(); } }));
+      ctrl.appendChild(el('label', { class: 'ss-w-slider' }, ['Incoming Load:', inp, lbl]));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(shed), text: 'Priority Shedding: ' + (shed ? 'ON' : 'OFF'), onClick: function () { shed = !shed; render(); } }));
       var over = load > 100;
-      statGrid(stats, [
-        ['Critical Checkout p99', !over ? '45 ms' : (shed ? '58 ms (Protected!)' : '8,500+ ms (Timeout Collapse)')],
-        ['Low-Priority Traffic', !over ? '100% Served' : (shed ? 'Shed with 503 + Retry-After' : 'Queues & Starves Everything')],
-        ['Goodput (Useful Work/s)', !over ? load + '%' : (shed ? '98% Capacity' : '< 15% (Death Spiral)')]
+      drawBars(svg, [
+        { label: 'Useful Goodput', pct: !over ? load : (shed ? 96 : 14), color: !over || shed ? OK : ERR, valueText: !over ? load + '% Served' : (shed ? '96% Critical Protected' : '14% Collapse!') },
+        { label: 'Checkout p99', pct: !over ? 12 : (shed ? 16 : 100), color: !over || shed ? OK : ERR, valueText: !over ? '45 ms' : (shed ? '58 ms' : '8,500 ms Timeout!') }
       ]);
+      statGrid(stats, [['Low-Priority', !over ? '100% Served' : (shed ? 'Shed Fast (503 Retry-After)' : 'Queues & Starves All')]]);
     }
-    shell.appendChild(ctrl); shell.appendChild(stats); render();
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
 
-  // 35. anim-distributed-trace
   WIDGETS['anim-distributed-trace'] = function (root) {
     var shell = makeShell(root, 'Distributed Trace Waterfall (OpenTelemetry)', 'L34 · Observability');
-    var fixed = false;
-    var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var svg = svgEl('svg', { viewBox: '0 0 600 120', class: 'ss-w-svg' });
+    var fixed = false, ctrl = el('div', { class: 'ss-w-ctrl' }), svg = svgEl('svg', { viewBox: '0 0 600 116', class: 'ss-w-svg' });
     function render() {
       ctrl.innerHTML = '';
-      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(!fixed), text: 'Buggy Trace (N+1 DB Calls · 420ms)', onClick: function () { fixed = false; render(); } }));
-      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(fixed), text: 'Batched Query Fix (65ms)', onClick: function () { fixed = true; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(!fixed), text: 'Buggy N+1 DB (420 ms)', onClick: function () { fixed = false; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(fixed), text: 'Batched Query Fix (65 ms)', onClick: function () { fixed = true; render(); } }));
       svg.innerHTML = '';
       var spans = [
-        { name: 'Gateway', x: 120, w: fixed ? 80 : 440, c: 'var(--accent,#4f46e5)' },
-        { name: 'Auth Check', x: 130, w: 30, c: 'var(--status-ok,#15803d)' },
-        { name: 'Order DB', x: 165, w: fixed ? 28 : 370, c: fixed ? 'var(--status-ok,#15803d)' : 'var(--status-err,#b91c1c)' },
-        { name: 'Kafka Pub', x: fixed ? 195 : 538, w: 20, c: 'var(--accent,#4f46e5)' }
+        { name: 'Gateway', x: 120, w: fixed ? 80 : 440, c: ACCENT },
+        { name: 'Auth Check', x: 130, w: 30, c: OK },
+        { name: 'Order DB', x: 165, w: fixed ? 28 : 370, c: fixed ? OK : ERR },
+        { name: 'Kafka Pub', x: fixed ? 195 : 538, w: 22, c: ACCENT }
       ];
       spans.forEach(function (sp, i) {
-        var y = 14 + i * 26;
-        svg.appendChild(svgEl('text', { x: 12, y: y + 14, 'font-size': '12', fill: 'var(--ink,#0f172a)', text: sp.name }));
+        var y = 12 + i * 26;
+        svg.appendChild(svgEl('text', { x: 12, y: y + 14, 'font-size': '12', fill: INK, text: sp.name }));
         svg.appendChild(svgEl('rect', { x: sp.x, y: y + 2, width: sp.w, height: 16, rx: 3, fill: sp.c }));
+        addPacket(svg, 'M ' + sp.x + ' ' + (y + 10) + ' L ' + (sp.x + sp.w) + ' ' + (y + 10), ACCENT_INK, '1.5s', (i * 0.22) + 's');
       });
     }
     shell.appendChild(ctrl); shell.appendChild(svg); render();
   };
 
-  // 36. anim-canary-rollback
   WIDGETS['anim-canary-rollback'] = function (root) {
     var shell = makeShell(root, 'SLO-Gated Progressive Canary Rollout', 'L36 · Deployments');
-    var stage = 1, errorSpike = false;
-    var pcts = ['1%', '10%', '50%', '100%'];
-    var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var stats = el('div', { class: 'ss-w-stats' });
+    var stage = 1, errorSpike = false, pcts = ['1%', '10%', '50%', '100%'];
+    var ctrl = el('div', { class: 'ss-w-ctrl' }), svg = svgEl('svg', { viewBox: '0 0 600 95', class: 'ss-w-svg' }), stats = el('div', { class: 'ss-w-stats' });
     function render() {
       ctrl.innerHTML = '';
       ctrl.appendChild(el('button', { class: 'ss-w-btn primary', text: 'Advance Canary (' + pcts[stage] + ')', onClick: function () { if (!errorSpike) stage = (stage + 1) % 4; render(); } }));
-      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(errorSpike), text: errorSpike ? 'Clear Error Spike' : 'Inject 5xx Error Spike', onClick: function () { errorSpike = !errorSpike; if (errorSpike) stage = 0; render(); } }));
-      statGrid(stats, [
-        ['Canary Traffic Weight', errorSpike ? '0% (Auto-Rolled Back!)' : pcts[stage]],
-        ['Canary 5xx Error Rate', errorSpike ? '4.8% (> 0.5% SLO Gate)' : '0.02% (Healthy)'],
-        ['Blast Radius', errorSpike ? 'Contained to initial 1–10% canary slice' : 'Safe progressive promotion']
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(errorSpike), text: errorSpike ? 'Clear Spike' : 'Inject 5xx Spike', onClick: function () { errorSpike = !errorSpike; if (errorSpike) stage = 0; render(); } }));
+      drawPipeline(svg, [
+        { id: 'r', x: 20, y: 28, w: 120, label: 'Mesh Router', active: true },
+        { id: 'v1', x: 220, y: 10, w: 150, h: 32, label: 'Baseline v2.13', active: true },
+        { id: 'v2', x: 220, y: 52, w: 150, h: 32, label: 'Canary v2.14 (' + (errorSpike ? '0%' : pcts[stage]) + ')', active: !errorSpike, tone: errorSpike ? 'err' : null },
+        { id: 'slo', x: 435, y: 28, w: 145, label: errorSpike ? 'ROLLED BACK!' : 'SLO Gate Healthy', active: true, tone: errorSpike ? 'err' : null, pulse: true }
+      ], [
+        { from: 'r', to: 'v1', y1: 42, y2: 26, active: true, dur: '1.1s' },
+        { from: 'r', to: 'v2', y1: 52, y2: 68, active: !errorSpike, color: errorSpike ? ERR : ACCENT, dur: '1.3s' },
+        { from: 'v2', to: 'slo', y1: 68, y2: 50, active: true, color: errorSpike ? ERR : OK, dur: '1.1s' }
       ]);
+      statGrid(stats, [['5xx Rate', errorSpike ? '4.8% (> 0.5% Gate)' : '0.02% Healthy'], ['Blast Radius', errorSpike ? 'Contained at <=10%' : 'Safe promotion']]);
     }
-    shell.appendChild(ctrl); shell.appendChild(stats); render();
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
 
-  // 37. anim-region-failover
   WIDGETS['anim-region-failover'] = function (root) {
     var shell = makeShell(root, 'Multi-Region Failover: RPO & RTO Simulator', 'L37 · Multi-Region');
-    var mode = 'active-passive', outage = false;
-    var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var stats = el('div', { class: 'ss-w-stats' });
+    var mode = 'active-passive', outage = false, ctrl = el('div', { class: 'ss-w-ctrl' }), svg = svgEl('svg', { viewBox: '0 0 600 95', class: 'ss-w-svg' }), stats = el('div', { class: 'ss-w-stats' });
     function render() {
       ctrl.innerHTML = '';
-      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(mode === 'active-passive'), text: 'Active-Passive (Warm Standby)', onClick: function () { mode = 'active-passive'; render(); } }));
-      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(mode === 'active-active'), text: 'Active-Active (Multi-Region)', onClick: function () { mode = 'active-active'; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(mode === 'active-passive'), text: 'Active-Passive', onClick: function () { mode = 'active-passive'; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(mode === 'active-active'), text: 'Active-Active', onClick: function () { mode = 'active-active'; render(); } }));
       ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(outage), text: outage ? 'Restore US-East' : 'Blackout US-East', onClick: function () { outage = !outage; render(); } }));
+      drawPipeline(svg, [
+        { id: 'dns', x: 20, y: 28, w: 120, label: 'Anycast GeoDNS', active: true },
+        { id: 'us', x: 230, y: 10, w: 145, h: 32, label: 'US-East', sub: outage ? 'OUTAGE!' : 'Serving', active: !outage, tone: outage ? 'err' : null },
+        { id: 'eu', x: 230, y: 52, w: 145, h: 32, label: 'EU-West', sub: outage || mode === 'active-active' ? 'Serving Live' : 'Warm Standby', active: outage || mode === 'active-active', pulse: outage },
+        { id: 'crr', x: 440, y: 28, w: 140, label: 'Cross-Region WAL', sub: outage ? 'Standby Promoted' : 'Async CRR 80 ms', active: !outage }
+      ], [
+        { from: 'dns', to: 'us', y1: 42, y2: 26, active: !outage, dur: '1.1s' },
+        { from: 'dns', to: 'eu', y1: 54, y2: 68, active: outage || mode === 'active-active', dur: '1.1s' },
+        { from: 'us', to: 'crr', y1: 26, y2: 44, active: !outage, dash: true, dur: '1.7s' }
+      ]);
       statGrid(stats, [
-        ['US-East Status', outage ? 'DOWN' : 'Serving 50–100%'],
-        ['Expected RTO (Recovery Time)', !outage ? '0s' : (mode === 'active-active' ? '~10–30s (Healthcheck DNS shift)' : '~5–15 min (Promote standby)')],
-        ['RPO (Async Replication Gap)', mode === 'active-active' ? 'Sub-second to few seconds' : 'Seconds to minutes depending on WAL lag']
+        ['US-East', outage ? 'DOWN' : 'Serving'],
+        ['Expected RTO', !outage ? '0s' : (mode === 'active-active' ? '10–30s DNS shift' : '5–15 min Standby Promote')]
       ]);
     }
-    shell.appendChild(ctrl); shell.appendChild(stats); render();
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
 
-  // 38. anim-adr-tradeoff-radar
   WIDGETS['anim-adr-tradeoff-radar'] = function (root) {
     var shell = makeShell(root, 'Architecture Option Trade-Off Matrix (ADR Explorer)', 'L38 · Mastery');
-    var opt = 'mod';
-    var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var stats = el('div', { class: 'ss-w-stats' });
+    var opt = 'mod', ctrl = el('div', { class: 'ss-w-ctrl' }), svg = svgEl('svg', { viewBox: '0 0 600 95', class: 'ss-w-svg' }), stats = el('div', { class: 'ss-w-stats' });
     function render() {
       ctrl.innerHTML = '';
-      [['mod', 'Modular Monolith'], ['micro', 'Event-Driven Microservices'], ['sl', 'Serverless Functions']].forEach(function (o) {
+      [['mod', 'Modular Monolith'], ['micro', 'Microservices'], ['sl', 'Serverless']].forEach(function (o) {
         ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(opt === o[0]), text: o[1], onClick: function () { opt = o[0]; render(); } }));
       });
-      var rows = opt === 'mod'
-        ? [['Operational Cost', 'Lowest'], ['Tail Latency', 'In-Process (< 5ms)'], ['Team Autonomy at 100+ Devs', 'Harder (Shared Deploy)']]
+      drawBars(svg, opt === 'mod'
+        ? [{ label: 'Simplicity & Speed', pct: 92, valueText: 'Highest' }, { label: 'Team Independence', pct: 45, color: WARN, valueText: 'Shared Deploy' }]
         : opt === 'micro'
-          ? [['Operational Cost', 'High (Mesh + Tracing + Queues)'], ['Tail Latency', 'Network Hops + Serialization'], ['Team Autonomy at 100+ Devs', 'High (Independent Releases)']]
-          : [['Operational Cost', 'Pay-Per-Use (Spiky Fit)'], ['Tail Latency', 'Cold Starts Possible'], ['Stateful Connection Limits', 'Needs HTTP DB Proxy']];
-      statGrid(stats, rows);
+          ? [{ label: 'Ops Cost & Mesh', pct: 86, color: WARN, valueText: 'High Overhead' }, { label: 'Team Independence', pct: 95, valueText: 'Independent CI/CD' }]
+          : [{ label: 'Idle Cost Savings', pct: 90, valueText: 'Scale to Zero' }, { label: 'Tail Cold Start', pct: 68, color: WARN, valueText: 'Warmup / Pool Needed' }]);
+      statGrid(stats, opt === 'mod'
+        ? [['Tail Latency', 'In-Process (< 5 ms)']]
+        : opt === 'micro'
+          ? [['Tail Latency', 'Network Hops + Serialization']]
+          : [['DB Connections', 'Needs HTTP Connection Pool / Proxy']]);
     }
-    shell.appendChild(ctrl); shell.appendChild(stats); render();
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
 
-  // 39. anim-llm-token-streaming
   WIDGETS['anim-llm-token-streaming'] = function (root) {
     var shell = makeShell(root, 'LLM Gateway: Semantic Cache & Token Streaming Latency', 'L39 · AI Systems');
-    var cacheHit = false, batching = true;
-    var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var stats = el('div', { class: 'ss-w-stats' });
+    var cacheHit = false, batching = true, ctrl = el('div', { class: 'ss-w-ctrl' }), svg = svgEl('svg', { viewBox: '0 0 600 95', class: 'ss-w-svg' }), stats = el('div', { class: 'ss-w-stats' });
     function render() {
       ctrl.innerHTML = '';
-      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(cacheHit), text: 'Semantic Cache Hit: ' + (cacheHit ? 'YES' : 'NO'), onClick: function () { cacheHit = !cacheHit; render(); } }));
+      ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(cacheHit), text: 'Semantic Cache: ' + (cacheHit ? 'HIT' : 'MISS'), onClick: function () { cacheHit = !cacheHit; render(); } }));
       ctrl.appendChild(el('button', { class: 'ss-w-btn', 'data-active': String(batching), text: 'Continuous Batching: ' + (batching ? 'ON' : 'OFF'), onClick: function () { batching = !batching; render(); } }));
+      drawPipeline(svg, [
+        { id: 'gw', x: 20, y: 28, w: 120, label: 'AI Gateway', sub: 'SSE Stream', active: true },
+        { id: 'sc', x: 215, y: 28, w: 145, label: 'Vector Cache', sub: cacheHit ? 'Sim >= 0.94 HIT!' : 'Miss -> Infer', active: true, pulse: cacheHit },
+        { id: 'gpu', x: 435, y: 28, w: 145, label: 'vLLM GPU Workers', sub: batching ? 'Continuous Batch' : 'HoL Queue!', active: !cacheHit, tone: !cacheHit && !batching ? 'warn' : null }
+      ], [
+        { from: 'gw', to: 'sc', active: true, dur: '0.8s' },
+        { from: 'sc', to: 'gpu', active: !cacheHit, dur: batching ? '1.2s' : '2.4s', color: !batching ? WARN : ACCENT }
+      ]);
       statGrid(stats, [
-        ['Time to First Token (TTFT)', cacheHit ? '35 ms (Vector Cache)' : (batching ? '420 ms' : '1,800 ms (Head-of-Line Queue)')],
-        ['GPU Cost / 1M Tokens', cacheHit ? '$0 (Bypassed Inference)' : (batching ? '1× Baseline' : '3.5× Under-Utilized')],
-        ['Transport', 'HTTP SSE Token Stream + Per-Tenant Token Bucket']
+        ['TTFT', cacheHit ? '35 ms (Cached)' : (batching ? '420 ms' : '1,800 ms')],
+        ['GPU Cost', cacheHit ? '$0' : (batching ? '1× Baseline' : '3.5× Idle Loss')]
       ]);
     }
-    shell.appendChild(ctrl); shell.appendChild(stats); render();
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
 
-  // 40. anim-strangler-cutover
   WIDGETS['anim-strangler-cutover'] = function (root) {
     var shell = makeShell(root, 'Strangler Fig Incremental Monolith Extraction', 'L40 · Evolution');
-    var pct = 25;
-    var ctrl = el('div', { class: 'ss-w-ctrl' });
-    var stats = el('div', { class: 'ss-w-stats' });
+    var pct = 25, ctrl = el('div', { class: 'ss-w-ctrl' }), svg = svgEl('svg', { viewBox: '0 0 600 95', class: 'ss-w-svg' }), stats = el('div', { class: 'ss-w-stats' });
     var inp = el('input', { type: 'range', min: '0', max: '100', step: '25', value: String(pct) });
     var lbl = el('span', { text: pct + '%' });
     inp.addEventListener('input', function () { pct = Number(inp.value); lbl.textContent = pct + '%'; render(); });
-    ctrl.appendChild(el('label', { class: 'ss-w-slider' }, ['Extracted Service Traffic:', inp, lbl]));
+    ctrl.appendChild(el('label', { class: 'ss-w-slider' }, ['Extracted Traffic:', inp, lbl]));
     function render() {
-      statGrid(stats, [
-        ['Legacy Monolith Traffic', (100 - pct) + '%'],
-        ['New Service Traffic', pct + '%'],
-        ['Safety Phase', pct === 0 ? 'Shadow Dual-Read Verification' : (pct < 100 ? 'Canary / Progressive Rollback Ready' : 'Monolith Route Retired')]
+      drawPipeline(svg, [
+        { id: 'ep', x: 20, y: 28, w: 135, label: 'Strangler Proxy', active: true },
+        { id: 'm', x: 240, y: 10, w: 165, h: 32, label: 'Monolith (' + (100 - pct) + '%)', active: pct < 100 },
+        { id: 'n', x: 240, y: 52, w: 165, h: 32, label: 'New Service (' + pct + '%)', active: pct > 0, pulse: pct > 0 },
+        { id: 'cdc', x: 455, y: 28, w: 125, label: 'Dual-Sync CDC', active: pct > 0 && pct < 100 }
+      ], [
+        { from: 'ep', to: 'm', y1: 42, y2: 26, active: pct < 100, dur: '1.2s' },
+        { from: 'ep', to: 'n', y1: 54, y2: 68, active: pct > 0, dur: pct >= 50 ? '0.9s' : '1.5s' },
+        { from: 'm', to: 'cdc', y1: 26, y2: 44, active: pct > 0 && pct < 100, dash: true, dur: '1.6s' }
       ]);
+      statGrid(stats, [['Phase', pct === 0 ? 'Shadow Dual-Read Verification' : (pct < 100 ? 'Progressive Canary Cutover' : 'Monolith Route Retired')]]);
     }
-    shell.appendChild(ctrl); shell.appendChild(stats); render();
+    shell.appendChild(ctrl); shell.appendChild(svg); shell.appendChild(stats); render();
   };
 
   function mountOne(node) {
@@ -1401,7 +1520,7 @@
       WIDGETS[id](node);
     } else {
       var shell = makeShell(node, 'Interactive Diagram: ' + id, 'Interactive Spec');
-      shell.appendChild(el('div', { class: 'ss-w-note', text: 'Interactive visualization stub (' + id + '). Refer to lesson diagram & simulation spec.' }));
+      shell.appendChild(el('div', { class: 'ss-w-note', text: 'Interactive visualization stub (' + id + ').' }));
     }
   }
 
@@ -1533,6 +1652,7 @@
         var nextTheme = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
         root.setAttribute('data-theme', nextTheme);
         themeBtn.innerHTML = nextTheme === 'dark' ? sunSvg : moonSvg;
+        if (window.__renderMermaidDecks) window.__renderMermaidDecks();
       };
       camBtn.onclick = toggleCam;
       fsBtn.onclick = function(){
@@ -1554,14 +1674,104 @@
         else if (e.key === 'Escape') { gridEl.hidden = true; gridBtn.removeAttribute('data-on'); notesEl.hidden = true; notesBtn.removeAttribute('data-on'); }
       });
 
-      show(idx, false, 'next');
+      requestAnimationFrame(function(){ show(idx, false, 'next'); });
     })();
   </script>
   <script type="module">
+    let mermaidApi = null;
+    let mmdSeq = 0;
+    function getSlideMermaidCfg(isDark) {
+      return {
+        startOnLoad: false,
+        theme: 'base',
+        flowchart: { curve: 'basis', padding: 14, nodeSpacing: 34, rankSpacing: 46, htmlLabels: true },
+        sequence: { mirrorActors: false, actorMargin: 42, messageMargin: 32, noteMargin: 10 },
+        themeVariables: isDark ? {
+          darkMode: true,
+          background: 'transparent',
+          fontFamily: '"Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',
+          fontSize: '14px',
+          primaryColor: '#1d2735',
+          primaryTextColor: '#eef2f6',
+          primaryBorderColor: '#a3e635',
+          secondaryColor: '#161e2b',
+          secondaryTextColor: '#eef2f6',
+          secondaryBorderColor: '#475569',
+          tertiaryColor: '#131a24',
+          tertiaryBorderColor: '#334155',
+          lineColor: '#8fa3b8',
+          textColor: '#eef2f6',
+          edgeLabelBackground: '#18202c',
+          clusterBkg: '#161d28',
+          clusterBorder: '#334155',
+          actorBkg: '#1d2735',
+          actorBorder: '#a3e635',
+          actorTextColor: '#eef2f6',
+          actorLineColor: '#475569',
+          signalColor: '#cbd5e1',
+          signalTextColor: '#eef2f6',
+          noteBkgColor: '#262116',
+          noteBorderColor: '#eab308',
+          noteTextColor: '#fef3c7'
+        } : {
+          darkMode: false,
+          background: 'transparent',
+          fontFamily: '"Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',
+          fontSize: '14px',
+          primaryColor: '#edf5ee',
+          primaryTextColor: '#18202c',
+          primaryBorderColor: '#2d7a47',
+          secondaryColor: '#f6f8f5',
+          secondaryTextColor: '#18202c',
+          secondaryBorderColor: '#9fb4a5',
+          tertiaryColor: '#f1f4f0',
+          tertiaryBorderColor: '#cbd5cd',
+          lineColor: '#3f5a4a',
+          textColor: '#18202c',
+          edgeLabelBackground: '#f7f9f7',
+          clusterBkg: '#f4f7f4',
+          clusterBorder: '#cbd5cd',
+          actorBkg: '#edf5ee',
+          actorBorder: '#2d7a47',
+          actorTextColor: '#18202c',
+          actorLineColor: '#94a3b8',
+          signalColor: '#243040',
+          signalTextColor: '#18202c',
+          noteBkgColor: '#fef9e7',
+          noteBorderColor: '#d97706',
+          noteTextColor: '#18202c'
+        }
+      };
+    }
+    window.__renderMermaidDecks = async function() {
+      if (!mermaidApi) return;
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      mermaidApi.initialize(getSlideMermaidCfg(isDark));
+      const boxes = document.querySelectorAll('.ss-mermaid-box');
+      for (const box of boxes) {
+        if (!box.dataset.mmdSrc) {
+          const pre = box.querySelector('pre.mermaid');
+          if (pre) box.dataset.mmdSrc = pre.textContent || '';
+        }
+        const src = (box.dataset.mmdSrc || '').trim();
+        if (!src) continue;
+        try {
+          const { svg } = await mermaidApi.render('ss-sm-' + (++mmdSeq), src);
+          box.innerHTML = svg;
+          const svgEl = box.querySelector('svg');
+          if (svgEl) {
+            svgEl.removeAttribute('height');
+            svgEl.style.maxWidth = '100%';
+            svgEl.style.maxHeight = '46vh';
+            svgEl.style.height = 'auto';
+          }
+        } catch (_) {}
+      }
+    };
     try {
       const m = await import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs');
-      m.default.initialize({ startOnLoad: false, theme: document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'neutral' });
-      await m.default.run({ querySelector: 'pre.mermaid' });
+      mermaidApi = m.default;
+      await window.__renderMermaidDecks();
     } catch (_) {
       // Offline graceful fallback: crisp monospace Mermaid source stays readable inside .ss-mermaid-box
     }

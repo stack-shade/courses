@@ -88,7 +88,7 @@ sequenceDiagram
   U->>API: PATCH /profile (bio="Staff Eng")
   API->>L: UPDATE profiles SET bio=... (LSN 9042)
   L-->>API: Commit OK (LSN 9042)
-  L==>R1: WAL stream (LSN 9042)
+  L-->>R1: Async WAL stream (LSN 9042)
   API-->>U: 200 OK (Write token: LSN 9042)
   U->>API: GET /profile (Reload 1)
   API->>R2: SELECT bio (Replica at LSN 8900)

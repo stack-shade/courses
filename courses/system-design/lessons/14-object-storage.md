@@ -63,11 +63,11 @@ See the standalone diagram source: [presigned-multipart-upload.mmd](../diagrams/
 
 ```mermaid
 sequenceDiagram
-  participant C as ([Client])
-  participant API as [Upload API]
-  participant DB as [(Metadata DB)]
-  participant S3 as [(Object Store)]
-  participant Q as [/Processing Queue/]
+  participant C as Client
+  participant API as Upload API
+  participant DB as Metadata DB
+  participant S3 as Object Store
+  participant Q as Processing Queue
 
   C->>API: POST /uploads/init (filename, sizeBytes, sha256)
   API->>S3: CreateMultipartUpload
@@ -87,7 +87,7 @@ sequenceDiagram
   API->>S3: CompleteMultipartUpload
   S3-->>API: 200 OK (Final Object ETag)
   API->>DB: UPDATE upload_sessions SET status='ready'
-  API-.->Q: Enqueue thumbnail / transcode job
+  API-->>Q: Enqueue thumbnail / transcode job
   API-->>C: 200 OK (assetId)
 ```
 

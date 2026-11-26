@@ -51,7 +51,7 @@ Invariant: **at least 1 doctor must remain on call**.
 sequenceDiagram
   participant T1 as Tx1 (Alice)
   participant T2 as Tx2 (Bob)
-  participant DB as [(Snapshot Isolation)]
+  participant DB as Primary DB (Snapshot)
   T1->>DB: BEGIN REPEATABLE READ (t=10)
   T2->>DB: BEGIN REPEATABLE READ (t=10)
   T1->>DB: SELECT count(*) -> 2

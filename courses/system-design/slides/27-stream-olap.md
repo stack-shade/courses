@@ -43,10 +43,10 @@ StackShade · System Design · Module 05
 
 ```mermaid
 flowchart LR
-  S[/Out-of-Order Stream/] -->|Extract event_time + W(t)| OP[Window Operator]
+  S[/"Out-of-Order Stream"/] -->|"Extract event_time + W(t)"| OP[Window Operator]
   OP -->|On-time| W1[12:00-12:01 Window]
-  W1 -->|W(t) passes cutoff| OLAP[(ClickHouse / Pinot)]
-  OP -.->|Late arrival| LATE[/Side Output / Upsert/]
+  W1 -->|"W(t) passes cutoff"| OLAP[(ClickHouse / Pinot)]
+  OP -.->|Late arrival| LATE[/"Side Output / Upsert"/]
 ```
 
 - **Watermark `W(t)`:** Heuristic clock asserting *"no more events expected before `t`."*

@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { Badge, Button, Card, Heading, ProgressBar, Tab, TabList, Text } from '@astryxdesign/core';
 import { MarkdownRenderer } from './MarkdownRenderer';
+import { LiveVisual } from './LiveVisual';
 import { LessonQuizAndRecall } from './LessonQuizAndRecall';
 import { withBasePath } from '@/lib/paths';
 import type { TocItem } from '@/lib/markdown';
@@ -78,12 +79,6 @@ export function LearningWorkspace({
       setCompleted([]);
     }
   }, [storageKey]);
-
-  useEffect(() => {
-    if (tab === 'visuals' && typeof window !== 'undefined' && window.StackShadeVisuals) {
-      window.StackShadeVisuals.mountAll();
-    }
-  }, [tab]);
 
   const toggleDone = (slug: string) => {
     const nextList = completed.includes(slug)
@@ -282,16 +277,23 @@ export function LearningWorkspace({
 
         <div className="flex gap-10">
           <div className="min-w-0 flex-1">
-            {tab === 'notes' && <MarkdownRenderer html={html} />}
+            {tab === 'notes' && (
+              <>
+                {current.animations.length > 0 && (
+                  <LiveVisual animIds={current.animations} className="mb-8 max-w-3xl ss-reveal" />
+                )}
+                <MarkdownRenderer html={html} />
+              </>
+            )}
 
             {tab === 'visuals' && (
-              <div className="max-w-3xl space-y-4">
+              <div className="max-w-3xl space-y-4 ss-reveal">
                 {current.animations.length === 0 ? (
                   <Text color="secondary">
                     No interactive widget mapped to this lesson yet. Check the Diagrams in the Article tab.
                   </Text>
                 ) : (
-                  current.animations.map((id) => <div key={id} data-stackshade-anim={id} />)
+                  <LiveVisual animIds={current.animations} />
                 )}
               </div>
             )}

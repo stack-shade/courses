@@ -47,9 +47,9 @@ Proxying 2 GiB screen recordings through your API tier:
 
 ```mermaid
 sequenceDiagram
-  participant C as ([Client])
-  participant API as [Upload API]
-  participant S3 as [(Object Store)]
+  participant C as Client
+  participant API as Upload API
+  participant S3 as Object Store
   C->>API: POST /uploads/init
   API->>S3: CreateMultipartUpload
   API-->>C: uploadId + Presigned Part URLs

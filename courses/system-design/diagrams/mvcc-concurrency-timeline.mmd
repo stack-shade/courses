@@ -1,7 +1,7 @@
 sequenceDiagram
   participant T1 as Tx1 (Doctor A)
   participant T2 as Tx2 (Doctor B)
-  participant DB as [(Primary DB · Snapshot Isolation)]
+  participant DB as Primary DB (Snapshot Isolation)
 
   Note over DB: Shift requires >= 1 doctor on call (A=on, B=on)
   T1->>DB: BEGIN REPEATABLE READ (Snapshot t=10)
