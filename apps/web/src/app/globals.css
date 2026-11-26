@@ -1,0 +1,197 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #ffffff;
+  --surface: #f8fafc;
+  --ink: #0f172a;
+  --ink-muted: #475569;
+  --border: #e2e8f0;
+  --accent: #4f46e5;
+  --accent-ink: #ffffff;
+  --status-ok: #15803d;
+  --status-warn: #b45309;
+  --status-err: #b91c1c;
+  --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --radius: 6px;
+}
+
+[data-theme="dark"] {
+  --bg: #0f141d;
+  --surface: #161c28;
+  --ink: #f1f5f9;
+  --ink-muted: #94a3b8;
+  --border: #252f42;
+  --accent: #a3e635;
+  --accent-ink: #0f141d;
+  --status-ok: #4ade80;
+  --status-warn: #fbbf24;
+  --status-err: #f87171;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+}
+
+/* Minimal Prose Styling matching Minimal Design System */
+.ss-prose {
+  max-width: 72ch;
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--ink);
+}
+
+.ss-prose h1 {
+  font-size: 2rem;
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 16px;
+}
+
+.ss-prose h2 {
+  font-size: 1.5rem;
+  line-height: 1.25;
+  font-weight: 600;
+  margin: 40px 0 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ss-prose h3 {
+  font-size: 1.125rem;
+  line-height: 1.35;
+  font-weight: 600;
+  margin: 24px 0 8px;
+}
+
+.ss-prose p {
+  margin: 12px 0;
+}
+
+.ss-prose ul,
+.ss-prose ol {
+  margin: 12px 0;
+  padding-left: 24px;
+}
+
+.ss-prose li {
+  margin: 6px 0;
+}
+
+.ss-prose a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.ss-prose code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+.ss-prose pre {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  overflow-x: auto;
+  margin: 16px 0;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.ss-prose pre code {
+  border: none;
+  padding: 0;
+  background: transparent;
+}
+
+.ss-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 14px;
+}
+
+.ss-prose th,
+.ss-prose td {
+  border: 1px solid var(--border);
+  padding: 9px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.ss-prose th {
+  background: var(--surface);
+  font-weight: 600;
+}
+
+.ss-prose blockquote {
+  border-left: 3px solid var(--accent);
+  background: var(--surface);
+  margin: 16px 0;
+  padding: 10px 14px;
+  color: var(--ink-muted);
+}
+
+.ss-prose details {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 10px 14px;
+  margin: 16px 0;
+}
+
+.ss-prose summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.ss-mermaid-wrap {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 16px;
+  margin: 18px 0;
+  overflow-x: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media print {
+  header, aside, nav, .no-print {
+    display: none !important;
+  }
+  .ss-prose {
+    max-width: 100%;
+  }
+}
