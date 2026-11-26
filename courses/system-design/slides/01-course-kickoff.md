@@ -42,12 +42,20 @@ We are learning how to choose:
 
 # The design loop
 
+<!-- step -->
 1. Clarify the problem.
+<!-- step -->
 2. Set functional and quality requirements.
+<!-- step -->
 3. Estimate users, requests, data and bandwidth.
+<!-- step -->
 4. Draw the simplest architecture that could work.
+<!-- step -->
 5. Identify bottlenecks and failure modes.
+<!-- step -->
 6. Deep-dive, compare options and defend trade-offs.
+
+<!-- note: This 6-step loop stays identical whether designing a small API or a multi-region system. -->
 
 ---
 
@@ -94,17 +102,23 @@ A small product may combine several boxes. This is a responsibility map, not a m
 
 # Beginner to advanced
 
+<!-- step -->
 **Foundations**
 - Requirements, estimates, networking, APIs, databases
 
+<!-- step -->
 **Building blocks**
 - Cache, load balancing, queues, storage and scaling
 
+<!-- step -->
 **Distributed systems**
 - Consistency, replication, failure handling and coordination
 
+<!-- step -->
 **Architecture mastery**
 - Multi-region, security, operations, cost and capstone designs
+
+<!-- note: Walk through the 4 stages sequentially so learners see how fundamentals build into distributed systems and capstone architecture. -->
 
 ---
 

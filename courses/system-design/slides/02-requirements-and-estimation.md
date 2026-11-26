@@ -24,13 +24,16 @@ StackShade · System Design
 
 # 1. Requirements before architecture
 
+<!-- step -->
 **Functional:** what must the product do?
-
+<!-- step -->
 **Non-functional:** how well must it do it?
-
+<!-- step -->
 **Constraints:** what limits the solution?
-
+<!-- step -->
 Don't confuse "use Redis" with a requirement.
+
+<!-- note: Emphasize that picking tools before constraints is the most common mistake. -->
 
 ---
 
