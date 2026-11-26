@@ -125,4 +125,4 @@ Change peak traffic to 20×.
 
 Recalculate peak QPS. Identify the likely bottleneck and explain what you would measure before scaling.
 
-**Practice:** docs/labs/01-capacity-estimation.md
+**Practice:** [Capacity Estimation Lab](../labs/01-capacity-estimation.md)

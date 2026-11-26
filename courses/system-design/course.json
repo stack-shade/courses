@@ -1,30 +1,151 @@
 {
   "slug": "system-design",
   "title": "System Design: Beginner to Advanced",
-  "description": "A practical path from system-design fundamentals and capacity estimation to distributed systems, reliability and complete architecture design.",
+  "subtitle": "From first-principles capacity math to distributed consensus, multi-region reliability, and real-world architecture.",
+  "description": "A complete beginner-to-advanced path covering requirements, networking, storage internals, caching, replication, sharding, streaming, distributed systems, reliability, security, and 16 production case studies.",
   "level": "Beginner to Advanced",
   "status": "in-progress",
+  "featured": true,
   "category": "Software Engineering",
+  "estimatedHours": 60,
+  "audience": [
+    "Students and early-career developers learning system design from scratch",
+    "Software engineers preparing for senior engineering and architecture interviews",
+    "Self-directed builders wanting practical labs, animated visuals, and primary sources"
+  ],
   "prerequisites": [
-    "Basic programming",
-    "HTTP and database familiarity are helpful but not required"
+    "Basic programming comfort in any language",
+    "Elementary HTTP and database familiarity helpful but not required"
+  ],
+  "outcomes": [
+    "Convert ambiguous product prompts into measurable functional requirements, SLIs/SLOs, and capacity math",
+    "Explain end-to-end internet transport (DNS, TCP, TLS 1.3, HTTP/2-3, CDN, load balancing) and API contracts",
+    "Choose and model storage engines (B+Trees, LSM-Trees, SQL, NoSQL, object storage) with transaction guarantees",
+    "Design resilient caching, replication, consistent-hash sharding, and asynchronous event pipelines",
+    "Reason rigorously about partial failure, clocks, quorums, CAP/PACELC, consensus, overload control, and security",
+    "Produce complete System Design Documents, ADRs, load benchmarks, and failure-mode analyses across 16 case studies"
   ],
   "topics": [
     "requirements",
     "capacity-estimation",
     "networking",
     "apis",
+    "storage-internals",
     "databases",
     "caching",
     "messaging",
+    "replication-sharding",
     "distributed-systems",
     "reliability",
+    "observability",
+    "security",
+    "multi-region",
+    "ai-systems",
     "architecture"
   ],
+  "counts": {
+    "modules": 9,
+    "lessons": 40,
+    "labs": 14,
+    "caseStudies": 16,
+    "projects": 5,
+    "assessments": 5
+  },
+  "modules": [
+    {
+      "id": "00",
+      "title": "Foundations & Design Reasoning",
+      "level": "Beginner",
+      "status": "in-progress",
+      "lessonRange": "01-04",
+      "lessonCount": 4,
+      "estimatedHours": 4
+    },
+    {
+      "id": "01",
+      "title": "Internet, Networking & API Contracts",
+      "level": "Beginner to Intermediate",
+      "status": "in-progress",
+      "lessonRange": "05-09",
+      "lessonCount": 5,
+      "estimatedHours": 6
+    },
+    {
+      "id": "02",
+      "title": "Data Modeling & Storage Internals",
+      "level": "Beginner to Intermediate",
+      "status": "planned",
+      "lessonRange": "10-14",
+      "lessonCount": 5,
+      "estimatedHours": 7
+    },
+    {
+      "id": "03",
+      "title": "Caching & Stateless Compute",
+      "level": "Intermediate",
+      "status": "planned",
+      "lessonRange": "15-18",
+      "lessonCount": 4,
+      "estimatedHours": 6
+    },
+    {
+      "id": "04",
+      "title": "Scaling Data: Replication & Sharding",
+      "level": "Intermediate to Advanced",
+      "status": "planned",
+      "lessonRange": "19-22",
+      "lessonCount": 4,
+      "estimatedHours": 6
+    },
+    {
+      "id": "05",
+      "title": "Asynchronous Systems, Streaming & Search",
+      "level": "Intermediate to Advanced",
+      "status": "planned",
+      "lessonRange": "23-27",
+      "lessonCount": 5,
+      "estimatedHours": 7
+    },
+    {
+      "id": "06",
+      "title": "Distributed Systems Theory & Coordination",
+      "level": "Advanced",
+      "status": "planned",
+      "lessonRange": "28-32",
+      "lessonCount": 5,
+      "estimatedHours": 8
+    },
+    {
+      "id": "07",
+      "title": "Reliability, Security, Observability & Cloud",
+      "level": "Advanced",
+      "status": "planned",
+      "lessonRange": "33-37",
+      "lessonCount": 5,
+      "estimatedHours": 8
+    },
+    {
+      "id": "08",
+      "title": "Architecture Mastery & Real-World Case Studies",
+      "level": "Advanced to Staff",
+      "status": "in-progress",
+      "lessonRange": "38-40",
+      "lessonCount": 3,
+      "estimatedHours": 8
+    }
+  ],
+  "downloads": {
+    "htmlSlidesBundle": "downloads/system-design-html-slides.zip",
+    "formats": ["html", "pptx", "pdf"],
+    "notes": "Self-contained HTML decks preserve step animations and offline interactive visuals; PDF and PPTX provide static snapshots."
+  },
   "youtube": {
     "channel": "https://www.youtube.com/@StackShade",
     "playlist": null,
     "videos": []
   },
-  "entrypoint": "README.md"
+  "entrypoint": "README.md",
+  "roadmap": "roadmap.md",
+  "curriculum": "curriculum.md",
+  "syllabus": "syllabus.md"
 }

@@ -8,17 +8,21 @@
     {
       "slug": "system-design",
       "title": "System Design: Beginner to Advanced",
-      "description": "A practical path from system-design fundamentals and capacity estimation to distributed systems, reliability and complete architecture design.",
+      "description": "A complete beginner-to-advanced path covering requirements, networking, storage internals, caching, replication, sharding, streaming, distributed systems, reliability, security, and 16 production case studies.",
       "level": "Beginner to Advanced",
       "status": "in-progress",
       "category": "Software Engineering",
+      "estimatedHours": 60,
+      "featured": true,
       "path": "courses/system-design/README.md",
       "topics": [
         "architecture",
         "scalability",
         "databases",
         "distributed-systems",
-        "reliability"
+        "reliability",
+        "security",
+        "ai-systems"
       ]
     }
   ]

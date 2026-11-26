@@ -1,82 +1,61 @@
 # Curated Resource Library
 
-A selected starting point for reliable learning material. Use the original course lessons as the guided path; use these resources to deepen or verify a topic.
+A selected primary-source library supporting all **9 modules** of the System Design course. Use the course lessons for the guided narrative and these primary references to verify specifications, inspect internals, and read real production engineering stories.
 
-**How to choose a source:** prefer standards, official documentation, course syllabi, research papers and engineering write-ups from the teams operating the systems. A blog post is a useful explanation, not automatically a universal rule. Some resources are books and may not be free; links are not permission to redistribute them.
+For an exact **Module 00–08 & Lesson 01–40 link matrix**, see [Topic Resource Index](topic-index.md).
 
-## Foundational system design
+**Source Integrity Policy:** Standards, official docs, peer-reviewed papers, and first-party engineering blogs come first. Paid books are explicitly labeled as not free full-text sources.
 
-| Resource | Best for | Notes |
-|---|---|---|
-| [System Design Primer](https://github.com/donnemartin/system-design-primer) | Broad topic map, trade-offs and practice prompts | Community-maintained reference; use as a map, not the only textbook |
-| [System Design 101](https://github.com/ByteByteGoHq/system-design-101) | Short visual explainers | Quick visual revision; validate details against primary sources |
-| [Azure Architecture Center](https://learn.microsoft.com/en-us/azure/architecture/) | Patterns and reference architectures | Vendor guidance; underlying patterns are broadly useful |
-| [AWS Well-Architected Framework](https://docs.aws.amazon.com/wellarchitected/) | Reliability, security, operations, performance, cost and sustainability | Review framework and workload-specific lenses |
+---
 
-## Distributed systems and data
+## 1. Standards & Networking Foundations
 
-| Resource | Best for | Notes |
-|---|---|---|
-| [MIT 6.5840 Distributed Systems](https://pdos.csail.mit.edu/6.5840/) | Replication, fault tolerance, consistency and labs | Advanced course; prerequisites matter |
-| [Designing Data-Intensive Applications](https://dataintensive.net/) | Data systems, replication, partitioning and stream processing | Martin Kleppmann; book, not a free full-text source |
-| [Martin Kleppmann's publications](https://martin.kleppmann.com/) | Papers and technical writing | Read the actual paper for research claims |
-| [Jepsen analyses](https://jepsen.io/analyses) | Real-world consistency and fault-testing results | Read the test model and limitations, not just the headline |
-| [The Raft consensus paper](https://raft.github.io/raft.pdf) | Understandable consensus algorithm | Research paper and visualization links |
+| Resource | Type | Access | Best For |
+|---|---|---|---|
+| [RFC 9110 · HTTP Semantics](https://www.rfc-editor.org/rfc/rfc9110) | RFC Standard | Free | Authoritative HTTP methods, caching, status codes, idempotency |
+| [RFC 8446 · TLS 1.3](https://www.rfc-editor.org/rfc/rfc8446) | RFC Standard | Free | Modern 1-RTT/0-RTT TLS handshakes and cipher security |
+| [RFC 9114 · HTTP/3](https://www.rfc-editor.org/rfc/rfc9114) | RFC Standard | Free | QUIC multiplexed transport eliminating TCP head-of-line blocking |
+| [RFC 9562 · UUID Versions](https://www.rfc-editor.org/rfc/rfc9562) | RFC Standard | Free | UUIDv4 vs time-ordered UUIDv7 for database-friendly primary keys |
+| [RFC 9700 · OAuth 2.0 Security BCP](https://www.rfc-editor.org/rfc/rfc9700) | RFC Standard | Free | Current OAuth 2.x/PKCE security requirements |
+| [MDN Web Docs · HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP) | Official Docs | Free | Browser-facing headers, caching, CORS, and cookies |
+| [Cloudflare Learning Center](https://www.cloudflare.com/learning/) | Technical Primer | Free | Clear visual explainers for DNS, BGP, Anycast, CDNs, and TLS |
 
-## Reliability and operations
+---
 
-| Resource | Best for |
-|---|---|
-| [Google SRE Book](https://sre.google/sre-book/table-of-contents/) | Reliability principles, SLOs, overload and incident response |
-| [Google SRE Workbook](https://sre.google/workbook/table-of-contents/) | Practical reliability exercises and case studies |
-| [Google SRE resources](https://sre.google/resources/) | Talks, workshops and non-abstract system design material |
-| [AWS Reliability Pillar](https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/) | Resilience, recovery and workload reliability |
-| [OpenTelemetry documentation](https://opentelemetry.io/docs/) | Vendor-neutral traces, metrics and logs |
+## 2. Databases, Storage & Distributed Systems
 
-## Web and networking foundations
+| Resource | Type | Access | Best For |
+|---|---|---|---|
+| [Designing Data-Intensive Applications (DDIA)](https://dataintensive.net/) | Book (Kleppmann) | Paid book | Deep mental models for storage, replication, sharding, streams, consistency |
+| [PostgreSQL Current Documentation](https://www.postgresql.org/docs/current/) | Official Docs | Free | MVCC isolation levels, B-Tree/GIN indexes, `EXPLAIN`, logical replication |
+| [RocksDB Architecture Wiki](https://github.com/facebook/rocksdb/wiki/RocksDB-Overview) | Official Docs | Free | LSM-Tree MemTables, SSTables, Bloom filters, and compaction |
+| [Redis Documentation](https://redis.io/docs/latest/) | Official Docs | Free | Data structures, eviction policies, persistence (RDB/AOF), clustering |
+| [Apache Kafka Documentation](https://kafka.apache.org/documentation/) | Official Docs | Free | Partitioned logs, consumer groups, delivery semantics, compaction |
+| [etcd Documentation](https://etcd.io/docs/) | Official Docs | Free | Raft-backed coordination, leases, watches, and linearizable reads |
+| [MIT 6.5840 Distributed Systems](https://pdos.csail.mit.edu/6.5840/) | University Course | Free | Consensus, Raft/MapReduce labs, replication, fault tolerance |
+| [The Raft Consensus Paper](https://raft.github.io/raft.pdf) | Research Paper | Free PDF | Leader election, log replication, safety proof |
+| [Amazon Dynamo Paper (2007)](https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf) | Research Paper | Free PDF | Consistent hashing, sloppy quorums, hinted handoff, vector clocks |
+| [Jepsen Consistency & Analyses](https://jepsen.io/analyses) | Fault Testing Reports | Free | Empirical consistency models and real distributed DB failure bugs |
 
-| Resource | Best for |
-|---|---|
-| [MDN HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP) | HTTP concepts and browser-facing behavior |
-| [RFC 9110 · HTTP Semantics](https://www.rfc-editor.org/rfc/rfc9110) | HTTP standards |
-| [RFC 8446 · TLS 1.3](https://www.rfc-editor.org/rfc/rfc8446) | TLS standard |
-| [RFC 9114 · HTTP/3](https://www.rfc-editor.org/rfc/rfc9114) | HTTP/3 standard |
-| [Cloudflare Learning Center](https://www.cloudflare.com/learning/) | DNS, CDN, caching, TLS and network explainers |
-| [Cloudflare Developer Docs](https://developers.cloudflare.com/) | Product docs and architecture details |
+---
 
-## Databases, caches and messaging
+## 3. Reliability, Security, Architecture & Operations
 
-| Resource | Best for |
-|---|---|
-| [PostgreSQL documentation](https://www.postgresql.org/docs/current/) | Relational modeling, indexes, transactions and query plans |
-| [Redis documentation](https://redis.io/docs/latest/) | Data structures, caching, persistence and clustering |
-| [Apache Kafka documentation](https://kafka.apache.org/documentation/) | Event streaming, partitions, delivery and operations |
-| [MongoDB documentation](https://www.mongodb.com/docs/manual/) | Document database concepts and operational model |
-| [etcd documentation](https://etcd.io/docs/) | Distributed key-value store and coordination use cases |
+| Resource | Type | Access | Best For |
+|---|---|---|---|
+| [Google SRE Book](https://sre.google/sre-book/table-of-contents/) | Official Book | Free online | SLIs/SLOs, error budgets, overload handling, postmortem culture |
+| [Google SRE Workbook](https://sre.google/workbook/table-of-contents/) | Official Workbook | Free online | Practical alerting, SLO math, and non-abstract system design |
+| [Amazon Builders' Library](https://aws.amazon.com/builders-library/) | First-Party Eng | Free | Timeouts, backoff + jitter, load shedding, shuffle sharding |
+| [AWS Well-Architected Framework](https://docs.aws.amazon.com/wellarchitected/) | Official Docs | Free | Reliability, security, performance, operations, and FinOps pillars |
+| [OpenTelemetry Documentation](https://opentelemetry.io/docs/) | Official Docs | Free | Vendor-neutral traces, RED/USE metrics, and context propagation |
+| [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/) | Security Guide | Free | AuthN, session security, rate limiting, cryptography checklists |
+| [Kubernetes Concepts](https://kubernetes.io/docs/concepts/) | Official Docs | Free | Container scheduling, probes, services, and rollout primitives |
+| [C4 Model](https://c4model.com/) & [Structurizr DSL](https://structurizr.com/dsl) | Architecture Notation | Free | Multi-level software architecture communication |
 
-## Security
+---
 
-| Resource | Best for |
-|---|---|
-| [OWASP Top 10](https://owasp.org/www-project-top-ten/) | Common application security risks |
-| [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/) | Practical secure implementation guidance |
-| [OAuth 2.0 Security BCP, RFC 9700](https://www.rfc-editor.org/rfc/rfc9700) | Current OAuth security guidance |
+## 4. Broad Maps & First-Party Engineering Blogs
 
-## Cloud, containers and architecture patterns
-
-| Resource | Best for |
-|---|---|
-| [Kubernetes concepts](https://kubernetes.io/docs/concepts/) | Orchestration concepts and primitives |
-| [Google Cloud Architecture Framework](https://cloud.google.com/architecture/framework) | Cloud architecture quality attributes |
-| [Microsoft Cloud Design Patterns](https://learn.microsoft.com/en-us/azure/architecture/patterns/) | Pattern catalog with context and consequences |
-| [C4 model](https://c4model.com/) | Communicating architecture at multiple levels |
-| [Structurizr DSL](https://structurizr.com/dsl) | Version-controlled C4 diagrams |
-
-## How to use this library
-
-1. Start with the relevant course lesson.
-2. Read one primary or official source.
-3. Write the concept in your own words and draw a diagram.
-4. Compare at least one alternative.
-5. Add the exact source and the claim it supports to your notes.
-6. Record when you checked version-sensitive documentation.
+- [System Design Primer](https://github.com/donnemartin/system-design-primer) — Open syllabus map and sizing baselines.
+- [System Design 101](https://github.com/ByteByteGoHq/system-design-101) — Visual summaries *(always cross-check nuance against RFCs/papers)*.
+- [Engineering Blogs & Production Stories](engineering-blogs.md) — Curated links + 6-question reading worksheet for Netflix, Cloudflare, Uber, Discord, Meta, Stripe, GitHub, and AWS.
